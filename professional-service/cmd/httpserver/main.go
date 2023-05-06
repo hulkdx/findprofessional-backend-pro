@@ -1,22 +1,21 @@
 package main
 
 import (
-	"fmt"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
 	"net/http"
-	"time"
-
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/api"
 )
 
 func main() {
+	cfg := config.Load()
 	// TODO: read db connection env
 	// TODO: database connection
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", 8080),
-		Handler:      &api.Router{},
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
-		IdleTimeout:  30 * time.Second,
+		Addr:         cfg.Server.Addr,
+		Handler:      &internal.Router{},
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 	server.ListenAndServe()
 	// TODO: shutdown gracefully
