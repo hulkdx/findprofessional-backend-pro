@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/hulkdx/findprofessional-backend-pro/api"
 	"net/http"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/api"
 )
 
 func main() {
