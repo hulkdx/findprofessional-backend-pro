@@ -1,8 +1,8 @@
 package integration_test
 
 import (
-	"github.com/hulkdx/findprofessional-backend-pro/api"
-	"github.com/hulkdx/findprofessional-backend-pro/tests/assert"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/api"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
