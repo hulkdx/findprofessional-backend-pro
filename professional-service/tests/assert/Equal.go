@@ -11,7 +11,7 @@ func Equal(t *testing.T, actual, expected interface{}) {
 		return
 	}
 	t.Helper()
-	t.Fatalf("Expected %s\nActual %s", expected, actual)
+	t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
 }
 
 func objectsAreEqual(actual, expected interface{}) bool {

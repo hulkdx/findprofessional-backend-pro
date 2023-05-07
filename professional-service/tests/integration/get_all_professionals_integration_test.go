@@ -1,7 +1,7 @@
 package integration_test
 
 import (
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/api"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"net/http"
 	"net/http/httptest"
@@ -13,7 +13,7 @@ func TestListProfessional(t *testing.T) {
 		// Arrange
 		request, _ := http.NewRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()
-		sut := &api.Router{}
+		sut := router.Handler()
 		// Act
 		sut.ServeHTTP(response, request)
 		// Asserts
