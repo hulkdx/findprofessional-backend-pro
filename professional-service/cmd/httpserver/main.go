@@ -2,20 +2,29 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
 	cfg := config.Load()
-	// TODO: database connection
+	db, err := dbConnect(cfg.Database.ConnectionString())
+	defer dbClose(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	server := &http.Server{
 		Addr:         cfg.Server.Addr,
 		Handler:      router.Handler(),
@@ -35,10 +44,28 @@ func main() {
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := server.Shutdown(ctx)
-	// TODO: close db connection
+	err = server.Shutdown(ctx)
 	if err != nil {
 		log.Fatal("Server shutdown error:", err)
 	}
 	log.Println("Server exiting")
+}
+
+func dbConnect(connectionString string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", connectionString)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+func dbClose(db *sql.DB) {
+	err := db.Close()
+	if err != nil {
+		log.Println("Could not close db")
+	}
 }

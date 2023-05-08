@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -19,29 +21,28 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	Driver   string
-	Host     string
-	Port     string
-	Name     string
-	User     string
-	Password string
+	url      string
+	username string
+	password string
+}
+
+func (d *DatabaseConfig) ConnectionString() string {
+	s := strings.Split(d.url, "postgresql://")
+	return fmt.Sprintf("postgresql://%s:%s@%s", d.username, d.password, s[1])
 }
 
 func Load() *Config {
 	cfg := &Config{
 		Server: ServerConfig{
-			Addr:         getEnv("SERVER_ADDR", ":8080"),
-			ReadTimeout:  getEnvTime("SERVER_READ_TIMEOUT", 1*time.Second),
-			WriteTimeout: getEnvTime("SERVER_WRITE_TIMEOUT", 1*time.Second),
-			IdleTimeout:  getEnvTime("SERVER_IDLE_TIMEOUT", 30*time.Second),
+			Addr:         getEnv("server_addr", ":8080"),
+			ReadTimeout:  getEnvTime("server_read_timeout", 1*time.Second),
+			WriteTimeout: getEnvTime("server_write_timeout", 1*time.Second),
+			IdleTimeout:  getEnvTime("server_idle_timeout", 30*time.Second),
 		},
 		Database: DatabaseConfig{
-			Driver:   os.Getenv("DB_DRIVER"),
-			Host:     os.Getenv("DB_HOST"),
-			Port:     os.Getenv("DB_PORT"),
-			Name:     os.Getenv("DB_NAME"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
+			url:      os.Getenv("postgres_url"),
+			username: os.Getenv("postgres_username"),
+			password: os.Getenv("postgres_password"),
 		},
 	}
 	return cfg
