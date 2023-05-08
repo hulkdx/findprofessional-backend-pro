@@ -14,10 +14,14 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Addr         string
+	Port         string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	IdleTimeout  time.Duration
+}
+
+func (s *ServerConfig) Addr() string {
+	return fmt.Sprintf(":%s", s.Port)
 }
 
 type DatabaseConfig struct {
@@ -34,7 +38,7 @@ func (d *DatabaseConfig) ConnectionString() string {
 func Load() *Config {
 	cfg := &Config{
 		Server: ServerConfig{
-			Addr:         getEnv("server_addr", ":8080"),
+			Port:         getEnv("server_port", "8080"),
 			ReadTimeout:  getEnvTime("server_read_timeout", 1*time.Second),
 			WriteTimeout: getEnvTime("server_write_timeout", 1*time.Second),
 			IdleTimeout:  getEnvTime("server_idle_timeout", 30*time.Second),

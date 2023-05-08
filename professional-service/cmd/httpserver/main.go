@@ -26,7 +26,7 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:         cfg.Server.Addr,
+		Addr:         cfg.Server.Addr(),
 		Handler:      router.Handler(),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
