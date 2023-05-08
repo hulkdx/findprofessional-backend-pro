@@ -31,14 +31,21 @@ type DatabaseConfig struct {
 }
 
 func (d *DatabaseConfig) ConnectionString() string {
-	s := strings.Split(d.url, "postgresql://")
-	return fmt.Sprintf("postgresql://%s:%s@%s", d.username, d.password, s[1])
+	split := strings.Split(d.url, "postgresql://")[1]
+	hasSsl := strings.Contains(split, "sslmode=")
+	var restUrl string
+	if hasSsl {
+		restUrl = split
+	} else {
+		restUrl = fmt.Sprintf("%s?sslmode=disable", split)
+	}
+	return fmt.Sprintf("postgresql://%s:%s@%s", d.username, d.password, restUrl)
 }
 
 func Load() *Config {
 	cfg := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("server_port", "8080"),
+			Port:         getEnv("server_port", "8081"),
 			ReadTimeout:  getEnvTime("server_read_timeout", 1*time.Second),
 			WriteTimeout: getEnvTime("server_write_timeout", 1*time.Second),
 			IdleTimeout:  getEnvTime("server_idle_timeout", 30*time.Second),
