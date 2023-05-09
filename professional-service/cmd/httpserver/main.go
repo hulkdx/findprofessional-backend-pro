@@ -18,6 +18,8 @@ import (
 )
 
 func main() {
+	log.Println("Server starting")
+
 	cfg := config.Load()
 	db, err := dbConnect(cfg.Database.ConnectionString())
 	defer dbClose(db)

@@ -1,0 +1,14 @@
+bases:
+  - ../base
+
+resources:
+  - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/db.yml
+
+secretGenerator:
+- name: secrets-env
+  envs:
+  - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/.env
+
+- name: config-files
+  files:
+    - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/rsa.public.key

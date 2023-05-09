@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: professional-service
+spec:
+  selector:
+    matchLabels:
+      app: professional-service
+  template:
+    metadata:
+      labels:
+        app: professional-service
+    spec:
+      containers:
+        - name: professional-service
+          image: hulkdx/ff-pro:v1
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - secretRef:
+                name: secrets-env
+          volumeMounts:
+          - mountPath: /config
+            name: config-files
+      volumes:
+      - name: config-files
+        secret:
+          secretName: config-files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: professional-service
+spec:
+  selector:
+    app: professional-service
+  type: NodePort
+  ports:
+    - port: 8081
+      targetPort: 8081
+      nodePort: 30001

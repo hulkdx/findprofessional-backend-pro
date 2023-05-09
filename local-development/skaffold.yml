@@ -1,0 +1,19 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+
+build:
+  artifacts:
+  - image: hulkdx/ff-pro
+    context: ../professional-service
+    buildpacks:
+      builder: gcr.io/buildpacks/builder:v1
+      dependencies:
+        paths:
+          - "**/*"
+
+manifests:
+  kustomize:
+    paths:
+      - ../deploy/dev
+deploy:
+  kubectl: {}
