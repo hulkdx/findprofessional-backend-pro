@@ -1,5 +1,10 @@
+.PHONY: deps
+deps:
+	@cd professional-service && \
+	go mod download
+
 .PHONY: build
-build:
+build: deps
 	@cd professional-service && \
 	go build -o ../build/app cmd/httpserver/main.go
 
