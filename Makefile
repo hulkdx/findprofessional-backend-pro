@@ -1,3 +1,17 @@
+.PHONY: build
+build:
+	cd professional-service && \
+	go build -o ../build/app cmd/httpserver/main.go
+
+.PHONY: run
+run: build
+	./build/app
+
+.PHONY: test
+test:
+	cd professional-service && \
+	go test -v ./...
+
 .PHONY: dev
 dev:
 	cd local-development && \
