@@ -1,23 +1,23 @@
 .PHONY: build
 build:
-	cd professional-service && \
+	@cd professional-service && \
 	go build -o ../build/app cmd/httpserver/main.go
 
 .PHONY: run
 run: build
-	./build/app
+	@./build/app
 
 .PHONY: test
 test:
-	cd professional-service && \
+	@cd professional-service && \
 	go test -v ./...
 
 .PHONY: dev
 dev:
-	cd local-development && \
+	@cd local-development && \
 	skaffold dev --port-forward 
 
 .PHONY: clear-minikube-psql-cache
 clear-minikube-psql-cache:
-	eval $$(minikube docker-env); \
+	@eval $$(minikube docker-env); \
 	docker volume rm --force psql_cache
