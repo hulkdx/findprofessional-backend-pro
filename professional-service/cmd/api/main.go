@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -17,33 +16,46 @@ import (
 
 func main() {
 	log.Println("Server starting")
-
 	cfg := config.Load()
+
 	database := db.Connect(cfg.Database)
 	defer database.Close()
 
-	server := &http.Server{
+	server := Server(cfg)
+	<-ListenAndServe(server)
+	Shutdown(server)
+}
+
+func Server(cfg *config.Config) *http.Server {
+	return &http.Server{
 		Addr:         cfg.Server.Addr(),
 		Handler:      router.Handler(),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
+}
 
+func ListenAndServe(server *http.Server) chan os.Signal {
 	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	go func() {
-		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("listen: %s\n", err)
+		err := server.ListenAndServe()
+		if err != nil {
+			log.Printf("Server error: %v\n", err)
 		}
 		quit <- syscall.SIGTERM
 	}()
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-	<-quit
+	return quit
+}
+
+func Shutdown(server *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := server.Shutdown(ctx)
 	if err != nil {
-		log.Fatal("Server shutdown error:", err)
+		log.Printf("Server shutdown with error:%v\n", err)
+	} else {
+		log.Printf("Server shutdown")
 	}
-	log.Println("Server exiting")
 }
