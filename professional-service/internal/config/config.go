@@ -30,8 +30,12 @@ type DatabaseConfig struct {
 	password string
 }
 
-func (d *DatabaseConfig) ConnectionString() string {
-	split := strings.Split(d.url, "postgresql://")[1]
+func (d *DatabaseConfig) Dsn() string {
+	url := d.url
+	if url == "" {
+		panic("Url is not provided")
+	}
+	split := strings.Split(url, "postgresql://")[1]
 	hasSsl := strings.Contains(split, "sslmode=")
 	var restUrl string
 	if hasSsl {

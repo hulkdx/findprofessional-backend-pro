@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"log"
 	"net/http"
@@ -12,20 +11,16 @@ import (
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/db"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
 	log.Println("Server starting")
 
 	cfg := config.Load()
-	db, err := dbConnect(cfg.Database.ConnectionString())
-	defer dbClose(db)
-	if err != nil {
-		log.Fatal(err)
-	}
+	database := db.Connect(cfg.Database)
+	defer database.Close()
 
 	server := &http.Server{
 		Addr:         cfg.Server.Addr(),
@@ -46,28 +41,9 @@ func main() {
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err = server.Shutdown(ctx)
+	err := server.Shutdown(ctx)
 	if err != nil {
 		log.Fatal("Server shutdown error:", err)
 	}
 	log.Println("Server exiting")
-}
-
-func dbConnect(connectionString string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connectionString)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
-}
-
-func dbClose(db *sql.DB) {
-	err := db.Close()
-	if err != nil {
-		log.Println("Could not close db")
-	}
 }

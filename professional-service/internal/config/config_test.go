@@ -14,7 +14,7 @@ func TestDatabaseConfigConnectionString(t *testing.T) {
 		password := "postgres"
 		db := DatabaseConfig{url: url, username: username, password: password}
 		// Act
-		result := db.ConnectionString()
+		result := db.Dsn()
 		// Assert
 		assert.Equal(t, result, expected)
 	})
@@ -27,7 +27,7 @@ func TestDatabaseConfigConnectionString(t *testing.T) {
 		password := "postgres"
 		db := DatabaseConfig{url: url, username: username, password: password}
 		// Act
-		result := db.ConnectionString()
+		result := db.Dsn()
 		// Assert
 		assert.Equal(t, result, expected)
 	})
