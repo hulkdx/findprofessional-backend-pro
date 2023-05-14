@@ -19,7 +19,7 @@ func main() {
 	cfg := config.Load()
 
 	database := db.Connect(cfg.Database)
-	defer database.Close()
+	defer db.Close(database)
 
 	server := newServer(cfg)
 	<-listenAndServe(server)

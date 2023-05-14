@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -62,7 +61,7 @@ func getEnvTime(key string, def time.Duration) time.Duration {
 	}
 	duration, err := time.ParseDuration(str)
 	if err != nil {
-		log.Fatal("Unable to parse time", err)
+		panic(err)
 	}
 	return duration
 }
