@@ -6,7 +6,7 @@ deps:
 .PHONY: build
 build: deps
 	@cd professional-service && \
-	go build -o ../build/app cmd/httpserver/main.go
+	go build -o ../build/app cmd/api/main.go
 
 .PHONY: run
 run: build
