@@ -12,9 +12,8 @@ func TestDatabaseConfigConnectionString(t *testing.T) {
 		url := "postgresql://postgresdb/postgres"
 		username := "postgres"
 		password := "postgres"
-		db := DatabaseConfig{url: url, username: username, password: password}
 		// Act
-		result := db.Dsn()
+		result := getDsn(url, username, password)
 		// Assert
 		assert.Equal(t, result, expected)
 	})
@@ -25,9 +24,8 @@ func TestDatabaseConfigConnectionString(t *testing.T) {
 		url := "postgresql://postgresdb/postgres?sslmode=require"
 		username := "postgres"
 		password := "postgres"
-		db := DatabaseConfig{url: url, username: username, password: password}
 		// Act
-		result := db.Dsn()
+		result := getDsn(url, username, password)
 		// Assert
 		assert.Equal(t, result, expected)
 	})

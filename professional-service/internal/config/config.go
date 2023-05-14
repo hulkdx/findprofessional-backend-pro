@@ -25,25 +25,7 @@ func (s *ServerConfig) Addr() string {
 }
 
 type DatabaseConfig struct {
-	url      string
-	username string
-	password string
-}
-
-func (d *DatabaseConfig) Dsn() string {
-	url := d.url
-	if url == "" {
-		panic("Url is not provided")
-	}
-	split := strings.Split(url, "postgresql://")[1]
-	hasSsl := strings.Contains(split, "sslmode=")
-	var restUrl string
-	if hasSsl {
-		restUrl = split
-	} else {
-		restUrl = fmt.Sprintf("%s?sslmode=disable", split)
-	}
-	return fmt.Sprintf("postgresql://%s:%s@%s", d.username, d.password, restUrl)
+	Dsn string
 }
 
 func Load() *Config {
@@ -55,9 +37,11 @@ func Load() *Config {
 			IdleTimeout:  getEnvTime("server_idle_timeout", 30*time.Second),
 		},
 		Database: DatabaseConfig{
-			url:      os.Getenv("postgres_url"),
-			username: os.Getenv("postgres_username"),
-			password: os.Getenv("postgres_password"),
+			getDsn(
+				os.Getenv("postgres_url"),
+				os.Getenv("postgres_username"),
+				os.Getenv("postgres_password"),
+			),
 		},
 	}
 	return cfg
@@ -81,4 +65,15 @@ func getEnvTime(key string, def time.Duration) time.Duration {
 		log.Fatal("Unable to parse time", err)
 	}
 	return duration
+}
+
+func getDsn(url string, username string, password string) string {
+	if url == "" {
+		panic("Url is not provided")
+	}
+	if !strings.Contains(url, "sslmode=") {
+		url = url + "?sslmode=disable"
+	}
+	restUrl := strings.Split(url, "postgresql://")[1]
+	return fmt.Sprintf("postgresql://%s:%s@%s", username, password, restUrl)
 }
