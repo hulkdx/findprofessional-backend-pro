@@ -12,6 +12,6 @@ func Handler(db *sql.DB) http.Handler {
 	controller := professional.NewController(db)
 
 	router := chi.NewRouter()
-	router.Get("/professionals", controller.GetAllProfessionals)
+	router.Get("/professionals", controller.FindAllProfessional)
 	return router
 }

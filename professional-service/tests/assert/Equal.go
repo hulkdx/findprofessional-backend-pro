@@ -2,9 +2,23 @@ package assert
 
 import (
 	"bytes"
+	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func EqualJSON(t *testing.T, a string, e interface{}) {
+	j, err := json.Marshal(e)
+	if err != nil {
+		panic(err)
+	}
+	actual := strings.TrimSpace(a)
+	expected := strings.TrimSpace(string(j))
+	if !reflect.DeepEqual(actual, expected) {
+		t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
+	}
+}
 
 func Equal(t *testing.T, actual, expected interface{}) {
 	if objectsAreEqual(actual, expected) {
