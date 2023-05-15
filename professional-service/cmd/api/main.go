@@ -9,10 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/db"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/logger"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/db"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
 func main() {
