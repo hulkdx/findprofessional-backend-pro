@@ -42,14 +42,14 @@ func TestFindAllProfessional(t *testing.T) {
 				UpdatedAt: &now,
 			},
 		}
-		expected := []map[string]any{
+		expected := []Professional{
 			{
-				"id":    1,
-				"email": "test1@gmail.com",
+				ID:    1,
+				Email: "test1@gmail.com",
 			},
 			{
-				"id":    2,
-				"email": "test2@gmail.com",
+				ID:    2,
+				Email: "test2@gmail.com",
 			},
 		}
 		repository := &MockRepository{findAllSuccess: data}
@@ -70,10 +70,24 @@ type MockRepository struct {
 }
 
 func (r *MockRepository) FindAll(fields ...string) ([]Professional, error) {
+	// Mimic the original filtering in repository
 	filter := []Professional{}
 	for _, pro := range r.findAllSuccess {
-		fpro := pro
-		// TODO:
+		fpro := Professional{}
+		for _, field := range fields {
+			switch field {
+			case "id":
+				fpro.ID = pro.ID
+			case "email":
+				fpro.Email = pro.Email
+			case "password":
+				fpro.Password = pro.Password
+			case "created_at":
+				fpro.CreatedAt = pro.CreatedAt
+			case "updated_at":
+				fpro.UpdatedAt = pro.UpdatedAt
+			}
+		}
 		filter = append(filter, fpro)
 	}
 	return filter, r.findAllError
