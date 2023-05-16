@@ -2,7 +2,7 @@ package professional
 
 type Service interface {
 	Repository() Repository
-	GetAllProfessionals() ([]Professional, error)
+	FindAllProfessional() ([]Professional, error)
 }
 
 type serviceImpl struct {
@@ -13,8 +13,8 @@ func (s *serviceImpl) Repository() Repository {
 	return s.repository
 }
 
-func (s *serviceImpl) GetAllProfessionals() ([]Professional, error) {
-	return s.repository.FindAll()
+func (s *serviceImpl) FindAllProfessional() ([]Professional, error) {
+	return s.repository.FindAll("id", "email")
 }
 
 func NewService(repository Repository) Service {

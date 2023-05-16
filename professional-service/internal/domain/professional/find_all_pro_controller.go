@@ -8,9 +8,11 @@ import (
 
 func (c *Controller) FindAllProfessional(w http.ResponseWriter, r *http.Request) {
 	// TODO: authenticate
-	response, err := c.service.GetAllProfessionals()
+	response, err := c.service.FindAllProfessional()
 	if err != nil {
 		// TODO:
+		w.Write([]byte(err.Error()))
+		return
 	}
 	err = utils.WriteJSON(w, http.StatusOK, response)
 	if err != nil {

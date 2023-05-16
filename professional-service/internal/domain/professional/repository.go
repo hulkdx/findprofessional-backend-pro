@@ -2,10 +2,13 @@ package professional
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
+	"time"
 )
 
 type Repository interface {
-	FindAll() ([]Professional, error)
+	FindAll(fields ...string) ([]Professional, error)
 }
 
 func NewRepository(db *sql.DB) Repository {
@@ -16,8 +19,9 @@ type impl struct {
 	db *sql.DB
 }
 
-func (p *impl) FindAll() ([]Professional, error) {
-	query := "SELECT id, email, password, created_at, updated_at FROM professionals"
+func (p *impl) FindAll(fields ...string) ([]Professional, error) {
+	selectedFields := strings.Join(fields, ", ")
+	query := fmt.Sprintf("SELECT %s FROM professionals", selectedFields)
 	rows, err := p.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -25,10 +29,31 @@ func (p *impl) FindAll() ([]Professional, error) {
 	defer rows.Close()
 	professionals := []Professional{}
 	for rows.Next() {
-		var pro Professional
-		err := rows.Scan(&pro.ID, &pro.Email, &pro.Password, &pro.CreatedAt, &pro.UpdatedAt)
-		if err != nil {
+		scanArgs := make([]any, len(fields))
+		for i := range fields {
+			scanArgs[i] = new(any)
+		}
+		if err := rows.Scan(scanArgs...); err != nil {
 			return nil, err
+		}
+
+		pro := Professional{}
+		for i, field := range fields {
+			item := scanArgs[i].(*interface{})
+			switch field {
+			case "id":
+				pro.ID = int((*item).(int64))
+			case "email":
+				pro.Email = (*item).(string)
+			case "password":
+				pro.Password = (*item).(string)
+			case "created_at":
+				time := (*item).(time.Time)
+				pro.CreatedAt = &time
+			case "updated_at":
+				time := (*item).(time.Time)
+				pro.UpdatedAt = &time
+			}
 		}
 		professionals = append(professionals, pro)
 	}
