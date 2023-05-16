@@ -28,7 +28,7 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
 		now := time.Now()
-		gdb.Create([]professional.Professional{
+		data := []professional.Professional{
 			{
 				ID:        1,
 				Email:     "test1@gmail.com",
@@ -43,7 +43,9 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				CreatedAt: &now,
 				UpdatedAt: &now,
 			},
-		})
+		}
+		gdb.Create(data)
+		defer gdb.Delete(data)
 		expected := []professional.Professional{
 			{
 				ID:    1,
