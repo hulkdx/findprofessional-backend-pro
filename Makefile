@@ -15,11 +15,11 @@ run: build
 .PHONY: test
 test:
 	@cd professional-service && \
-	go test ./... | grep -v 'no test'
+	go test ./...
 
 .PHONY: dev
 dev:
-	@cd local-development && \
+	@cd dev-tools && \
 	skaffold dev --port-forward 
 
 .PHONY: clear-minikube-psql-cache

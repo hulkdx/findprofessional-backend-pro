@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/logger"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 
 	_ "github.com/lib/pq"
 )

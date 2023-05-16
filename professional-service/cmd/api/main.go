@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/config"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/db"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/logger"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/db"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	database := db.Connect(cfg.Database)
 	defer db.Close(database)
 
-	server := newServer(cfg)
+	server := newServer(cfg, database)
 	<-listenAndServe(server)
 	err := shutdown(server)
 	if err != nil {
@@ -31,10 +32,10 @@ func main() {
 	}
 }
 
-func newServer(cfg *config.Config) *http.Server {
+func newServer(cfg *config.Config, db *sql.DB) *http.Server {
 	return &http.Server{
 		Addr:         cfg.Server.Addr(),
-		Handler:      router.Handler(),
+		Handler:      router.Handler(db),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
