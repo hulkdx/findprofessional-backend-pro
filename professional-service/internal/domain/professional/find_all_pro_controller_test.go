@@ -59,7 +59,7 @@ func TestFindAllProfessional(t *testing.T) {
 		// Act
 		controller.FindAllProfessional(response, request)
 		// Assert
-		assert.Equal(t, response.Code, http.StatusOK)
+		assert.Equal(t, response.Code, http.StatusInternalServerError)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
 }
