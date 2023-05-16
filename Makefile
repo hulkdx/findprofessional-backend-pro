@@ -19,7 +19,7 @@ test:
 
 .PHONY: dev
 dev:
-	@cd local-development && \
+	@cd dev-tools && \
 	skaffold dev --port-forward 
 
 .PHONY: clear-minikube-psql-cache
