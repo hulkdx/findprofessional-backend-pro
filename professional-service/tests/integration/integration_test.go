@@ -5,10 +5,10 @@ import (
 )
 
 func TestIntegrations(t *testing.T) {
-	db, closeDb := InitDb()
+	db, gdb, closeDb := InitDb()
 	defer closeDb()
 
 	t.Run("ListProfessionalTests", func(t *testing.T) {
-		ListProfessionalTest(t, db)
+		ListProfessionalTest(t, db, gdb)
 	})
 }

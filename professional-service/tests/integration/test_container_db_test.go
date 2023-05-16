@@ -14,7 +14,7 @@ import (
 	"log"
 )
 
-func InitDb() (*sql.DB, func()) {
+func InitDb() (*sql.DB, *gorm.DB, func()) {
 	ctx := context.Background()
 
 	// Create a PostgreSQL container
@@ -62,7 +62,7 @@ func InitDb() (*sql.DB, func()) {
 		log.Fatal(err)
 	}
 
-	return db, func() {
+	return db, gormDB, func() {
 		db.Close()
 		postgresContainer.Terminate(ctx)
 	}
