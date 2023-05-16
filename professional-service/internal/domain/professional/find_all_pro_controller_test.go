@@ -21,7 +21,7 @@ func TestFindAllProfessional(t *testing.T) {
 		controller.FindAllProfessional(response, request)
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.Equal(t, response.Body.String(), "[]")
+		assert.EqualJSON(t, response.Body.String(), []string{})
 	})
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
