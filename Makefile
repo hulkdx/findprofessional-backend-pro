@@ -15,7 +15,7 @@ run: build
 .PHONY: test
 test:
 	@cd professional-service && \
-	go test ./... | grep -v 'no test'
+	go test ./...
 
 .PHONY: dev
 dev:
