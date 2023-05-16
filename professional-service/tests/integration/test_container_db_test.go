@@ -5,11 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/docker/go-connections/nat"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	_ "github.com/lib/pq"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
-
-	_ "github.com/lib/pq"
 )
 
 func InitDb() (*sql.DB, func()) {
@@ -25,7 +27,7 @@ func InitDb() (*sql.DB, func()) {
 				"POSTGRES_PASSWORD": "testpassword",
 				"POSTGRES_DB":       "testdb",
 			},
-			WaitingFor: wait.ForLog("database system is ready to accept connections"),
+			WaitingFor: wait.ForListeningPort("5432/tcp"),
 		},
 		Started: true,
 	})
@@ -50,6 +52,14 @@ func InitDb() (*sql.DB, func()) {
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		log.Fatal("Failed to connect to PostgreSQL: ", err)
+	}
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{Conn: db, PreferSimpleProtocol: true}), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = gormDB.AutoMigrate(&professional.Professional{})
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return db, func() {

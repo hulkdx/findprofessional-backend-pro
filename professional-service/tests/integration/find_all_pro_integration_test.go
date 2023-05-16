@@ -19,6 +19,6 @@ func ListProfessionalTest(t *testing.T, db *sql.DB) {
 		sut.ServeHTTP(response, request)
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.Equal(t, response.Body.String(), "[]")
+		assert.EqualJSON(t, response.Body.String(), []string{})
 	})
 }
