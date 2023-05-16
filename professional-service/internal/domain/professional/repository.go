@@ -12,14 +12,14 @@ type Repository interface {
 }
 
 func NewRepository(db *sql.DB) Repository {
-	return &impl{db}
+	return &repositoryImpl{db}
 }
 
-type impl struct {
+type repositoryImpl struct {
 	db *sql.DB
 }
 
-func (p *impl) FindAll(fields ...string) ([]Professional, error) {
+func (p *repositoryImpl) FindAll(fields ...string) ([]Professional, error) {
 	selectedFields := strings.Join(fields, ", ")
 	query := fmt.Sprintf("SELECT %s FROM professionals", selectedFields)
 	rows, err := p.db.Query(query)
