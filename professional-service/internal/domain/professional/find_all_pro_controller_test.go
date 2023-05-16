@@ -76,15 +76,15 @@ func (r *MockRepository) FindAll(fields ...string) ([]Professional, error) {
 		fpro := Professional{}
 		for _, field := range fields {
 			switch field {
-			case "id":
+			case "ID":
 				fpro.ID = pro.ID
-			case "email":
+			case "Email":
 				fpro.Email = pro.Email
-			case "password":
+			case "Password":
 				fpro.Password = pro.Password
-			case "created_at":
+			case "Created_at":
 				fpro.CreatedAt = pro.CreatedAt
-			case "updated_at":
+			case "Updated_at":
 				fpro.UpdatedAt = pro.UpdatedAt
 			}
 		}

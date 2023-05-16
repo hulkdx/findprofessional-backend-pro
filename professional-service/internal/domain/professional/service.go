@@ -14,7 +14,7 @@ func (s *serviceImpl) Repository() Repository {
 }
 
 func (s *serviceImpl) FindAllProfessional() ([]Professional, error) {
-	return s.repository.FindAll("id", "email")
+	return s.repository.FindAll("ID", "Email")
 }
 
 func NewService(repository Repository) Service {

@@ -3,8 +3,8 @@ package professional
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strings"
-	"time"
 )
 
 type Repository interface {
@@ -27,36 +27,22 @@ func (p *impl) FindAll(fields ...string) ([]Professional, error) {
 		return nil, err
 	}
 	defer rows.Close()
+
 	professionals := []Professional{}
 	for rows.Next() {
-		scanArgs := make([]any, len(fields))
+		pro := Professional{}
+		elem := reflect.ValueOf(&pro).Elem()
+		scanArgs := make([]interface{}, len(fields))
 		for i := range fields {
-			scanArgs[i] = new(any)
+			field := elem.FieldByName(fields[i])
+			scanArgs[i] = field.Addr().Interface()
 		}
 		if err := rows.Scan(scanArgs...); err != nil {
 			return nil, err
 		}
-
-		pro := Professional{}
-		for i, field := range fields {
-			item := scanArgs[i].(*interface{})
-			switch field {
-			case "id":
-				pro.ID = int((*item).(int64))
-			case "email":
-				pro.Email = (*item).(string)
-			case "password":
-				pro.Password = (*item).(string)
-			case "created_at":
-				time := (*item).(time.Time)
-				pro.CreatedAt = &time
-			case "updated_at":
-				time := (*item).(time.Time)
-				pro.UpdatedAt = &time
-			}
-		}
 		professionals = append(professionals, pro)
 	}
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
