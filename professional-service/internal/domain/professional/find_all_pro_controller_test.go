@@ -14,11 +14,10 @@ func TestFindAllProfessional(t *testing.T) {
 	t.Run("empty repository", func(t *testing.T) {
 		// Arrange
 		data := []Professional{}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, request)
+		controller.FindAllProfessional(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
@@ -52,11 +51,10 @@ func TestFindAllProfessional(t *testing.T) {
 				Email: "test2@gmail.com",
 			},
 		}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, request)
+		controller.FindAllProfessional(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
@@ -69,6 +67,11 @@ func createController(findAllSuccess []Professional) *Controller {
 		service:     NewService(repository),
 		userService: user.NewService(),
 	}
+}
+
+func newRequest() *http.Request {
+	request, _ := http.NewRequest("GET", "/professionals", nil)
+	return request
 }
 
 type MockRepository struct {
