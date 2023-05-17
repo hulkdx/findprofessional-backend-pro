@@ -13,7 +13,7 @@ import (
 )
 
 func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
-	sut := router.Handler(db)
+	sut := IntegrationTestHandler(db)
 
 	t.Run("Empty professionals", func(t *testing.T) {
 		// Arrange
@@ -64,4 +64,18 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
+}
+
+func IntegrationTestHandler(db *sql.DB) http.Handler {
+	controller := professional.NewController(
+		professional.NewService(professional.NewRepository(db)),
+		&MockUserService{},
+	)
+	return router.Handler(controller)
+}
+
+type MockUserService struct{}
+
+func (m *MockUserService) IsAuthenticated(auth string) bool {
+	return true
 }
