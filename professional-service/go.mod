@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/docker/go-connections v0.4.0
 	github.com/go-chi/chi/v5 v5.0.8
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/lib/pq v1.10.9
 	github.com/testcontainers/testcontainers-go v0.20.1
 	gorm.io/driver/postgres v1.5.0
