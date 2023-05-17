@@ -1,6 +1,7 @@
 package professional
 
 import (
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,10 +14,9 @@ func TestFindAllProfessional(t *testing.T) {
 	t.Run("empty repository", func(t *testing.T) {
 		// Arrange
 		data := []Professional{}
-		repository := &MockRepository{findAllSuccess: data}
 		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
-		controller := &Controller{service: NewService(repository)}
+		controller := createController(data)
 		// Act
 		controller.FindAllProfessional(response, request)
 		// Assert
@@ -52,16 +52,23 @@ func TestFindAllProfessional(t *testing.T) {
 				Email: "test2@gmail.com",
 			},
 		}
-		repository := &MockRepository{findAllSuccess: data}
 		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
-		controller := &Controller{service: NewService(repository)}
+		controller := createController(data)
 		// Act
 		controller.FindAllProfessional(response, request)
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
+}
+
+func createController(findAllSuccess []Professional) *Controller {
+	repository := &MockRepository{findAllSuccess: findAllSuccess}
+	return &Controller{
+		service:     NewService(repository),
+		userService: user.NewService(),
+	}
 }
 
 type MockRepository struct {
