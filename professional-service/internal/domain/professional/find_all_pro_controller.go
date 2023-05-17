@@ -7,7 +7,14 @@ import (
 )
 
 func (c *Controller) FindAllProfessional(w http.ResponseWriter, r *http.Request) {
-	// TODO: authenticate
+	// TODO: move it into middleware
+	auth := r.Header.Get("Authorization")
+	if !c.userService.IsAuthenticated(auth) {
+		// TODO:
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("{}"))
+		return
+	}
 	response, err := c.service.FindAllProfessional()
 	if err != nil {
 		// TODO:
