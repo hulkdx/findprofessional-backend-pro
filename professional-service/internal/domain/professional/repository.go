@@ -11,12 +11,12 @@ type Repository interface {
 	FindAll(fields ...string) ([]Professional, error)
 }
 
-func NewRepository(db *sql.DB) Repository {
-	return &repositoryImpl{db}
-}
-
 type repositoryImpl struct {
 	db *sql.DB
+}
+
+func NewRepository(db *sql.DB) Repository {
+	return &repositoryImpl{db}
 }
 
 func (p *repositoryImpl) FindAll(fields ...string) ([]Professional, error) {
