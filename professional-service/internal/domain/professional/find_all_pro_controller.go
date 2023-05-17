@@ -1,21 +1,21 @@
 package professional
 
 import (
+	"errors"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 	"net/http"
 )
 
 func (c *Controller) FindAllProfessional(w http.ResponseWriter, r *http.Request) {
-	// TODO: authenticate
-	response, err := c.service.FindAllProfessional()
-	if err != nil {
-		// TODO:
-		w.Write([]byte(err.Error()))
+	auth := r.Header.Get("Authorization")
+	if !c.userService.IsAuthenticated(auth) {
+		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
 		return
 	}
-	err = utils.WriteJSON(w, http.StatusOK, response)
+	response, err := c.service.FindAllProfessional()
 	if err != nil {
-		logger.Error("WriteJSON error: ", err)
+		utils.WriteGeneralError(w, errors.New("invalid data"))
+		return
 	}
+	utils.WriteJSON(w, http.StatusOK, response)
 }

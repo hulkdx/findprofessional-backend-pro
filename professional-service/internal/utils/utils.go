@@ -23,10 +23,21 @@ func ReadJSON(r *http.Request, out interface{}) error {
 	return nil
 }
 
-func WriteJSON(w http.ResponseWriter, code int, v interface{}) error {
+func WriteJSON(w http.ResponseWriter, code int, v interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	enc := json.NewEncoder(w)
 	enc.SetEscapeHTML(false)
-	return enc.Encode(v)
+	_ = enc.Encode(v)
+}
+
+func WriteError(w http.ResponseWriter, code int, error string) {
+	data := map[string]any{
+		"error": error,
+	}
+	WriteJSON(w, code, data)
+}
+
+func WriteGeneralError(w http.ResponseWriter, error error) {
+	WriteError(w, http.StatusInternalServerError, error.Error())
 }

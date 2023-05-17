@@ -13,12 +13,10 @@ func TestFindAllProfessional(t *testing.T) {
 	t.Run("empty repository", func(t *testing.T) {
 		// Arrange
 		data := []Professional{}
-		repository := &MockRepository{findAllSuccess: data}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
-		controller := &Controller{service: NewService(repository)}
+		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, request)
+		controller.FindAllProfessional(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
@@ -52,16 +50,27 @@ func TestFindAllProfessional(t *testing.T) {
 				Email: "test2@gmail.com",
 			},
 		}
-		repository := &MockRepository{findAllSuccess: data}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
-		controller := &Controller{service: NewService(repository)}
+		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, request)
+		controller.FindAllProfessional(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
+}
+
+func createController(findAllSuccess []Professional) *Controller {
+	repository := &MockRepository{findAllSuccess: findAllSuccess}
+	return &Controller{
+		service:     NewService(repository),
+		userService: &MockUserService{},
+	}
+}
+
+func newRequest() *http.Request {
+	request, _ := http.NewRequest("GET", "/professionals", nil)
+	return request
 }
 
 type MockRepository struct {
@@ -91,4 +100,10 @@ func (r *MockRepository) FindAll(fields ...string) ([]Professional, error) {
 		filter = append(filter, fpro)
 	}
 	return filter, r.findAllError
+}
+
+type MockUserService struct{}
+
+func (m *MockUserService) IsAuthenticated(string) bool {
+	return true
 }
