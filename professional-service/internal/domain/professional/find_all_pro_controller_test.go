@@ -1,7 +1,6 @@
 package professional
 
 import (
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -65,7 +64,7 @@ func createController(findAllSuccess []Professional) *Controller {
 	repository := &MockRepository{findAllSuccess: findAllSuccess}
 	return &Controller{
 		service:     NewService(repository),
-		userService: user.NewService(),
+		userService: &MockUserService{},
 	}
 }
 
@@ -101,4 +100,10 @@ func (r *MockRepository) FindAll(fields ...string) ([]Professional, error) {
 		filter = append(filter, fpro)
 	}
 	return filter, r.findAllError
+}
+
+type MockUserService struct{}
+
+func (m *MockUserService) IsAuthenticated(string) bool {
+	return true
 }
