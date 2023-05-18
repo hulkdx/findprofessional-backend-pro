@@ -2,8 +2,9 @@ package professional
 
 import (
 	"errors"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"net/http"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 func (c *Controller) FindAllProfessional(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +13,7 @@ func (c *Controller) FindAllProfessional(w http.ResponseWriter, r *http.Request)
 		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
 		return
 	}
-	response, err := c.service.FindAllProfessional(r.Context())
+	response, err := c.service.FindAll(r.Context())
 	if err != nil {
 		utils.WriteGeneralError(w, errors.New("invalid data"))
 		return

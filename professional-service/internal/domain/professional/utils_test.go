@@ -7,6 +7,9 @@ type FakeRepository struct {
 	findAllError    error
 	findByIdSuccess Professional
 	findByIdError   error
+	createError     error
+	deleteError     error
+	updateError     error
 }
 
 func (r *FakeRepository) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
@@ -15,6 +18,16 @@ func (r *FakeRepository) FindAll(ctx context.Context, fields ...string) ([]Profe
 
 func (r *FakeRepository) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
 	return r.findByIdSuccess, r.findByIdError
+}
+
+func (r *FakeRepository) Create(ctx context.Context, p Professional) error {
+	return r.createError
+}
+func (r *FakeRepository) Delete(ctx context.Context, id string) error {
+	return r.deleteError
+}
+func (r *FakeRepository) Update(ctx context.Context, id string, p Professional) error {
+	return r.updateError
 }
 
 type MockUserServiceAlwaysAuthenticated struct{}

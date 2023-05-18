@@ -2,6 +2,7 @@ package professional
 
 import (
 	"database/sql"
+
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 )
 
