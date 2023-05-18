@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func EqualJSON(t *testing.T, a string, e interface{}) {
+func EqualJSON(t *testing.T, a string, e any) {
 	j, err := json.Marshal(e)
 	if err != nil {
 		panic(err)
@@ -20,7 +20,7 @@ func EqualJSON(t *testing.T, a string, e interface{}) {
 	}
 }
 
-func Equal(t *testing.T, actual, expected interface{}) {
+func Equal(t *testing.T, actual, expected any) {
 	if objectsAreEqual(actual, expected) {
 		return
 	}
@@ -28,7 +28,7 @@ func Equal(t *testing.T, actual, expected interface{}) {
 	t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
 }
 
-func objectsAreEqual(actual, expected interface{}) bool {
+func objectsAreEqual(actual, expected any) bool {
 	if expected == nil || actual == nil {
 		return expected == actual
 	}
