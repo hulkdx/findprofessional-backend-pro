@@ -2,25 +2,26 @@ package integration_test
 
 import (
 	"database/sql"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
-	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"gorm.io/gorm"
 )
 
 func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
-	sut := IntegrationTestHandler(db)
+	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty professionals", func(t *testing.T) {
 		// Arrange
 		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
-		sut.ServeHTTP(response, request)
+		handler.ServeHTTP(response, request)
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
@@ -28,7 +29,7 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
 		now := time.Now()
-		data := []professional.Professional{
+		records := []professional.Professional{
 			{
 				ID:        1,
 				Email:     "test1@gmail.com",
@@ -44,8 +45,8 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				UpdatedAt: &now,
 			},
 		}
-		gdb.Create(data)
-		defer gdb.Delete(data)
+		gdb.Create(records)
+		defer gdb.Delete(records)
 		expected := []professional.Professional{
 			{
 				ID:    1,
@@ -59,19 +60,19 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		request, _ := http.NewRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
-		sut.ServeHTTP(response, request)
+		handler.ServeHTTP(response, request)
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
 }
 
-func IntegrationTestHandler(db *sql.DB) http.Handler {
+func NewTestController(db *sql.DB) *professional.Controller {
 	controller := professional.NewController(
 		professional.NewService(professional.NewRepository(db)),
 		&MockUserService{},
 	)
-	return router.Handler(controller)
+	return controller
 }
 
 type MockUserService struct{}
