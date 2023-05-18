@@ -16,7 +16,7 @@ func TestFindAllProfessional(t *testing.T) {
 		response := httptest.NewRecorder()
 		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, newRequest())
+		controller.FindAll(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
@@ -43,7 +43,7 @@ func TestFindAllProfessional(t *testing.T) {
 		response := httptest.NewRecorder()
 		controller := createController(data)
 		// Act
-		controller.FindAllProfessional(response, newRequest())
+		controller.FindAll(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), data)

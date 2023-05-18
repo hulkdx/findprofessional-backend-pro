@@ -9,6 +9,6 @@ import (
 
 func Handler(controller *professional.Controller) http.Handler {
 	router := chi.NewRouter()
-	router.Get("/professionals", controller.FindAllProfessional)
+	router.Get("/professionals", controller.FindAll)
 	return router
 }
