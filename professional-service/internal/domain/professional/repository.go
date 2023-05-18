@@ -11,8 +11,6 @@ import (
 type Repository interface {
 	FindAll(ctx context.Context, fields ...string) ([]Professional, error)
 	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
-	Create(ctx context.Context, p Professional) error
-	Delete(ctx context.Context, id string) error
 	Update(ctx context.Context, id string, p Professional) error
 }
 
@@ -32,24 +30,6 @@ func (r *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Profe
 func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
 	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = ?", strings.Join(fields, ", "))
 	return r.findOne(ctx, fields, query, id)
-}
-
-func (r *repositoryImpl) Create(ctx context.Context, p Professional) error {
-	query := "INSERT INTO professionals (email, password, created_at, updated_at) VALUES (?, ?, ?, ?)"
-	_, err := r.db.ExecContext(ctx, query, p.Email, p.Password, p.CreatedAt, p.UpdatedAt)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *repositoryImpl) Delete(ctx context.Context, id string) error {
-	query := "DELETE FROM professionals WHERE id = ?"
-	_, err := r.db.ExecContext(ctx, query, id)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p Professional) error {
