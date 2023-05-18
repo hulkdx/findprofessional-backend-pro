@@ -11,6 +11,9 @@ import (
 type Repository interface {
 	FindAll(ctx context.Context, fields ...string) ([]Professional, error)
 	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
+	Create(ctx context.Context, p Professional) error
+	Delete(ctx context.Context, id string) error
+	Update(ctx context.Context, id string, p Professional) error
 }
 
 type repositoryImpl struct {
@@ -21,18 +24,45 @@ func NewRepository(db *sql.DB) Repository {
 	return &repositoryImpl{db}
 }
 
-func (p *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
+func (r *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
 	query := fmt.Sprintf("SELECT %s FROM professionals", strings.Join(fields, ", "))
-	return p.find(ctx, fields, query)
+	return r.find(ctx, fields, query)
 }
 
-func (p *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
+func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
 	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = ?", strings.Join(fields, ", "))
-	return p.findOne(ctx, fields, query, id)
+	return r.findOne(ctx, fields, query, id)
 }
 
-func (p *repositoryImpl) find(ctx context.Context, fields []string, query string, args ...any) ([]Professional, error) {
-	rows, err := p.db.QueryContext(ctx, query, args...)
+func (r *repositoryImpl) Create(ctx context.Context, p Professional) error {
+	query := "INSERT INTO professionals (email, password, created_at, updated_at) VALUES (?, ?, ?, ?)"
+	_, err := r.db.ExecContext(ctx, query, p.Email, p.Password, p.CreatedAt, p.UpdatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repositoryImpl) Delete(ctx context.Context, id string) error {
+	query := "DELETE FROM professionals WHERE id = ?"
+	_, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repositoryImpl) Update(ctx context.Context, id string, p Professional) error {
+	query := "UPDATE professionals SET email = ?, password = ?, updated_at = ? WHERE id = ?"
+	_, err := r.db.ExecContext(ctx, query, p.Email, p.Password, p.UpdatedAt, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repositoryImpl) find(ctx context.Context, fields []string, query string, args ...any) ([]Professional, error) {
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -59,8 +89,8 @@ func (p *repositoryImpl) find(ctx context.Context, fields []string, query string
 	return professionals, nil
 }
 
-func (p *repositoryImpl) findOne(ctx context.Context, fields []string, query string, queryArgs ...any) (Professional, error) {
-	professionals, err := p.find(ctx, fields, query, queryArgs...)
+func (r *repositoryImpl) findOne(ctx context.Context, fields []string, query string, queryArgs ...any) (Professional, error) {
+	professionals, err := r.find(ctx, fields, query, queryArgs...)
 	if err != nil {
 		return Professional{}, err
 	}
