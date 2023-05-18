@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/db"
@@ -43,12 +44,12 @@ func newServer(cfg *config.Config, handler http.Handler) *http.Server {
 	}
 }
 
-func listenAndServe(server *http.Server) chan os.Signal {
+func listenAndServe(server *http.Server) <-chan os.Signal {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	go func() {
 		err := server.ListenAndServe()
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			logger.Error("ListenAndServe", err)
 		}
 		quit <- syscall.SIGTERM
