@@ -14,9 +14,9 @@ func TestFindAllProfessional(t *testing.T) {
 		// Arrange
 		data := []Professional{}
 		response := httptest.NewRecorder()
-		controller := createController(data)
+		controller := findAllController(data)
 		// Act
-		controller.FindAll(response, newRequest())
+		controller.FindAll(response, findAllRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
@@ -41,16 +41,16 @@ func TestFindAllProfessional(t *testing.T) {
 			},
 		}
 		response := httptest.NewRecorder()
-		controller := createController(data)
+		controller := findAllController(data)
 		// Act
-		controller.FindAll(response, newRequest())
+		controller.FindAll(response, findAllRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), data)
 	})
 }
 
-func createController(findAllSuccess []Professional) *Controller {
+func findAllController(findAllSuccess []Professional) *Controller {
 	repository := &FakeRepository{findAllSuccess: findAllSuccess}
 	return &Controller{
 		service:     NewService(repository),
@@ -58,7 +58,7 @@ func createController(findAllSuccess []Professional) *Controller {
 	}
 }
 
-func newRequest() *http.Request {
+func findAllRequest() *http.Request {
 	request, _ := http.NewRequest("GET", "/professionals", nil)
 	return request
 }
