@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"net/http/httptest"
@@ -77,6 +78,6 @@ func NewTestController(db *sql.DB) *professional.Controller {
 
 type MockUserService struct{}
 
-func (m *MockUserService) IsAuthenticated(auth string) bool {
+func (m *MockUserService) IsAuthenticated(ctx context.Context, auth string) bool {
 	return true
 }

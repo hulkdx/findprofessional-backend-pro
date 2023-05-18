@@ -40,70 +40,25 @@ func TestFindAllProfessional(t *testing.T) {
 				UpdatedAt: &now,
 			},
 		}
-		expected := []Professional{
-			{
-				ID:    1,
-				Email: "test1@gmail.com",
-			},
-			{
-				ID:    2,
-				Email: "test2@gmail.com",
-			},
-		}
 		response := httptest.NewRecorder()
 		controller := createController(data)
 		// Act
 		controller.FindAllProfessional(response, newRequest())
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.EqualJSON(t, response.Body.String(), expected)
+		assert.EqualJSON(t, response.Body.String(), data)
 	})
 }
 
 func createController(findAllSuccess []Professional) *Controller {
-	repository := &MockRepository{findAllSuccess: findAllSuccess}
+	repository := &FakeRepository{findAllSuccess: findAllSuccess}
 	return &Controller{
 		service:     NewService(repository),
-		userService: &MockUserService{},
+		userService: &MockUserServiceAlwaysAuthenticated{},
 	}
 }
 
 func newRequest() *http.Request {
 	request, _ := http.NewRequest("GET", "/professionals", nil)
 	return request
-}
-
-type MockRepository struct {
-	findAllSuccess []Professional
-	findAllError   error
-}
-
-func (r *MockRepository) FindAll(fields ...string) ([]Professional, error) {
-	// Mimic the original filtering in repository
-	filter := []Professional{}
-	for _, pro := range r.findAllSuccess {
-		fpro := Professional{}
-		for _, field := range fields {
-			switch field {
-			case "ID":
-				fpro.ID = pro.ID
-			case "Email":
-				fpro.Email = pro.Email
-			case "Password":
-				fpro.Password = pro.Password
-			case "Created_at":
-				fpro.CreatedAt = pro.CreatedAt
-			case "Updated_at":
-				fpro.UpdatedAt = pro.UpdatedAt
-			}
-		}
-		filter = append(filter, fpro)
-	}
-	return filter, r.findAllError
-}
-
-type MockUserService struct{}
-
-func (m *MockUserService) IsAuthenticated(string) bool {
-	return true
 }

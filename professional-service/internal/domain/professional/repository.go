@@ -1,6 +1,7 @@
 package professional
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -8,7 +9,8 @@ import (
 )
 
 type Repository interface {
-	FindAll(fields ...string) ([]Professional, error)
+	FindAll(ctx context.Context, fields ...string) ([]Professional, error)
+	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
 }
 
 type repositoryImpl struct {
@@ -19,10 +21,18 @@ func NewRepository(db *sql.DB) Repository {
 	return &repositoryImpl{db}
 }
 
-func (p *repositoryImpl) FindAll(fields ...string) ([]Professional, error) {
-	selectedFields := strings.Join(fields, ", ")
-	query := fmt.Sprintf("SELECT %s FROM professionals", selectedFields)
-	rows, err := p.db.Query(query)
+func (p *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
+	query := fmt.Sprintf("SELECT %s FROM professionals", strings.Join(fields, ", "))
+	return p.find(ctx, fields, query)
+}
+
+func (p *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
+	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = ?", strings.Join(fields, ", "))
+	return p.findOne(ctx, fields, query, id)
+}
+
+func (p *repositoryImpl) find(ctx context.Context, fields []string, query string, args ...any) ([]Professional, error) {
+	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +57,15 @@ func (p *repositoryImpl) FindAll(fields ...string) ([]Professional, error) {
 		return nil, err
 	}
 	return professionals, nil
+}
+
+func (p *repositoryImpl) findOne(ctx context.Context, fields []string, query string, queryArgs ...any) (Professional, error) {
+	professionals, err := p.find(ctx, fields, query, queryArgs...)
+	if err != nil {
+		return Professional{}, err
+	}
+	if len(professionals) == 0 {
+		return Professional{}, sql.ErrNoRows
+	}
+	return professionals[0], nil
 }
