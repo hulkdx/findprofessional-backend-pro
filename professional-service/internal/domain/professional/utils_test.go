@@ -22,8 +22,11 @@ func (r *FakeRepository) Update(ctx context.Context, id string, p Professional) 
 	return r.updateError
 }
 
-type MockUserServiceAlwaysAuthenticated struct{}
+type MockUserServiceAlwaysAuthenticated struct {
+	IsAuthenticatedCalled bool
+}
 
 func (m *MockUserServiceAlwaysAuthenticated) IsAuthenticated(context.Context, string) bool {
+	m.IsAuthenticatedCalled = true
 	return true
 }

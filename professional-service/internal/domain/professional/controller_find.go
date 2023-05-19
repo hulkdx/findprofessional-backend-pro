@@ -12,6 +12,11 @@ import (
 var ErrUnknown = errors.New("unknown")
 
 func (c *Controller) Find(w http.ResponseWriter, r *http.Request) {
+	auth := r.Header.Get("Authorization")
+	if !c.userService.IsAuthenticated(r.Context(), auth) {
+		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
+		return
+	}
 	id := chi.URLParam(r, "id")
 	response, err := c.service.FindById(r.Context(), id)
 	if err != nil {

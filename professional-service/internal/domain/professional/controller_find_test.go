@@ -11,6 +11,18 @@ import (
 )
 
 func TestFindProfessional(t *testing.T) {
+	t.Run("authorize", func(t *testing.T) {
+		// Arrange
+		userService := &MockUserServiceAlwaysAuthenticated{}
+		controller := &Controller{
+			service:     NewService(&FakeRepository{}),
+			userService: userService,
+		}
+		// Act
+		controller.Find(httptest.NewRecorder(), findRequest(1))
+		// Assert
+		assert.Equal(t, userService.IsAuthenticatedCalled, true)
+	})
 	t.Run("empty repository", func(t *testing.T) {
 		// Arrange
 		id := 1
