@@ -10,7 +10,7 @@ var ErrNotFound = errors.New("not found")
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
 	FindById(ctx context.Context, id string) (Professional, error)
-	Update(ctx context.Context, id string, p Professional) error
+	Update(ctx context.Context, id string, p UpdateRequest) error
 }
 
 type serviceImpl struct {
@@ -29,6 +29,6 @@ func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, er
 	return s.repository.FindById(ctx, id, "ID", "Email")
 }
 
-func (s *serviceImpl) Update(ctx context.Context, id string, p Professional) error {
+func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
 	return s.repository.Update(ctx, id, p)
 }

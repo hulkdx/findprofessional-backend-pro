@@ -12,7 +12,7 @@ import (
 type Repository interface {
 	FindAll(ctx context.Context, fields ...string) ([]Professional, error)
 	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
-	Update(ctx context.Context, id string, p Professional) error
+	Update(ctx context.Context, id string, p UpdateRequest) error
 }
 
 type repositoryImpl struct {
@@ -33,7 +33,7 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...stri
 	return r.findOne(ctx, fields, query, id)
 }
 
-func (r *repositoryImpl) Update(ctx context.Context, id string, p Professional) error {
+func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
 	query := "UPDATE professionals SET email = $1, updated_at = $2 WHERE id = $3"
 	result, err := r.db.ExecContext(ctx, query, p.Email, time.Now(), id)
 	if err != nil {

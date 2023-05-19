@@ -18,7 +18,7 @@ func (r *FakeRepository) FindById(ctx context.Context, id string, fields ...stri
 	return r.findByIdSuccess, r.findByIdError
 }
 
-func (r *FakeRepository) Update(ctx context.Context, id string, p Professional) error {
+func (r *FakeRepository) Update(ctx context.Context, id string, p UpdateRequest) error {
 	return r.updateError
 }
 
