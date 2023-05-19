@@ -3,6 +3,7 @@ package professional
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -33,7 +34,9 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	idInt, _ := strconv.Atoi(id)
 	response := Professional{
+		ID:        idInt,
 		Email:     updateRequest.Email,
 		UpdatedAt: nil,
 		CreatedAt: nil,

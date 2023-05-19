@@ -14,4 +14,7 @@ func TestIntegrations(t *testing.T) {
 	t.Run("FindProfessionalTests", func(t *testing.T) {
 		FindProfessionalTest(t, db, gdb)
 	})
+	t.Run("UpdateProfessionalTest", func(t *testing.T) {
+		UpdateProfessionalTest(t, db, gdb)
+	})
 }
