@@ -9,7 +9,7 @@ var ErrNotFound = errors.New("not found")
 
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
-	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
+	FindById(ctx context.Context, id string) (Professional, error)
 	Update(ctx context.Context, id string, p Professional) error
 }
 
@@ -25,8 +25,8 @@ func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
 	return s.repository.FindAll(ctx, "ID", "Email")
 }
 
-func (s *serviceImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
-	return s.repository.FindById(ctx, id, fields...)
+func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, error) {
+	return s.repository.FindById(ctx, id, "ID", "Email")
 }
 
 func (s *serviceImpl) Update(ctx context.Context, id string, p Professional) error {

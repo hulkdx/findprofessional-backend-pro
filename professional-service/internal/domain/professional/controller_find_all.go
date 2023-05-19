@@ -1,7 +1,6 @@
 package professional
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -15,7 +14,7 @@ func (c *Controller) FindAll(w http.ResponseWriter, r *http.Request) {
 	}
 	response, err := c.service.FindAll(r.Context())
 	if err != nil {
-		utils.WriteGeneralError(w, errors.New("invalid data"))
+		utils.WriteGeneralError(w, ErrUnknown)
 		return
 	}
 	utils.WriteJSON(w, http.StatusOK, response)

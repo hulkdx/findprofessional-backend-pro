@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty professionals", func(t *testing.T) {
@@ -27,6 +27,7 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
 	})
+
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
 		now := time.Now()

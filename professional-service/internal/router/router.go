@@ -10,5 +10,6 @@ import (
 func Handler(controller *professional.Controller) http.Handler {
 	router := chi.NewRouter()
 	router.Get("/professionals", controller.FindAll)
+	router.Get("/professional/{id}", controller.Find)
 	return router
 }

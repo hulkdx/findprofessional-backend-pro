@@ -28,7 +28,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Profe
 }
 
 func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
-	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = ?", strings.Join(fields, ", "))
+	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = $1", strings.Join(fields, ", "))
 	return r.findOne(ctx, fields, query, id)
 }
 
