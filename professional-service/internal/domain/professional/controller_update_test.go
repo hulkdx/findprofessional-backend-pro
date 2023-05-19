@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
@@ -37,20 +38,47 @@ func TestUpdateProfessional(t *testing.T) {
 		assert.Equal(t, response.Code, http.StatusNotFound)
 	})
 
-	t.Run("found in repository", func(t *testing.T) {
-		// Arrange
-		id := 1
-		requestBody := `{ "email": "new@email.com" }`
-		request := updateRequest(id, requestBody)
-		response := httptest.NewRecorder()
-		controller := updateController(nil)
-		// Act
-		controller.Update(response, request)
-		// Assert
-		assert.Equal(t, response.Code, http.StatusOK)
+	t.Run("valid emails", func(t *testing.T) {
+		validEmails := []string{
+			"new@email.com",
+			"50charemailxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@gmail.com",
+		}
+		for _, email := range validEmails {
+			// Arrange
+			id := 1
+			requestBody := fmt.Sprintf(`{ "email": "%s" }`, email)
+			request := updateRequest(id, requestBody)
+			response := httptest.NewRecorder()
+			controller := updateController(nil)
+			// Act
+			controller.Update(response, request)
+			// Assert
+			assert.Equal(t, response.Code, http.StatusOK)
+		}
 	})
 
 	// TODO: add test for invalid email address
+	t.Run("invalid email", func(t *testing.T) {
+		invalidEmails := []string{
+			"",
+			"23123",
+			"space email@gmail.com",
+			"51charemailxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@gmail.com",
+		}
+		for _, email := range invalidEmails {
+			// Arrange
+			id := 1
+			fmt.Println(email)
+			requestBody := fmt.Sprintf(`{ "email": "%s" }`, email)
+			request := updateRequest(id, requestBody)
+			response := httptest.NewRecorder()
+			controller := updateController(nil)
+			// Act
+			controller.Update(response, request)
+			// Assert
+			assert.Equal(t, response.Code, http.StatusBadRequest)
+		}
+	})
 }
 
 func updateController(updateError error) *Controller {
@@ -62,6 +90,6 @@ func updateController(updateError error) *Controller {
 }
 
 func updateRequest(id int, body string) *http.Request {
-	request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", id), nil)
+	request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", 400), strings.NewReader(body))
 	return request
 }
