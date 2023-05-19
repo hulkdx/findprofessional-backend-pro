@@ -14,7 +14,7 @@ func (c *Controller) FindAll(w http.ResponseWriter, r *http.Request) {
 	}
 	response, err := c.service.FindAll(r.Context())
 	if err != nil {
-		utils.WriteGeneralError(w, ErrUnknown)
+		utils.WriteGeneralError(w, utils.ErrUnknown)
 		return
 	}
 	utils.WriteJSON(w, http.StatusOK, response)
