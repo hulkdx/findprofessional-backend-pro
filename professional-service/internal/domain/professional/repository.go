@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type Repository interface {
@@ -33,10 +34,17 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...stri
 }
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p Professional) error {
-	query := "UPDATE professionals SET email = ?, password = ?, updated_at = ? WHERE id = ?"
-	_, err := r.db.ExecContext(ctx, query, p.Email, p.Password, p.UpdatedAt, id)
+	query := "UPDATE professionals SET email = $1, updated_at = $2 WHERE id = $3"
+	result, err := r.db.ExecContext(ctx, query, p.Email, time.Now(), id)
 	if err != nil {
 		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 	return nil
 }
