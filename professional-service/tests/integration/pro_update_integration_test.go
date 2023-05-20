@@ -3,6 +3,7 @@ package integration_test
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -21,7 +22,7 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		// Arrange
 		id := 1
 		requestBody := `{ "email": "new@email.com" }`
-		request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
+		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
@@ -40,7 +41,7 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		defer gdb.Delete(record)
 
 		requestBody := `{ "email": "new@email.com" }`
-		request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
+		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
 		expected := &professional.Professional{
 			ID:    id,
@@ -52,4 +53,10 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), expected)
 	})
+}
+
+func NewJsonRequest(method, url string, body io.Reader) *http.Request {
+	request, _ := http.NewRequest(method, url, body)
+	request.Header.Set("Content-Type", "application/json")
+	return request
 }

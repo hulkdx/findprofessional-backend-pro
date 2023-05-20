@@ -9,6 +9,9 @@ import (
 
 func Handler(controller *professional.Controller) http.Handler {
 	router := chi.NewRouter()
+
+	router.Use(ContentTypeJsonMiddleware)
+
 	router.Get("/professionals", controller.FindAll)
 	router.Get("/professional/{id}", controller.Find)
 	router.Post("/professional/{id}", controller.Update)

@@ -19,7 +19,7 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 
 	t.Run("Empty professionals", func(t *testing.T) {
 		// Arrange
-		request, _ := http.NewRequest("GET", "/professionals", nil)
+		request := NewJsonRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
@@ -59,7 +59,7 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				Email: "test2@gmail.com",
 			},
 		}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
+		request := NewJsonRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
