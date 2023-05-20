@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"crypto/rsa"
 	"fmt"
 	"github.com/golang-jwt/jwt"
@@ -12,7 +13,7 @@ import (
 const publicKeyPath = "/config/rsa.public.key"
 
 type Service interface {
-	IsAuthenticated(auth string) bool
+	IsAuthenticated(ctx context.Context, auth string) bool
 }
 
 type serviceImpl struct {
@@ -33,7 +34,7 @@ func NewService() Service {
 	}
 }
 
-func (s *serviceImpl) IsAuthenticated(auth string) bool {
+func (s *serviceImpl) IsAuthenticated(ctx context.Context, auth string) bool {
 	accessToken := getAccessTokenFromAuthHeader(auth)
 	if accessToken == "" {
 		return false

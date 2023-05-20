@@ -10,8 +10,12 @@ func ReadJSON(r *http.Request, out interface{}) error {
 	if r.Body == nil || r.ContentLength == 0 {
 		return nil
 	}
+	if r.ContentLength > 1000000 {
+		return errors.New("request body too large")
+	}
 
 	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
 	err := dec.Decode(out)
 	defer r.Body.Close()
 	if err != nil {

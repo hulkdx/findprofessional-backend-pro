@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"net/http/httptest"
@@ -13,12 +14,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty professionals", func(t *testing.T) {
 		// Arrange
-		request, _ := http.NewRequest("GET", "/professionals", nil)
+		request := NewJsonRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
@@ -26,6 +27,7 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualJSON(t, response.Body.String(), []string{})
 	})
+
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
 		now := time.Now()
@@ -57,7 +59,7 @@ func ListProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				Email: "test2@gmail.com",
 			},
 		}
-		request, _ := http.NewRequest("GET", "/professionals", nil)
+		request := NewJsonRequest("GET", "/professionals", nil)
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
@@ -77,6 +79,6 @@ func NewTestController(db *sql.DB) *professional.Controller {
 
 type MockUserService struct{}
 
-func (m *MockUserService) IsAuthenticated(auth string) bool {
+func (m *MockUserService) IsAuthenticated(ctx context.Context, auth string) bool {
 	return true
 }

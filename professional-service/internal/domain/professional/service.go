@@ -1,7 +1,16 @@
 package professional
 
+import (
+	"context"
+	"errors"
+)
+
+var ErrNotFound = errors.New("not found")
+
 type Service interface {
-	FindAllProfessional() ([]Professional, error)
+	FindAll(context.Context) ([]Professional, error)
+	FindById(ctx context.Context, id string) (Professional, error)
+	Update(ctx context.Context, id string, p UpdateRequest) error
 }
 
 type serviceImpl struct {
@@ -12,6 +21,14 @@ func NewService(repository Repository) Service {
 	return &serviceImpl{repository}
 }
 
-func (s *serviceImpl) FindAllProfessional() ([]Professional, error) {
-	return s.repository.FindAll("ID", "Email")
+func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
+	return s.repository.FindAll(ctx, "ID", "Email")
+}
+
+func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, error) {
+	return s.repository.FindById(ctx, id, "ID", "Email")
+}
+
+func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
+	return s.repository.Update(ctx, id, p)
 }
