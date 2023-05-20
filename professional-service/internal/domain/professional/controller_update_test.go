@@ -57,7 +57,6 @@ func TestUpdateProfessional(t *testing.T) {
 		}
 	})
 
-	// TODO: add test for invalid email address
 	t.Run("invalid email", func(t *testing.T) {
 		invalidEmails := []string{
 			"",
