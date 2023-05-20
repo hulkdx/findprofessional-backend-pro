@@ -5,8 +5,16 @@ build:
   artifacts:
   - image: hulkdx/ff-pro
     context: ../professional-service
-    buildpacks:
-      builder: gcr.io/buildpacks/builder:v1
+    custom:
+      buildCommand: |
+        set -e
+        cd ..
+        GOOS=linux make build
+        cat <<EOF | docker build --tag=$IMAGE -f - "$BUILD_CONTEXT"
+            FROM golang:1.20.4-alpine
+            COPY build/app app
+            ENTRYPOINT [ "./app" ]
+        EOF
       dependencies:
         paths:
           - "**/*"
@@ -16,4 +24,5 @@ manifests:
     paths:
       - ../deploy/dev
 deploy:
+  tolerateFailuresUntilDeadline: true
   kubectl: {}
