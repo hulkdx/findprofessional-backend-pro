@@ -4,6 +4,7 @@ COPY professional-service .
 RUN go mod download
 RUN go build \
     -ldflags "-w -s"\
+    -buildvcs=false \
     -o app \
     cmd/api/main.go
 # -----------------------------------------------------------------------------
