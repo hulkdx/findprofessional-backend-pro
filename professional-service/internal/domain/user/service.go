@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
-	"github.com/golang-jwt/jwt"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 	"os"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
 const publicKeyPath = "/config/rsa.public.key"

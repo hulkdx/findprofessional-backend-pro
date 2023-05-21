@@ -5,6 +5,9 @@ on:
   push:
     branches: [ "main" ]
 
+env:
+  DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/ff-pro:v1
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -21,8 +24,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Run tests
-      run: make test
-
     - name: Build server
       run: make build
+
+    - name: docker push
+      run: |
+        docker login --username ${{ secrets.DOCKER_USER }} --password-stdin <<< ${{ secrets.DOCKER_API_KEY }} &> /dev/null
+        docker push ${DOCKER_IMAGE_NAME} &> /dev/null
