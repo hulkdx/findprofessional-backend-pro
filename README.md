@@ -1,3 +1,7 @@
+![Build](https://img.shields.io/github/actions/workflow/status/hulkdx/findprofessional-backend-pro/push.yml?branch=main)
+[![Docker Status](https://badgen.net/docker/size/hulkdx/ff-pro/v1/amd64?icon=docker&label=docker&url)](https://hub.docker.com/repository/docker/hulkdx/ff-pro)
+[![Golang](https://img.shields.io/badge/golang-1.20.4-blue.svg?logo=go)](https://go.dev/)
+
 # Professional microservice
 
 ## Development
