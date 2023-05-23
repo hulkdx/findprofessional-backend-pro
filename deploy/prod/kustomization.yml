@@ -1,0 +1,13 @@
+namePrefix: prod-
+
+bases:
+  - ../base
+
+secretGenerator:
+- name: secrets-env
+  envs:
+  - .env
+
+- name: config-files
+  files:
+  - rsa.public.key
