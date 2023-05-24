@@ -4,11 +4,10 @@ kind: Config
 build:
   artifacts:
   - image: hulkdx/ff-pro
-    context: ../professional-service
+    context: ../
     custom:
       buildCommand: |
         set -e
-        cd ..
         GOOS=linux make build
         cat <<EOF | docker build --tag=$IMAGE -f - "$BUILD_CONTEXT"
             FROM golang:1.20.4-alpine
