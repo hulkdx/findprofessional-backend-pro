@@ -3,15 +3,12 @@ package professional
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"reflect"
-	"strings"
 	"time"
 )
 
 type Repository interface {
-	FindAll(ctx context.Context, fields ...string) ([]Professional, error)
-	FindById(ctx context.Context, id string, fields ...string) (Professional, error)
+	FindAll(ctx context.Context) ([]Professional, error)
+	FindById(ctx context.Context, id string) (Professional, error)
 	Update(ctx context.Context, id string, p UpdateRequest) error
 }
 
@@ -23,14 +20,14 @@ func NewRepository(db *sql.DB) Repository {
 	return &repositoryImpl{db}
 }
 
-func (r *repositoryImpl) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
-	query := fmt.Sprintf("SELECT %s FROM professionals", strings.Join(fields, ", "))
-	return r.find(ctx, fields, query)
+func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
+	query := "SELECT id, email FROM professionals"
+	return r.find(ctx, query)
 }
 
-func (r *repositoryImpl) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
-	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = $1", strings.Join(fields, ", "))
-	return r.findOne(ctx, fields, query, id)
+func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional, error) {
+	query := "SELECT id, email FROM professionals WHERE id = $1"
+	return r.findOne(ctx, query, id)
 }
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
@@ -49,7 +46,7 @@ func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest)
 	return nil
 }
 
-func (r *repositoryImpl) find(ctx context.Context, fields []string, query string, args ...any) ([]Professional, error) {
+func (r *repositoryImpl) find(ctx context.Context, query string, args ...any) ([]Professional, error) {
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -59,13 +56,7 @@ func (r *repositoryImpl) find(ctx context.Context, fields []string, query string
 	professionals := []Professional{}
 	for rows.Next() {
 		pro := Professional{}
-		elem := reflect.ValueOf(&pro).Elem()
-		scanArgs := make([]interface{}, len(fields))
-		for i := range fields {
-			field := elem.FieldByName(fields[i])
-			scanArgs[i] = field.Addr().Interface()
-		}
-		if err := rows.Scan(scanArgs...); err != nil {
+		if err := rows.Scan(&pro.ID, &pro.Email); err != nil {
 			return nil, err
 		}
 		professionals = append(professionals, pro)
@@ -77,8 +68,8 @@ func (r *repositoryImpl) find(ctx context.Context, fields []string, query string
 	return professionals, nil
 }
 
-func (r *repositoryImpl) findOne(ctx context.Context, fields []string, query string, queryArgs ...any) (Professional, error) {
-	professionals, err := r.find(ctx, fields, query, queryArgs...)
+func (r *repositoryImpl) findOne(ctx context.Context, query string, queryArgs ...any) (Professional, error) {
+	professionals, err := r.find(ctx, query, queryArgs...)
 	if err != nil {
 		return Professional{}, err
 	}

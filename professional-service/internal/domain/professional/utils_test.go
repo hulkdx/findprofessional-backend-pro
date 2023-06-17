@@ -10,11 +10,11 @@ type FakeRepository struct {
 	updateError     error
 }
 
-func (r *FakeRepository) FindAll(ctx context.Context, fields ...string) ([]Professional, error) {
+func (r *FakeRepository) FindAll(ctx context.Context) ([]Professional, error) {
 	return r.findAllSuccess, r.findAllError
 }
 
-func (r *FakeRepository) FindById(ctx context.Context, id string, fields ...string) (Professional, error) {
+func (r *FakeRepository) FindById(ctx context.Context, id string) (Professional, error) {
 	return r.findByIdSuccess, r.findByIdError
 }
 
