@@ -5,6 +5,13 @@ import (
 	"errors"
 )
 
+var (
+	filterQuery = `id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url`
+	filterItems = func(pro *Professional) []any {
+		return []any{&pro.ID, &pro.Email, &pro.FirstName, &pro.LastName, &pro.CoachType, &pro.PriceNumber, &pro.PriceCurrency, &pro.ProfileImageUrl}
+	}
+)
+
 var ErrNotFound = errors.New("not found")
 
 type Service interface {
@@ -22,11 +29,12 @@ func NewService(repository Repository) Service {
 }
 
 func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
-	return s.repository.FindAll(ctx)
+
+	return s.repository.FindAll(ctx, filterQuery, filterItems)
 }
 
 func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, error) {
-	return s.repository.FindById(ctx, id)
+	return s.repository.FindById(ctx, id, filterQuery, filterItems)
 }
 
 func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {

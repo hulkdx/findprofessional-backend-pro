@@ -3,12 +3,15 @@ package professional
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 )
 
+type FilterItems func(pro *Professional) []any
+
 type Repository interface {
-	FindAll(ctx context.Context) ([]Professional, error)
-	FindById(ctx context.Context, id string) (Professional, error)
+	FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error)
+	FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error)
 	Update(ctx context.Context, id string, p UpdateRequest) error
 }
 
@@ -20,14 +23,14 @@ func NewRepository(db *sql.DB) Repository {
 	return &repositoryImpl{db}
 }
 
-func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
-	query := "SELECT id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url FROM professionals"
-	return r.find(ctx, query)
+func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
+	query := fmt.Sprintf("SELECT %s FROM professionals", filterQuery)
+	return r.find(ctx, filterItems, query)
 }
 
-func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional, error) {
-	query := "SELECT id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url FROM professionals WHERE id = $1"
-	return r.findOne(ctx, query, id)
+func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
+	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = $1", filterQuery)
+	return r.findOne(ctx, filterItems, query, id)
 }
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
@@ -46,7 +49,7 @@ func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest)
 	return nil
 }
 
-func (r *repositoryImpl) find(ctx context.Context, query string, args ...any) ([]Professional, error) {
+func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, query string, args ...any) ([]Professional, error) {
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -56,16 +59,7 @@ func (r *repositoryImpl) find(ctx context.Context, query string, args ...any) ([
 	professionals := []Professional{}
 	for rows.Next() {
 		pro := Professional{}
-		err := rows.Scan(
-			&pro.ID,
-			&pro.Email,
-			&pro.FirstName,
-			&pro.LastName,
-			&pro.CoachType,
-			&pro.PriceNumber,
-			&pro.PriceCurrency,
-			&pro.ProfileImageUrl,
-		)
+		err := rows.Scan(filterItems(&pro)...)
 		if err != nil {
 			return nil, err
 		}
@@ -78,8 +72,8 @@ func (r *repositoryImpl) find(ctx context.Context, query string, args ...any) ([
 	return professionals, nil
 }
 
-func (r *repositoryImpl) findOne(ctx context.Context, query string, queryArgs ...any) (Professional, error) {
-	professionals, err := r.find(ctx, query, queryArgs...)
+func (r *repositoryImpl) findOne(ctx context.Context, filterItems FilterItems, query string, queryArgs ...any) (Professional, error) {
+	professionals, err := r.find(ctx, filterItems, query, queryArgs...)
 	if err != nil {
 		return Professional{}, err
 	}
