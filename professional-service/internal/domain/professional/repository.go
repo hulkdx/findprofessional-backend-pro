@@ -21,12 +21,12 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
-	query := "SELECT id, email FROM professionals"
+	query := "SELECT id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url FROM professionals"
 	return r.find(ctx, query)
 }
 
 func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional, error) {
-	query := "SELECT id, email FROM professionals WHERE id = $1"
+	query := "SELECT id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url FROM professionals WHERE id = $1"
 	return r.findOne(ctx, query, id)
 }
 
@@ -56,7 +56,17 @@ func (r *repositoryImpl) find(ctx context.Context, query string, args ...any) ([
 	professionals := []Professional{}
 	for rows.Next() {
 		pro := Professional{}
-		if err := rows.Scan(&pro.ID, &pro.Email); err != nil {
+		err := rows.Scan(
+			&pro.ID,
+			&pro.Email,
+			&pro.FirstName,
+			&pro.LastName,
+			&pro.CoachType,
+			&pro.PriceNumber,
+			&pro.PriceCurrency,
+			&pro.ProfileImageUrl,
+		)
+		if err != nil {
 			return nil, err
 		}
 		professionals = append(professionals, pro)
