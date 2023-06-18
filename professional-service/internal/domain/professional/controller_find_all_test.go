@@ -58,22 +58,22 @@ func TestFindAllProfessional(t *testing.T) {
 			{
 				ID:              1,
 				Email:           "test1@gmail.com",
-				FirstName:       "Test 1",
-				LastName:        "Last 1",
-				CoachType:       "Type 1",
-				PriceNumber:     100,
-				PriceCurrency:   "EUR",
-				ProfileImageUrl: "Url 1",
+				FirstName:       String("Test 1"),
+				LastName:        String("Last 1"),
+				CoachType:       String("Type 1"),
+				PriceNumber:     Int(100),
+				PriceCurrency:   String("EUR"),
+				ProfileImageUrl: String("Url 1"),
 			},
 			{
 				ID:              2,
 				Email:           "test2@gmail.com",
-				FirstName:       "Test 2",
-				LastName:        "Last 2",
-				CoachType:       "Type 2",
-				PriceNumber:     100,
-				PriceCurrency:   "EUR",
-				ProfileImageUrl: "Url 2",
+				FirstName:       String("Test 2"),
+				LastName:        String("Last 2"),
+				CoachType:       String("Type 2"),
+				PriceNumber:     Int(100),
+				PriceCurrency:   String("EUR"),
+				ProfileImageUrl: String("Url 2"),
 			},
 		}
 		response := httptest.NewRecorder()
@@ -97,4 +97,12 @@ func findAllController(findAllSuccess []Professional) *Controller {
 func findAllRequest() *http.Request {
 	request, _ := http.NewRequest("GET", "/professionals", nil)
 	return request
+}
+
+func String(s string) *string {
+	return &s
+}
+
+func Int(i int) *int {
+	return &i
 }
