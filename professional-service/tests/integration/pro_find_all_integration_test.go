@@ -65,7 +65,7 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		handler.ServeHTTP(response, request)
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.EqualJSON(t, response.Body.String(), expected)
+		assert.EqualAnyOrderJSON(t, response.Body.String(), expected)
 	})
 }
 

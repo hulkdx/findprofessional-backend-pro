@@ -6,9 +6,29 @@ import (
 )
 
 var (
-	filterQuery = `id, email, first_name, last_name, coach_type, price_number, price_currency, profile_image_url`
+	filterQuery = `
+	p.id,
+	email,
+	first_name,
+	last_name,
+	coach_type,
+	price_number,
+	price_currency,
+	profile_image_url,
+	AVG(rate)::numeric(10,2) AS rating
+`
 	filterItems = func(pro *Professional) []any {
-		return []any{&pro.ID, &pro.Email, &pro.FirstName, &pro.LastName, &pro.CoachType, &pro.PriceNumber, &pro.PriceCurrency, &pro.ProfileImageUrl}
+		return []any{
+			&pro.ID,
+			&pro.Email,
+			&pro.FirstName,
+			&pro.LastName,
+			&pro.CoachType,
+			&pro.PriceNumber,
+			&pro.PriceCurrency,
+			&pro.ProfileImageUrl,
+			&pro.Rating,
+		}
 	}
 )
 
@@ -29,7 +49,6 @@ func NewService(repository Repository) Service {
 }
 
 func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
-
 	return s.repository.FindAll(ctx, filterQuery, filterItems)
 }
 

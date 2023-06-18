@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+
 	"github.com/docker/go-connections/nat"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	_ "github.com/lib/pq"
@@ -11,7 +13,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func InitDb() (*sql.DB, *gorm.DB, func()) {
@@ -57,7 +58,7 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = gormDB.AutoMigrate(&professional.Professional{})
+	integrationDbTables(gormDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,4 +67,24 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 		db.Close()
 		postgresContainer.Terminate(ctx)
 	}
+}
+
+func integrationDbTables(gormDB *gorm.DB) error {
+	err := gormDB.AutoMigrate(&professional.Professional{})
+	if err != nil {
+		return err
+	}
+	// https://github.com/hulkdx/findprofessional-backend-user/blob/main/user-service/src/main/resources/db/changelog/db.changelog-master.sql
+	err = gormDB.Exec(`
+	CREATE TABLE "professional_rating" (
+		"id" BIGSERIAL PRIMARY KEY,
+		"user_id" BIGINT NOT NULL,
+		"professional_id" BIGINT NOT NULL,
+		"rate" INT NOT NULL
+	);
+	`).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

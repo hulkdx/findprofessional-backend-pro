@@ -12,6 +12,7 @@ type Professional struct {
 	PriceNumber     *int       `json:"priceNumber,omitempty"`
 	PriceCurrency   *string    `json:"priceCurrency,omitempty"`
 	ProfileImageUrl *string    `json:"profileImageUrl,omitempty"`
+	Rating          *string    `json:"rating,omitempty"`
 	CreatedAt       *time.Time `json:"createdAt,omitempty"`
 	UpdatedAt       *time.Time `json:"updatedAt,omitempty"`
 }
