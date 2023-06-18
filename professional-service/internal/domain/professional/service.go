@@ -29,7 +29,6 @@ func NewService(repository Repository) Service {
 }
 
 func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
-
 	return s.repository.FindAll(ctx, filterQuery, filterItems)
 }
 
