@@ -24,12 +24,23 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
-	query := fmt.Sprintf("SELECT %s FROM professionals", filterQuery)
+	query := fmt.Sprintf(`
+	SELECT %s FROM professionals p
+	LEFT JOIN professional_rating r
+		ON p.id=r.professional_id
+	GROUP BY p.id
+	`, filterQuery)
 	return r.find(ctx, filterItems, query)
 }
 
 func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
-	query := fmt.Sprintf("SELECT %s FROM professionals WHERE id = $1", filterQuery)
+	query := fmt.Sprintf(`
+	SELECT %s FROM professionals p
+	LEFT JOIN professional_rating r
+		ON p.id=r.professional_id
+	WHERE p.id=$1
+	GROUP BY p.id
+	`, filterQuery)
 	return r.findOne(ctx, filterItems, query, id)
 }
 
