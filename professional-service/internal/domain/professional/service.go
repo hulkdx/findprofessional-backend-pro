@@ -15,6 +15,7 @@ var (
 	price_number,
 	price_currency,
 	profile_image_url,
+	description,
 	AVG(rate)::numeric(10,2) AS rating
 `
 	filterItems = func(pro *Professional) []any {
@@ -27,6 +28,7 @@ var (
 			&pro.PriceNumber,
 			&pro.PriceCurrency,
 			&pro.ProfileImageUrl,
+			&pro.Description,
 			&pro.Rating,
 		}
 	}
