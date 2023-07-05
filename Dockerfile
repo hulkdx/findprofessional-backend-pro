@@ -7,7 +7,8 @@ RUN go build \
     -buildvcs=false \
     -o app \
     cmd/api/main.go
+
 # -----------------------------------------------------------------------------
-FROM alpine:3.16
+FROM alpine:latest
 COPY --from=builder /src/app app
 ENTRYPOINT [ "./app" ]
