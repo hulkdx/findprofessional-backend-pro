@@ -9,7 +9,8 @@ env:
   DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/ff-pro:v1
 
 jobs:
-  tests:
+  deploy:
+    name: build and deploy to kubernetes
     runs-on: ubuntu-latest
 
     steps:
