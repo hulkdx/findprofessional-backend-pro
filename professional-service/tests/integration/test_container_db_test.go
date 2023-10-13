@@ -75,16 +75,20 @@ func integrationDbTables(gormDB *gorm.DB) error {
 		return err
 	}
 	// https://github.com/hulkdx/findprofessional-backend-user/blob/main/user-service/src/main/resources/db/changelog/db.changelog-master.sql
-	err = gormDB.Exec(`
-	CREATE TABLE "professional_rating" (
-		"id" BIGSERIAL PRIMARY KEY,
-		"user_id" BIGINT NOT NULL,
-		"professional_id" BIGINT NOT NULL,
-		"rate" INT NOT NULL
-	);
-	`).Error
+	err = gormDB.AutoMigrate(&ProfessionalRating{})
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+type ProfessionalRating struct {
+	ID             uint `gorm:"primaryKey"`
+	UserID         int64
+	ProfessionalID int64
+	Rate           int
+}
+
+func (ProfessionalRating) TableName() string {
+	return "professional_rating"
 }
