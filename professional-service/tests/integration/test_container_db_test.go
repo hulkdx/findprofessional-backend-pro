@@ -13,6 +13,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 func InitDb() (*sql.DB, *gorm.DB, func()) {
@@ -54,7 +55,12 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 	if err != nil {
 		log.Fatal("Failed to connect to PostgreSQL: ", err)
 	}
-	gormDB, err := gorm.Open(postgres.New(postgres.Config{Conn: db, PreferSimpleProtocol: true}), &gorm.Config{})
+	gormDB, err := gorm.Open(
+		postgres.New(postgres.Config{Conn: db, PreferSimpleProtocol: true}),
+		&gorm.Config{
+			NamingStrategy: TestNamingStrategy{},
+		},
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +76,7 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 }
 
 func integrationDbTables(gormDB *gorm.DB) error {
-	err := gormDB.AutoMigrate(&professional.Professional{})
+	err := gormDB.AutoMigrate(&professional.Professional{}, &professional.Availability{})
 	if err != nil {
 		return err
 	}
@@ -82,13 +88,23 @@ func integrationDbTables(gormDB *gorm.DB) error {
 	return nil
 }
 
+type TestNamingStrategy struct {
+	schema.NamingStrategy
+}
+
+func (ns TestNamingStrategy) TableName(table string) string {
+	if table == "ProfessionalRating" {
+		return "professional_rating"
+	}
+	if table == "Availability" {
+		return "professional_availability"
+	}
+	return ns.NamingStrategy.TableName(table)
+}
+
 type ProfessionalRating struct {
 	ID             uint `gorm:"primaryKey"`
 	UserID         int64
 	ProfessionalID int64
 	Rate           int
-}
-
-func (ProfessionalRating) TableName() string {
-	return "professional_rating"
 }
