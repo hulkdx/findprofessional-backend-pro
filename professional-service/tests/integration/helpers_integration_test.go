@@ -106,3 +106,76 @@ func insertAvailability(db *sql.DB, availabilities ...professional.Availability)
 		defer db.Exec(`DELETE FROM professional_availability; DELETE FROM professionals;`)
 	}
 }
+
+type ProfessionalRating struct {
+	ID             uint
+	UserID         int64
+	ProfessionalID int64
+	Rate           int
+}
+
+func insertRating(db *sql.DB, rating ...ProfessionalRating) func() {
+	query := `INSERT INTO "professional_rating" ("professional_id", "user_id", "rate") VALUES ($1, $2, $3)`
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	for _, r := range rating {
+		_, err := stmt.Exec(r.ProfessionalID, r.UserID, r.Rate)
+		if err != nil {
+			tx.Rollback()
+			log.Fatal(err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+
+	return func() {
+		defer db.Exec(`DELETE FROM professional_rating;`)
+	}
+}
+
+type User struct {
+	ID uint
+}
+
+func insertUser(db *sql.DB, user ...User) func() {
+	query := `INSERT INTO "users" (id, email, password) VALUES ($1, $2, $3)`
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	for _, u := range user {
+		_, err := stmt.Exec(u.ID, u.ID, "")
+		if err != nil {
+			tx.Rollback()
+			log.Fatal(err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+
+	return func() {
+		defer db.Exec(`DELETE FROM users;`)
+	}
+}
