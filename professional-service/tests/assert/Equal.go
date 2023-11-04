@@ -81,3 +81,49 @@ func objectsAreEqual(actual, expected any) bool {
 
 	return reflect.DeepEqual(expected, actual)
 }
+
+func EqualAnyOrder(t *testing.T, actual, expected interface{}) {
+	t.Helper()
+	extraA, extraB := diffLists(actual, expected)
+	if len(extraA) == 0 && len(extraB) == 0 {
+		return
+	}
+	t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
+}
+
+func diffLists(listA, listB interface{}) (extraA, extraB []interface{}) {
+	aValue := reflect.ValueOf(listA)
+	bValue := reflect.ValueOf(listB)
+
+	aLen := aValue.Len()
+	bLen := bValue.Len()
+
+	// Mark indexes in bValue that we already used
+	visited := make([]bool, bLen)
+	for i := 0; i < aLen; i++ {
+		element := aValue.Index(i).Interface()
+		found := false
+		for j := 0; j < bLen; j++ {
+			if visited[j] {
+				continue
+			}
+			if objectsAreEqual(bValue.Index(j).Interface(), element) {
+				visited[j] = true
+				found = true
+				break
+			}
+		}
+		if !found {
+			extraA = append(extraA, element)
+		}
+	}
+
+	for j := 0; j < bLen; j++ {
+		if visited[j] {
+			continue
+		}
+		extraB = append(extraB, bValue.Index(j).Interface())
+	}
+
+	return
+}

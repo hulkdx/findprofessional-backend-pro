@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
 
+	"cloud.google.com/go/civil"
 	"github.com/docker/go-connections/nat"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	_ "github.com/lib/pq"
@@ -76,6 +78,7 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 }
 
 func integrationDbTables(gormDB *gorm.DB) error {
+	schema.RegisterSerializer("custom", CustomSerializer{})
 	err := gormDB.AutoMigrate(&professional.Professional{}, &professional.Availability{})
 	if err != nil {
 		return err
@@ -107,4 +110,24 @@ type ProfessionalRating struct {
 	UserID         int64
 	ProfessionalID int64
 	Rate           int
+}
+
+type CustomSerializer struct{}
+
+func (CustomSerializer) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
+	t := sql.NullTime{}
+	if err = t.Scan(dbValue); err == nil && t.Valid {
+		err = field.Set(ctx, dst, t.Time.Unix())
+	}
+	return
+}
+
+func (CustomSerializer) Value(ctx context.Context, field *schema.Field, dst reflect.Value, fieldValue interface{}) (result interface{}, err error) {
+	switch v := fieldValue.(type) {
+	case civil.Time:
+		result = v.String()
+	default:
+		err = fmt.Errorf("invalid field type %#v for UnixSecondSerializer, only int, uint supported", v)
+	}
+	return
 }
