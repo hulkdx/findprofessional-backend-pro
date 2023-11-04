@@ -12,10 +12,9 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
-	"gorm.io/gorm"
 )
 
-func UpdateProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty database", func(t *testing.T) {
@@ -37,8 +36,8 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 			ID:    id,
 			Email: "emailofidone@email.com",
 		}
-		gdb.Create(record)
-		defer gdb.Delete(record)
+		d1 := insertPro(db, *record)
+		defer d1()
 
 		requestBody := `{ "email": "new@email.com" }`
 		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))

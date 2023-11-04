@@ -8,11 +8,21 @@ func TestIntegrations(t *testing.T) {
 	db, closeDb := InitDb()
 	defer closeDb()
 
-	FindAllProfessionalTest(t, db)
-	FindAllAvailabilityProfessionalTest(t, db)
-	FindAllRatingProfessionalTest(t, db)
+	t.Run("FindAllProfessionalTest", func(t *testing.T) {
+		FindAllProfessionalTest(t, db)
+	})
+	t.Run("FindAllAvailabilityProfessionalTest", func(t *testing.T) {
+		FindAllAvailabilityProfessionalTest(t, db)
+	})
+	t.Run("FindAllRatingProfessionalTest", func(t *testing.T) {
+		FindAllRatingProfessionalTest(t, db)
+	})
 
-	// FindProfessionalTest(t, db, gdb)
+	t.Run("FindProfessionalTest", func(t *testing.T) {
+		FindProfessionalTest(t, db)
+	})
 
-	// UpdateProfessionalTest(t, db, gdb)
+	t.Run("UpdateProfessionalTest", func(t *testing.T) {
+		UpdateProfessionalTest(t, db)
+	})
 }

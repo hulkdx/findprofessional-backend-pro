@@ -40,6 +40,8 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery st
 	SELECT %s FROM professionals p
 	LEFT JOIN professional_rating r
 		ON p.id=r.professional_id
+	LEFT JOIN professional_availability a
+		ON p.id=a.professional_id
 	WHERE p.id=$1
 	GROUP BY p.id
 	`, filterQuery)
