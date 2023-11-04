@@ -5,12 +5,12 @@ import (
 )
 
 func TestIntegrations(t *testing.T) {
-	db, gdb, closeDb := InitDb()
+	db, closeDb := InitDb()
 	defer closeDb()
 
 	// FindAllProfessionalTest(t, db, gdb)
 	// FindProfessionalTest(t, db, gdb)
-	FindAllAvailabilityProfessionalTest(t, db, gdb)
+	FindAllAvailabilityProfessionalTest(t, db)
 	// FindAllRatingProfessionalTest(t, db, gdb)
 	// UpdateProfessionalTest(t, db, gdb)
 }

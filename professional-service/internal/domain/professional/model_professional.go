@@ -14,7 +14,7 @@ type Professional struct {
 	Password        string         `json:"password,omitempty"`
 	FirstName       string         `json:"firstName,omitempty"`
 	LastName        string         `json:"lastName,omitempty"`
-	CoachType       *string        `json:"coachType,omitempty"`
+	CoachType       string         `json:"coachType,omitempty"`
 	PriceNumber     *int           `json:"priceNumber,omitempty"`
 	PriceCurrency   *string        `json:"priceCurrency,omitempty"`
 	ProfileImageUrl *string        `json:"profileImageUrl,omitempty"`

@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,22 +11,21 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
-	"gorm.io/gorm"
 )
 
-func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB) {
 	handler := router.Handler(NewTestController(db))
-	t.Run("empty availabilities", func(t *testing.T) {
+	t.Run("empty availability", func(t *testing.T) {
 		// Arrange
 		expected := []professional.Availability{}
-		records := []professional.Professional{
-			{
-				ID:        1,
-				FirstName: "Saba",
-			},
+		_, err := db.Exec(`INSERT INTO "professionals"
+		(id,"email","password","first_name","last_name","coach_type","price_number","price_currency") VALUES
+		(1 ,''			,''				 ,''          ,''          ,''          ,0					  ,''				      )
+		`)
+		if err != nil {
+			log.Fatal(err)
 		}
-		gdb.Debug().Create(records)
-		defer gdb.Delete(records)
+		defer db.Exec(`DELETE FROM professional_availability; DELETE FROM professionals;`)
 
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()
@@ -59,8 +59,22 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB)
 			},
 		}
 
-		gdb.Exec(`INSERT INTO "professionals" ("email","password","first_name","last_name","coach_type","price_number","price_currency","profile_image_url","description","rating","created_at","updated_at","id") VALUES ('','','testsadsa','',NULL,NULL,NULL,NULL,NULL,NULL,'2023-11-04 17:59:23.23','2023-11-04 17:59:23.23',1)`)
-		gdb.Exec(`INSERT INTO "professional_availability" ("professional_id","date","from","to","id") VALUES (1,'"2023-11-04"','05:30:00','06:30:00',1),(1,'"2020-11-04"','15:30:00','16:00:00',2)`)
+		_, err := db.Exec(`INSERT INTO "professionals"
+		(id,"email","password","first_name","last_name","coach_type","price_number","price_currency") VALUES
+		(1 ,''			,''				 ,''          ,''          ,''          ,0					  ,''				      )
+		`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = db.Exec(`INSERT INTO "professional_availability"
+		("professional_id","date"				 ,"from"    ,"to"      ) VALUES
+		(1								,'"2023-11-04"','05:30:00','06:30:00'),
+		(1								,'"2020-11-04"','15:30:00','16:00:00')
+		`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Exec(`DELETE FROM professional_availability; DELETE FROM professionals;`)
 
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()

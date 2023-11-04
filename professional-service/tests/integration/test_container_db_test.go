@@ -5,20 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"reflect"
 
-	"cloud.google.com/go/civil"
 	"github.com/docker/go-connections/nat"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	_ "github.com/lib/pq"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
-func InitDb() (*sql.DB, *gorm.DB, func()) {
+func InitDb() (*sql.DB, func()) {
 	ctx := context.Background()
 
 	// Create a PostgreSQL container
@@ -57,77 +51,67 @@ func InitDb() (*sql.DB, *gorm.DB, func()) {
 	if err != nil {
 		log.Fatal("Failed to connect to PostgreSQL: ", err)
 	}
-	gormDB, err := gorm.Open(
-		postgres.New(postgres.Config{Conn: db, PreferSimpleProtocol: true}),
-		&gorm.Config{
-			NamingStrategy: TestNamingStrategy{},
-		},
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	integrationDbTables(gormDB)
+	integrationDbTables(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return db, gormDB, func() {
+	return db, func() {
 		db.Close()
 		postgresContainer.Terminate(ctx)
 	}
 }
 
-func integrationDbTables(gormDB *gorm.DB) error {
-	schema.RegisterSerializer("custom", CustomSerializer{})
-	err := gormDB.AutoMigrate(&professional.Professional{}, &professional.Availability{})
-	if err != nil {
-		return err
-	}
+func integrationDbTables(db *sql.DB) error {
 	// https://github.com/hulkdx/findprofessional-backend-user/blob/main/user-service/src/main/resources/db/changelog/db.changelog-master.sql
-	err = gormDB.AutoMigrate(&ProfessionalRating{})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type TestNamingStrategy struct {
-	schema.NamingStrategy
-}
-
-func (ns TestNamingStrategy) TableName(table string) string {
-	if table == "ProfessionalRating" {
-		return "professional_rating"
-	}
-	if table == "Availability" {
-		return "professional_availability"
-	}
-	return ns.NamingStrategy.TableName(table)
-}
-
-type ProfessionalRating struct {
-	ID             uint `gorm:"primaryKey"`
-	UserID         int64
-	ProfessionalID int64
-	Rate           int
-}
-
-type CustomSerializer struct{}
-
-func (CustomSerializer) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
-	t := sql.NullTime{}
-	if err = t.Scan(dbValue); err == nil && t.Valid {
-		err = field.Set(ctx, dst, t.Time.Unix())
-	}
-	return
-}
-
-func (CustomSerializer) Value(ctx context.Context, field *schema.Field, dst reflect.Value, fieldValue interface{}) (result interface{}, err error) {
-	switch v := fieldValue.(type) {
-	case civil.Time:
-		result = v.String()
-	default:
-		err = fmt.Errorf("invalid field type %#v for UnixSecondSerializer, only int, uint supported", v)
-	}
-	return
+	_, err := db.Exec(`
+	CREATE TABLE "users" (
+		"id"  BIGSERIAL PRIMARY KEY,
+		"email" VARCHAR(255) UNIQUE NOT NULL,
+		"password" VARCHAR(255) NOT NULL,
+		"first_name" VARCHAR(255),
+		"last_name" VARCHAR(255),
+		"created_at" timestamp,
+		"updated_at" timestamp
+	);
+	
+	CREATE TABLE "professionals" (
+		"id" BIGSERIAL PRIMARY KEY,
+		"email" VARCHAR(255) UNIQUE NOT NULL,
+		"password" VARCHAR(255) NOT NULL,
+		"first_name" VARCHAR(255) NOT NULL,
+		"last_name" VARCHAR(255) NOT NULL,
+		"coach_type" VARCHAR(255) NOT NULL,
+		"price_number" BIGINT NOT NULL,
+		"price_currency" VARCHAR(255) NOT NULL,
+		"profile_image_url" VARCHAR(255),
+		"description" VARCHAR(255),
+		"created_at" timestamp,
+		"updated_at" timestamp
+	);
+	
+	CREATE TABLE "professional_rating" (
+		"id" BIGSERIAL PRIMARY KEY,
+		"user_id" BIGINT NOT NULL,
+		"professional_id" BIGINT NOT NULL,
+		"rate" INT NOT NULL
+	);
+	
+	CREATE UNIQUE INDEX ON "professional_rating" ("user_id", "professional_id");
+	
+	ALTER TABLE "professional_rating" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+	
+	ALTER TABLE "professional_rating" ADD FOREIGN KEY ("professional_id") REFERENCES "professionals" ("id");
+	
+	CREATE TABLE "professional_availability" (
+		"id" BIGSERIAL PRIMARY KEY,
+		"professional_id" BIGINT NOT NULL,
+		"date" DATE NOT NULL,
+		"from" TIME NOT NULL,
+		"to" TIME NOT NULL
+	);
+	
+	ALTER TABLE "professional_availability" ADD FOREIGN KEY ("professional_id") REFERENCES "professionals" ("id");
+	`)
+	return err
 }
