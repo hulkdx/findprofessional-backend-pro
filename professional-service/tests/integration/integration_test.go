@@ -8,7 +8,7 @@ func TestIntegrations(t *testing.T) {
 	db, closeDb := InitDb()
 	defer closeDb()
 
-	// FindAllProfessionalTest(t, db, gdb)
+	FindAllProfessionalTest(t, db)
 	// FindProfessionalTest(t, db, gdb)
 	FindAllAvailabilityProfessionalTest(t, db)
 	// FindAllRatingProfessionalTest(t, db, gdb)

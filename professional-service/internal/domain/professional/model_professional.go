@@ -20,7 +20,7 @@ type Professional struct {
 	ProfileImageUrl *string        `json:"profileImageUrl,omitempty"`
 	Description     *string        `json:"description,omitempty"`
 	Rating          *string        `json:"rating,omitempty"`
-	Availability    Availabilities `json:"availabilities,omitempty"`
+	Availability    Availabilities `json:"availability,omitempty"`
 	CreatedAt       *time.Time     `json:"createdAt,omitempty"`
 	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
 }
