@@ -11,10 +11,9 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
-	"gorm.io/gorm"
 )
 
-func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("proffesional got give 5 star ratings from all users", func(t *testing.T) {
@@ -30,8 +29,16 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				UpdatedAt: &now,
 			},
 		}
-		gdb.Create(professional_records)
-		defer gdb.Delete(professional_records)
+		d1 := insertPro(db, professional_records...)
+		defer d1()
+
+		d2 := insertUser(db, []User{
+			{ID: 2},
+			{ID: 3},
+			{ID: 4},
+			{ID: 5},
+		}...)
+		defer d2()
 
 		rating_records := []ProfessionalRating{
 			{
@@ -59,8 +66,8 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				Rate:           5,
 			},
 		}
-		gdb.Create(rating_records)
-		defer gdb.Delete(rating_records)
+		d3 := insertRating(db, rating_records...)
+		defer d3()
 
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()
@@ -89,8 +96,8 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 				UpdatedAt: &now,
 			},
 		}
-		gdb.Create(professional_records)
-		defer gdb.Delete(professional_records)
+		d1 := insertPro(db, professional_records...)
+		defer d1()
 
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()

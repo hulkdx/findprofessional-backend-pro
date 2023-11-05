@@ -11,10 +11,9 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
-	"gorm.io/gorm"
 )
 
-func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
+func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty professionals", func(t *testing.T) {
@@ -33,30 +32,38 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB, gdb *gorm.DB) {
 		now := time.Now()
 		records := []professional.Professional{
 			{
-				ID:        1,
-				Email:     "test1@gmail.com",
-				Password:  "some_hex_value2",
-				CreatedAt: &now,
-				UpdatedAt: &now,
+				ID:            1,
+				Email:         "test1@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
+				CreatedAt:     &now,
+				UpdatedAt:     &now,
 			},
 			{
-				ID:        2,
-				Email:     "test2@gmail.com",
-				Password:  "some_hex_value2",
-				CreatedAt: &now,
-				UpdatedAt: &now,
+				ID:            2,
+				Email:         "test2@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
+				CreatedAt:     &now,
+				UpdatedAt:     &now,
 			},
 		}
-		gdb.Create(records)
-		defer gdb.Delete(records)
+		d1 := insertPro(db, records...)
+		defer d1()
 		expected := []professional.Professional{
 			{
-				ID:    1,
-				Email: "test1@gmail.com",
+				ID:            1,
+				Email:         "test1@gmail.com",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
 			},
 			{
-				ID:    2,
-				Email: "test2@gmail.com",
+				ID:            2,
+				Email:         "test2@gmail.com",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
 			},
 		}
 		request := NewJsonRequest("GET", "/professional", nil)

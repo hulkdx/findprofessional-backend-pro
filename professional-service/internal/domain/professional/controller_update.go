@@ -39,7 +39,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	idInt, _ := strconv.Atoi(id)
+	idInt, _ := strconv.ParseInt(id, 10, 64)
 	response := Professional{
 		ID:        idInt,
 		Email:     updateRequest.Email,

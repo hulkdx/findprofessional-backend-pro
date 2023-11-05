@@ -28,6 +28,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	SELECT %s FROM professionals p
 	LEFT JOIN professional_rating r
 		ON p.id=r.professional_id
+	LEFT JOIN professional_availability a
+		ON p.id=a.professional_id
 	GROUP BY p.id
 	`, filterQuery)
 	return r.find(ctx, filterItems, query)
@@ -38,6 +40,8 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery st
 	SELECT %s FROM professionals p
 	LEFT JOIN professional_rating r
 		ON p.id=r.professional_id
+	LEFT JOIN professional_availability a
+		ON p.id=a.professional_id
 	WHERE p.id=$1
 	GROUP BY p.id
 	`, filterQuery)
@@ -69,7 +73,9 @@ func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, quer
 
 	professionals := []Professional{}
 	for rows.Next() {
-		pro := Professional{}
+		pro := Professional{
+			Availability: []Availability{},
+		}
 		err := rows.Scan(filterItems(&pro)...)
 		if err != nil {
 			return nil, err

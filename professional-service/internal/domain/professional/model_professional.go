@@ -1,19 +1,42 @@
 package professional
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+
+	"cloud.google.com/go/civil"
+)
 
 type Professional struct {
-	ID              int        `json:"id,omitempty"`
-	Email           string     `json:"email,omitempty"`
-	Password        string     `json:"password,omitempty"`
-	FirstName       string     `json:"firstName,omitempty"`
-	LastName        string     `json:"lastName,omitempty"`
-	CoachType       string     `json:"coachType,omitempty"`
-	PriceNumber     int        `json:"priceNumber,omitempty"`
-	PriceCurrency   string     `json:"priceCurrency,omitempty"`
-	ProfileImageUrl *string    `json:"profileImageUrl,omitempty"`
-	Description     *string    `json:"description,omitempty"`
-	Rating          *string    `json:"rating,omitempty"`
-	CreatedAt       *time.Time `json:"createdAt,omitempty"`
-	UpdatedAt       *time.Time `json:"updatedAt,omitempty"`
+	ID              int64          `json:"id,omitempty"`
+	Email           string         `json:"email,omitempty"`
+	Password        string         `json:"password,omitempty"`
+	FirstName       string         `json:"firstName,omitempty"`
+	LastName        string         `json:"lastName,omitempty"`
+	CoachType       string         `json:"coachType,omitempty"`
+	PriceNumber     *int           `json:"priceNumber,omitempty"`
+	PriceCurrency   *string        `json:"priceCurrency,omitempty"`
+	ProfileImageUrl *string        `json:"profileImageUrl,omitempty"`
+	Description     *string        `json:"description,omitempty"`
+	Rating          *string        `json:"rating,omitempty"`
+	Availability    Availabilities `json:"availability,omitempty"`
+	CreatedAt       *time.Time     `json:"createdAt,omitempty"`
+	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
+}
+
+type Availability struct {
+	ID             int64
+	ProfessionalID int
+	Date           civil.Date `json:"date,omitempty"`
+	From           civil.Time `json:"from,omitempty"`
+	To             civil.Time `json:"to,omitempty"`
+}
+
+type Availabilities []Availability
+
+func (ls *Availabilities) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+	return json.Unmarshal(src.([]byte), ls)
 }

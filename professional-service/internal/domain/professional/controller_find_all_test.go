@@ -61,8 +61,8 @@ func TestFindAllProfessional(t *testing.T) {
 				FirstName:       "Test 1",
 				LastName:        "Last 1",
 				CoachType:       "Type 1",
-				PriceNumber:     100,
-				PriceCurrency:   "EUR",
+				PriceNumber:     Int(100),
+				PriceCurrency:   String("EUR"),
 				ProfileImageUrl: String("Url 1"),
 			},
 			{
@@ -71,8 +71,8 @@ func TestFindAllProfessional(t *testing.T) {
 				FirstName:       "Test 2",
 				LastName:        "Last 2",
 				CoachType:       "Type 2",
-				PriceNumber:     100,
-				PriceCurrency:   "EUR",
+				PriceNumber:     Int(100),
+				PriceCurrency:   String("EUR"),
 				ProfileImageUrl: String("Url 2"),
 			},
 		}
