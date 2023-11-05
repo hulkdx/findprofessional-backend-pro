@@ -25,8 +25,8 @@ type Professional struct {
 }
 
 type Availability struct {
-	ID             int64
-	ProfessionalID int
+	ID             int64      `json:"-"`
+	ProfessionalID int        `json:"-"`
 	Date           civil.Date `json:"date,omitempty"`
 	From           civil.Time `json:"from,omitempty"`
 	To             civil.Time `json:"to,omitempty"`

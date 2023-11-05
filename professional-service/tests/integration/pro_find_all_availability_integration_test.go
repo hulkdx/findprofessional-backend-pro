@@ -36,17 +36,17 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.EqualAnyOrder(t, response_model[0].Availability, expected)
 	})
 
-	t.Run("testing adding some availabilities", func(t *testing.T) {
+	t.Run("some availabilities", func(t *testing.T) {
 		// Arrange
 		expected := []professional.Availability{
 			{
-				ID:   1,
+				ID:   0,
 				Date: civil.Date{Year: 2023, Month: 11, Day: 4},
 				From: civil.Time{Hour: 5, Minute: 30},
 				To:   civil.Time{Hour: 6, Minute: 30},
 			},
 			{
-				ID:   2,
+				ID:   0,
 				Date: civil.Date{Year: 2020, Month: 11, Day: 4},
 				From: civil.Time{Hour: 15, Minute: 30},
 				To:   civil.Time{Hour: 16, Minute: 00},
