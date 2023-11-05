@@ -33,7 +33,7 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 		// Arrange
 		id := 1
 		record := &professional.Professional{
-			ID:    id,
+			ID:    int64(id),
 			Email: "emailofidone@email.com",
 		}
 		d1 := insertPro(db, *record)
@@ -43,7 +43,7 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
 		expected := &professional.Professional{
-			ID:    id,
+			ID:    int64(id),
 			Email: "new@email.com",
 		}
 		// Act

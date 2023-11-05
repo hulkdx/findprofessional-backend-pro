@@ -7,9 +7,8 @@ import (
 	"cloud.google.com/go/civil"
 )
 
-// TODO: convert id to int64
 type Professional struct {
-	ID              int            `json:"id,omitempty"`
+	ID              int64          `json:"id,omitempty"`
 	Email           string         `json:"email,omitempty"`
 	Password        string         `json:"password,omitempty"`
 	FirstName       string         `json:"firstName,omitempty"`
@@ -25,13 +24,12 @@ type Professional struct {
 	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
 }
 
-// TODO: remove gorm
 type Availability struct {
-	ID             int
+	ID             int64
 	ProfessionalID int
-	Date           civil.Date `json:"date,omitempty" gorm:"type:date;serializer:json"`
-	From           civil.Time `json:"from,omitempty" gorm:"serializer:custom"`
-	To             civil.Time `json:"to,omitempty" gorm:"serializer:custom"`
+	Date           civil.Date `json:"date,omitempty"`
+	From           civil.Time `json:"from,omitempty"`
+	To             civil.Time `json:"to,omitempty"`
 }
 
 type Availabilities []Availability

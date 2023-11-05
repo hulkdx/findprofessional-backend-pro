@@ -28,7 +28,7 @@ func FindProfessionalTest(t *testing.T, db *sql.DB) {
 
 	t.Run("found a record", func(t *testing.T) {
 		// Arrange
-		id := 1
+		id := int64(1)
 		record := &professional.Professional{
 			ID:            id,
 			Email:         "emailofidone@email.com",
