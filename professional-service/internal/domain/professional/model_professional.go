@@ -20,7 +20,7 @@ type Professional struct {
 	Description     *string        `json:"description,omitempty"`
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
-	Review          *Review        `json:"review,omitempty"`
+	Review          Review         `json:"review"`
 	CreatedAt       *time.Time     `json:"createdAt,omitempty"`
 	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
 }
@@ -43,7 +43,7 @@ func (ls *Availabilities) Scan(src any) error {
 }
 
 type Review struct {
-	Total   int             `json:"total,omitempty"`
+	Total   int             `json:"total"`
 	Content []ReviewContent `json:"content,omitempty"`
 }
 

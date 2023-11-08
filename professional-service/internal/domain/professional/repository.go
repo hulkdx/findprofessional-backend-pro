@@ -84,6 +84,7 @@ func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, quer
 	for rows.Next() {
 		pro := Professional{
 			Availability: []Availability{},
+			Review:       Review{},
 		}
 		err := rows.Scan(filterItems(&pro)...)
 		if err != nil {
