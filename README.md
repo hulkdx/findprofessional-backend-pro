@@ -17,3 +17,6 @@ To start development, run `make dev`
 ## Deployment
 
 ## Troubleshooting
+
+## TODO
+- Host swagger docs to some url
