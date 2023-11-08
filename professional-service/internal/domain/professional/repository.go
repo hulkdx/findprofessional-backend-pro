@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type FilterItems func(pro *Professional) []any
@@ -16,11 +18,15 @@ type Repository interface {
 }
 
 type repositoryImpl struct {
-	db *sql.DB
+	db           *sql.DB
+	timeProvider utils.TimeProvider
 }
 
-func NewRepository(db *sql.DB) Repository {
-	return &repositoryImpl{db}
+func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
+	return &repositoryImpl{
+		db,
+		timeProvider,
+	}
 }
 
 func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
@@ -29,9 +35,12 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	LEFT JOIN professional_rating r
 		ON p.id=r.professional_id
 	LEFT JOIN professional_availability a
-		ON p.id=a.professional_id
+		ON p.id=a.professional_id AND a.date > '%s'
 	GROUP BY p.id
-	`, filterQuery)
+	`,
+		filterQuery,
+		r.timeProvider.Now().Format("2006-01-01"),
+	)
 	return r.find(ctx, filterItems, query)
 }
 
