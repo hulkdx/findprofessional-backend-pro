@@ -8,14 +8,14 @@ import (
 var (
 	filterQuery = `
 	p.id,
-	email,
-	first_name,
-	last_name,
-	coach_type,
-	price_number,
-	price_currency,
-	profile_image_url,
-	description,
+	p.email,
+	p.first_name,
+	p.last_name,
+	p.coach_type,
+	p.price_number,
+	p.price_currency,
+	p.profile_image_url,
+	p.description,
 	AVG(rate)::numeric(10,2) AS rating,
 	jsonb_agg(a) FILTER (WHERE a IS NOT NULL)
 `
