@@ -17,7 +17,8 @@ var (
 	p.profile_image_url,
 	p.description,
 	AVG(rate)::numeric(10,2) AS rating,
-	jsonb_agg(a) FILTER (WHERE a IS NOT NULL)
+	jsonb_agg(a) FILTER (WHERE a IS NOT NULL),
+	jsonb_agg(r) FILTER (WHERE r IS NOT NULL)
 `
 	filterItems = func(pro *Professional) []any {
 		return []any{
@@ -32,6 +33,7 @@ var (
 			&pro.Description,
 			&pro.Rating,
 			&pro.Availability,
+			&pro.Review,
 		}
 	}
 )

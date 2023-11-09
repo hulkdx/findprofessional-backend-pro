@@ -46,6 +46,13 @@ func (ls *Availabilities) Scan(src any) error {
 
 type Reviews []Review
 
+func (ls *Reviews) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+	return json.Unmarshal(src.([]byte), ls)
+}
+
 type Review struct {
 	ID             uint      `json:"-"`
 	UserID         int64     `json:"-"`
