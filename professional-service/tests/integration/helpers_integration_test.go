@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 )
 
 func Unmarshal(response *httptest.ResponseRecorder, output any) {
@@ -158,27 +159,18 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 	}
 }
 
-type User struct {
-	ID           int
-	FirstName    string
-	LastName     string
-	Email        string
-	Password     string
-	ProfileImage string
-}
-
 func insertUserWithId(db *sql.DB, userId ...int) func() {
-	u := []User{}
+	u := []user.User{}
 	for _, id := range userId {
-		u = append(u, User{ID: id, Email: fmt.Sprint(id)})
+		u = append(u, user.User{ID: id, Email: fmt.Sprint(id)})
 	}
 	return insertUser(db, u...)
 }
 
-func insertUser(db *sql.DB, user ...User) func() {
+func insertUser(db *sql.DB, user ...user.User) func() {
 	query := `INSERT INTO "users"
 	(id, email, password, first_name, last_name, profile_image) VALUES
-	($1, $2, $3, $4, $5, $6)`
+	($1, $2, $3, '', $4, $5)`
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -195,7 +187,6 @@ func insertUser(db *sql.DB, user ...User) func() {
 		_, err := stmt.Exec(
 			u.ID,
 			u.Email,
-			u.Password,
 			u.FirstName,
 			u.LastName,
 			u.ProfileImage,
