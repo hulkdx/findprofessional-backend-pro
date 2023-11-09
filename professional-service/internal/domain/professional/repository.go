@@ -35,7 +35,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	LEFT JOIN professional_review r
 		ON p.id=r.professional_id
 	LEFT JOIN professional_availability a
-		ON p.id=a.professional_id AND a.date > '%s'
+		ON p.id=a.professional_id
+			AND a.date > '%s'
 	GROUP BY p.id
 	`,
 		filterQuery,
