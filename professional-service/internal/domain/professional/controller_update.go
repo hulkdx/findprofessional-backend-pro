@@ -41,10 +41,8 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	idInt, _ := strconv.ParseInt(id, 10, 64)
 	response := Professional{
-		ID:        idInt,
-		Email:     updateRequest.Email,
-		UpdatedAt: nil,
-		CreatedAt: nil,
+		ID:    idInt,
+		Email: updateRequest.Email,
 	}
 	utils.WriteJSON(w, http.StatusOK, response)
 }

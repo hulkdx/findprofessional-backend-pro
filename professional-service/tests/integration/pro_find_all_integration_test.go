@@ -30,7 +30,6 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
-		now := time.Now()
 		records := []professional.Professional{
 			{
 				ID:            1,
@@ -38,8 +37,8 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 				Password:      "some_hex_value2",
 				PriceNumber:   Int(0),
 				PriceCurrency: String(""),
-				CreatedAt:     &now,
-				UpdatedAt:     &now,
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 			},
 			{
 				ID:            2,
@@ -47,8 +46,8 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 				Password:      "some_hex_value2",
 				PriceNumber:   Int(0),
 				PriceCurrency: String(""),
-				CreatedAt:     &now,
-				UpdatedAt:     &now,
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 			},
 		}
 		d1 := insertPro(db, records...)

@@ -19,14 +19,13 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 	t.Run("proffesional got give 5 star ratings from all users", func(t *testing.T) {
 		// Arrange
 		expected_rating := "5.00"
-		now := time.Now()
 		professional_records := []professional.Professional{
 			{
 				ID:        1,
 				Email:     "test1@gmail.com",
 				Password:  "some_hex_value2",
-				CreatedAt: &now,
-				UpdatedAt: &now,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
 		}
 		d1 := insertPro(db, professional_records...)
@@ -40,7 +39,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 		}...)
 		defer d2()
 
-		rating_records := []ProfessionalRating{
+		rating_records := []professional.ProfessionalRating{
 			{
 				ID:             1,
 				UserID:         2,
@@ -86,14 +85,13 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 		// Arrange
 		var expected_rating string
 
-		now := time.Now()
 		professional_records := []professional.Professional{
 			{
 				ID:        1,
 				Email:     "test1@gmail.com",
 				Password:  "some_hex_value2",
-				CreatedAt: &now,
-				UpdatedAt: &now,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
 		}
 		d1 := insertPro(db, professional_records...)

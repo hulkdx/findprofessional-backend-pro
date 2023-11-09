@@ -21,8 +21,8 @@ type Professional struct {
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
 	Review          Review         `json:"review"`
-	CreatedAt       *time.Time     `json:"createdAt,omitempty"`
-	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
+	CreatedAt       time.Time      `json:"createdAt,omitempty"`
+	UpdatedAt       time.Time      `json:"updatedAt,omitempty"`
 }
 
 type Availability struct {
@@ -31,6 +31,8 @@ type Availability struct {
 	Date           civil.Date `json:"date,omitempty"`
 	From           civil.Time `json:"from,omitempty"`
 	To             civil.Time `json:"to,omitempty"`
+	CreatedAt      time.Time  `json:"createdAt,omitempty"`
+	UpdatedAt      time.Time  `json:"updatedAt,omitempty"`
 }
 
 type Availabilities []Availability
@@ -43,9 +45,15 @@ func (ls *Availabilities) Scan(src any) error {
 }
 
 type Review struct {
-	Total   int             `json:"total"`
-	Content []ReviewContent `json:"content,omitempty"`
+	Total   int                  `json:"total"`
+	Content []ProfessionalRating `json:"content,omitempty"`
 }
 
-type ReviewContent struct {
+type ProfessionalRating struct {
+	ID             uint
+	UserID         int64
+	ProfessionalID int64
+	Rate           int
+	CreatedAt      time.Time `json:"createdAt,omitempty"`
+	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }

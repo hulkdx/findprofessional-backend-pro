@@ -107,14 +107,7 @@ func insertAvailability(db *sql.DB, availabilities ...professional.Availability)
 	}
 }
 
-type ProfessionalRating struct {
-	ID             uint
-	UserID         int64
-	ProfessionalID int64
-	Rate           int
-}
-
-func insertRating(db *sql.DB, rating ...ProfessionalRating) func() {
+func insertRating(db *sql.DB, rating ...professional.ProfessionalRating) func() {
 	query := `INSERT INTO "professional_rating" ("professional_id", "user_id", "rate") VALUES ($1, $2, $3)`
 
 	tx, err := db.Begin()
