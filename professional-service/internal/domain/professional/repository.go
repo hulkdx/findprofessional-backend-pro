@@ -32,7 +32,7 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
 	query := fmt.Sprintf(`
 	SELECT %s FROM professionals p
-	LEFT JOIN professional_rating r
+	LEFT JOIN professional_review r
 		ON p.id=r.professional_id
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id AND a.date > '%s'
@@ -47,7 +47,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
 	query := fmt.Sprintf(`
 	SELECT %s FROM professionals p
-	LEFT JOIN professional_rating r
+	LEFT JOIN professional_review r
 		ON p.id=r.professional_id
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
@@ -84,7 +84,7 @@ func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, quer
 	for rows.Next() {
 		pro := Professional{
 			Availability: []Availability{},
-			Review:       Review{},
+			Review:       []Review{},
 		}
 		err := rows.Scan(filterItems(&pro)...)
 		if err != nil {

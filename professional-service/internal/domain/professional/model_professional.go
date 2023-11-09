@@ -20,7 +20,7 @@ type Professional struct {
 	Description     *string        `json:"description,omitempty"`
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
-	Review          Review         `json:"review"`
+	Review          Reviews        `json:"reviews,omitempty"`
 	CreatedAt       time.Time      `json:"createdAt,omitempty"`
 	UpdatedAt       time.Time      `json:"updatedAt,omitempty"`
 }
@@ -44,16 +44,14 @@ func (ls *Availabilities) Scan(src any) error {
 	return json.Unmarshal(src.([]byte), ls)
 }
 
-type Review struct {
-	Total   int                  `json:"total"`
-	Content []ProfessionalRating `json:"content,omitempty"`
-}
+type Reviews []Review
 
-type ProfessionalRating struct {
-	ID             uint
-	UserID         int64
-	ProfessionalID int64
-	Rate           int
+type Review struct {
+	ID             uint      `json:"-"`
+	UserID         int64     `json:"-"`
+	ProfessionalID int64     `json:"-"`
+	Rate           int       `json:"rate,omitempty"`
+	ContentText    string    `json:"content_text,omitempty"`
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }

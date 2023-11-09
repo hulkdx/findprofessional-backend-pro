@@ -46,8 +46,6 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 				Password:      "some_hex_value2",
 				PriceNumber:   Int(0),
 				PriceCurrency: String(""),
-				CreatedAt:     time.Now(),
-				UpdatedAt:     time.Now(),
 			},
 		}
 		d1 := insertPro(db, records...)

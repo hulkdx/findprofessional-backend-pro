@@ -29,7 +29,6 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		response_model := []professional.Professional{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
-		assert.Equal(t, response_model[0].Review.Total, 0)
-		assert.Equal(t, len(response_model[0].Review.Content), 0)
+		assert.Equal(t, len(response_model[0].Review), 0)
 	})
 }
