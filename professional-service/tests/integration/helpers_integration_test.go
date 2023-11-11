@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
@@ -24,6 +25,49 @@ func Int(i int) *int {
 }
 
 // Database helpers
+
+func OutputSQL(db *sql.DB, query string) {
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	valuePtrs := make([]interface{}, len(columns))
+
+	for i := range columns {
+		valuePtrs[i] = &values[i]
+	}
+
+	fmt.Println(strings.Join(columns, "\t\t")) // Print column names
+
+	for rows.Next() {
+		if err := rows.Scan(valuePtrs...); err != nil {
+			log.Fatal(err)
+		}
+
+		var rowStrings []string
+		for _, raw := range values {
+			if raw == nil {
+				rowStrings = append(rowStrings, "NULL")
+			} else {
+				rowStrings = append(rowStrings, string(raw))
+			}
+		}
+		rowString := strings.Join(rowStrings, "\t\t")
+		fmt.Println(rowString)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func insertEmptyPro(db *sql.DB) func() {
 	return insertPro(db, professional.Professional{})
