@@ -166,8 +166,8 @@ func insertAvailability(db *sql.DB, availabilities ...professional.Availability)
 
 func insertReview(db *sql.DB, review ...professional.Review) func() {
 	query := `INSERT INTO "professional_review" 
-	("professional_id", "user_id", "rate", "created_at", "updated_at") VALUES
-	($1, $2, $3, $4, $5)`
+	("professional_id", "user_id", "rate", "created_at", "updated_at", "content_text") VALUES
+	($1, $2, $3, $4, $5, $6)`
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -187,6 +187,7 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 			r.Rate,
 			r.CreatedAt,
 			r.UpdatedAt,
+			r.ContentText,
 		)
 		if err != nil {
 			tx.Rollback()
