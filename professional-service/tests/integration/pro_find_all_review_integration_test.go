@@ -50,6 +50,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		defer d1()
 		reviews := []professional.Review{
 			{
+				ID:             67,
 				UserID:         int64(user.ID),
 				ProfessionalID: proId,
 				Rate:           4,
@@ -73,6 +74,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, response_model[0].ID, proId)
 		assert.Equal(t, len(response_model[0].Review), 1)
+		assert.Equal(t, response_model[0].Review[0].ID, int64(67))
 		assert.Equal(t, response_model[0].Review[0].Rate, 4)
 		assert.Equal(t, *response_model[0].Review[0].ContentText, "It was a good review!")
 		assert.Equal(t, response_model[0].Review[0].User.ID, user.ID)

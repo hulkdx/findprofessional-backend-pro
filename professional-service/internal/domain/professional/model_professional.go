@@ -55,7 +55,7 @@ func (ls *Reviews) Scan(src any) error {
 }
 
 type Review struct {
-	ID             uint      `json:"id,omitempty"`
+	ID             int64     `json:"id,omitempty"`
 	UserID         int64     `json:"-"`
 	User           user.User `json:"user,omitempty"`
 	ProfessionalID int64     `json:"-"`
