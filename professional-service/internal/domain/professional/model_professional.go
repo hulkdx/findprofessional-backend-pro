@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 )
 
 type Professional struct {
@@ -56,9 +57,10 @@ func (ls *Reviews) Scan(src any) error {
 type Review struct {
 	ID             uint      `json:"id,omitempty"`
 	UserID         int64     `json:"-"`
+	User           user.User `json:"user,omitempty"`
 	ProfessionalID int64     `json:"-"`
 	Rate           int       `json:"rate,omitempty"`
-	ContentText    *string   `json:"content_text,omitempty"`
+	ContentText    *string   `json:"contentText,omitempty"`
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }

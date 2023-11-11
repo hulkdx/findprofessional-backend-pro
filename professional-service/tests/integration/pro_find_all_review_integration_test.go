@@ -37,8 +37,11 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 	t.Run("some review", func(t *testing.T) {
 		// Arrange
 		user := user.User{
-			ID:    1,
-			Email: "test_user@gmail.com",
+			ID:           1,
+			Email:        "test_user@gmail.com",
+			FirstName:    "user first name",
+			LastName:     "user last name",
+			ProfileImage: "image.someurl.com",
 		}
 		proId := int64(2)
 		now := time.Now()
@@ -72,5 +75,9 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, len(response_model[0].Review), 1)
 		assert.Equal(t, response_model[0].Review[0].Rate, 4)
 		assert.Equal(t, *response_model[0].Review[0].ContentText, "It was a good review!")
+		assert.Equal(t, response_model[0].Review[0].User.Email, user.Email)
+		assert.Equal(t, response_model[0].Review[0].User.FirstName, user.FirstName)
+		assert.Equal(t, response_model[0].Review[0].User.LastName, user.LastName)
+		assert.Equal(t, response_model[0].Review[0].User.ProfileImage, user.ProfileImage)
 	})
 }

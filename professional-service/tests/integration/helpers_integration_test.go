@@ -215,7 +215,7 @@ func insertUserWithId(db *sql.DB, userId ...int) func() {
 func insertUser(db *sql.DB, user ...user.User) func() {
 	query := `INSERT INTO "users"
 	(id, email, password, first_name, last_name, profile_image) VALUES
-	($1, $2, $3, '', $4, $5)`
+	($1, $2, '', $3, $4, $5)`
 
 	tx, err := db.Begin()
 	if err != nil {

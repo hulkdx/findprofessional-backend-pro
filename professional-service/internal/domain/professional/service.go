@@ -18,7 +18,18 @@ var (
 	p.description,
 	AVG(rate)::numeric(10,2) AS rating,
 	jsonb_agg(a) FILTER (WHERE a.id IS NOT NULL),
-	jsonb_agg(r) FILTER (WHERE r.id IS NOT NULL)
+	jsonb_agg(json_build_object(
+		'id', r.id,
+		'rate', r.rate,
+		'contentText', r.content_text,
+		'user', json_build_object(
+			'id', u.id,
+			'email', u.email,
+			'firstName', u.first_name,
+			'lastName', u.last_name,
+			'profileImage', u.profile_image
+		)
+		)) FILTER (WHERE r.id IS NOT NULL)
 `
 	filterItems = func(pro *Professional) []any {
 		return []any{

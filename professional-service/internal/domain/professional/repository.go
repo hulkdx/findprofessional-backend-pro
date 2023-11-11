@@ -34,6 +34,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	SELECT %s FROM professionals p
 	LEFT JOIN professional_review r
 		ON p.id=r.professional_id
+	LEFT JOIN users u
+		ON r.user_id=u.id
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
 			AND a.date > '%s'
@@ -50,6 +52,8 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery st
 	SELECT %s FROM professionals p
 	LEFT JOIN professional_review r
 		ON p.id=r.professional_id
+	LEFT JOIN users u
+		ON r.user_id=u.id
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
 	WHERE p.id=$1
