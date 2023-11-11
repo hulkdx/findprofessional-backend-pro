@@ -17,6 +17,9 @@ func TestIntegrations(t *testing.T) {
 	t.Run("FindAllRatingProfessionalTest", func(t *testing.T) {
 		FindAllRatingProfessionalTest(t, db)
 	})
+	t.Run("FindAllReviewProfessionalTest", func(t *testing.T) {
+		FindAllReviewProfessionalTest(t, db)
+	})
 
 	t.Run("FindProfessionalTest", func(t *testing.T) {
 		FindProfessionalTest(t, db)

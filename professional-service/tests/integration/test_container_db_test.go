@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 
 	"github.com/docker/go-connections/nat"
 	_ "github.com/lib/pq"
@@ -63,55 +65,24 @@ func InitDb() (*sql.DB, func()) {
 }
 
 func integrationDbTables(db *sql.DB) error {
-	// https://github.com/hulkdx/findprofessional-backend-user/blob/main/user-service/src/main/resources/db/changelog/db.changelog-master.sql
-	_, err := db.Exec(`
-	CREATE TABLE "users" (
-		"id"  BIGSERIAL PRIMARY KEY,
-		"email" VARCHAR(255) UNIQUE NOT NULL,
-		"password" VARCHAR(255) NOT NULL,
-		"first_name" VARCHAR(255),
-		"last_name" VARCHAR(255),
-		"created_at" timestamp,
-		"updated_at" timestamp
-	);
-	
-	CREATE TABLE "professionals" (
-		"id" BIGSERIAL PRIMARY KEY,
-		"email" VARCHAR(255) UNIQUE NOT NULL,
-		"password" VARCHAR(255) NOT NULL,
-		"first_name" VARCHAR(255) NOT NULL,
-		"last_name" VARCHAR(255) NOT NULL,
-		"coach_type" VARCHAR(255) NOT NULL,
-		"price_number" BIGINT NOT NULL,
-		"price_currency" VARCHAR(255) NOT NULL,
-		"profile_image_url" VARCHAR(255),
-		"description" VARCHAR(255),
-		"created_at" timestamp,
-		"updated_at" timestamp
-	);
-	
-	CREATE TABLE "professional_rating" (
-		"id" BIGSERIAL PRIMARY KEY,
-		"user_id" BIGINT NOT NULL,
-		"professional_id" BIGINT NOT NULL,
-		"rate" INT NOT NULL
-	);
-	
-	CREATE UNIQUE INDEX ON "professional_rating" ("user_id", "professional_id");
-	
-	ALTER TABLE "professional_rating" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-	
-	ALTER TABLE "professional_rating" ADD FOREIGN KEY ("professional_id") REFERENCES "professionals" ("id");
-	
-	CREATE TABLE "professional_availability" (
-		"id" BIGSERIAL PRIMARY KEY,
-		"professional_id" BIGINT NOT NULL,
-		"date" DATE NOT NULL,
-		"from" TIME NOT NULL,
-		"to" TIME NOT NULL
-	);
-	
-	ALTER TABLE "professional_availability" ADD FOREIGN KEY ("professional_id") REFERENCES "professionals" ("id");
-	`)
+	content, err := fetchURLContent("https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/user-service/src/main/resources/db/changelog/db.changelog-master.sql")
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(content)
 	return err
+}
+
+func fetchURLContent(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	content := string(body)
+	return content, nil
 }

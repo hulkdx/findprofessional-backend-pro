@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 )
 
 type Professional struct {
@@ -20,8 +21,9 @@ type Professional struct {
 	Description     *string        `json:"description,omitempty"`
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
-	CreatedAt       *time.Time     `json:"createdAt,omitempty"`
-	UpdatedAt       *time.Time     `json:"updatedAt,omitempty"`
+	Review          Reviews        `json:"reviews,omitempty"`
+	CreatedAt       time.Time      `json:"createdAt,omitempty"`
+	UpdatedAt       time.Time      `json:"updatedAt,omitempty"`
 }
 
 type Availability struct {
@@ -30,6 +32,8 @@ type Availability struct {
 	Date           civil.Date `json:"date,omitempty"`
 	From           civil.Time `json:"from,omitempty"`
 	To             civil.Time `json:"to,omitempty"`
+	CreatedAt      time.Time  `json:"createdAt,omitempty"`
+	UpdatedAt      time.Time  `json:"updatedAt,omitempty"`
 }
 
 type Availabilities []Availability
@@ -39,4 +43,24 @@ func (ls *Availabilities) Scan(src any) error {
 		return nil
 	}
 	return json.Unmarshal(src.([]byte), ls)
+}
+
+type Reviews []Review
+
+func (ls *Reviews) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+	return json.Unmarshal(src.([]byte), ls)
+}
+
+type Review struct {
+	ID             uint      `json:"id,omitempty"`
+	UserID         int64     `json:"-"`
+	User           user.User `json:"user,omitempty"`
+	ProfessionalID int64     `json:"-"`
+	Rate           int       `json:"rate,omitempty"`
+	ContentText    *string   `json:"contentText,omitempty"`
+	CreatedAt      time.Time `json:"createdAt,omitempty"`
+	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }
