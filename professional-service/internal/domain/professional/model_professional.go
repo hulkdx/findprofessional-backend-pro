@@ -54,11 +54,11 @@ func (ls *Reviews) Scan(src any) error {
 }
 
 type Review struct {
-	ID             uint      `json:"-"`
+	ID             uint      `json:"id,omitempty"`
 	UserID         int64     `json:"-"`
 	ProfessionalID int64     `json:"-"`
 	Rate           int       `json:"rate,omitempty"`
-	ContentText    string    `json:"content_text,omitempty"`
+	ContentText    *string   `json:"content_text,omitempty"`
 	CreatedAt      time.Time `json:"createdAt,omitempty"`
 	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }

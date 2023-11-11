@@ -71,5 +71,6 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, response_model[0].ID, proId)
 		assert.Equal(t, len(response_model[0].Review), 1)
 		assert.Equal(t, response_model[0].Review[0].Rate, 4)
+		assert.Equal(t, *response_model[0].Review[0].ContentText, "It was a good review!")
 	})
 }
