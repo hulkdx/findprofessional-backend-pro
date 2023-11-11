@@ -61,6 +61,6 @@ type Review struct {
 	ProfessionalID int64     `json:"-"`
 	Rate           int       `json:"rate,omitempty"`
 	ContentText    *string   `json:"contentText,omitempty"`
-	CreatedAt      time.Time `json:"createdAt,omitempty"`
-	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
+	CreatedAt      time.Time `json:"-"`
+	UpdatedAt      time.Time `json:"-"`
 }
