@@ -45,7 +45,8 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		}
 		proId := int64(2)
 		now := time.Now()
-		insertUser(db, user)
+		d0 := insertUser(db, user)
+		defer d0()
 		d1 := insertPro(db, professional.Professional{ID: proId})
 		defer d1()
 		reviews := []professional.Review{
