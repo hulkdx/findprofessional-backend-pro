@@ -44,7 +44,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 			ProfileImage: "image.someurl.com",
 		}
 		proId := int64(2)
-		now := time.Now()
+		date := time.Now().UTC()
 		d0 := insertUser(db, user)
 		defer d0()
 		d1 := insertPro(db, professional.Professional{ID: proId})
@@ -56,17 +56,20 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 				ProfessionalID: proId,
 				Rate:           4,
 				ContentText:    String("It was a good review!"),
-				CreatedAt:      now,
-				UpdatedAt:      now,
+				CreatedAt:      date,
+				UpdatedAt:      date,
 			},
 		}
 		d2 := insertReview(db, reviews...)
 		defer d2()
 
+		OutputSQL(db, "Select * FROM professional_review")
+
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
+
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 
@@ -82,5 +85,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, response_model[0].Review[0].User.FirstName, user.FirstName)
 		assert.Equal(t, response_model[0].Review[0].User.LastName, user.LastName)
 		assert.Equal(t, response_model[0].Review[0].User.ProfileImage, user.ProfileImage)
+		assert.Equal(t, response_model[0].Review[0].CreatedAt, date)
+		assert.Equal(t, response_model[0].Review[0].UpdatedAt, date)
 	})
 }

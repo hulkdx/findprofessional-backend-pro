@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
@@ -174,14 +175,9 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 		log.Fatal(err)
 	}
 
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
 	for _, r := range review {
-		_, err := stmt.Exec(
+		_, err := db.Exec(
+			query,
 			r.ProfessionalID,
 			r.UserID,
 			r.Rate,
@@ -191,7 +187,6 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 			r.ID,
 		)
 		if err != nil {
-			tx.Rollback()
 			log.Fatal(err)
 		}
 	}
@@ -215,8 +210,8 @@ func insertUserWithId(db *sql.DB, userId ...int) func() {
 
 func insertUser(db *sql.DB, user ...user.User) func() {
 	query := `INSERT INTO "users"
-	(id, email, password, first_name, last_name, profile_image) VALUES
-	($1, $2, '', $3, $4, $5)`
+	(id, email, password, first_name, last_name, profile_image, created_at, updated_at) VALUES
+	($1, $2, '', $3, $4, $5, $6, $7)`
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -236,6 +231,8 @@ func insertUser(db *sql.DB, user ...user.User) func() {
 			u.FirstName,
 			u.LastName,
 			u.ProfileImage,
+			time.Now(),
+			time.Now(),
 		)
 		if err != nil {
 			tx.Rollback()
