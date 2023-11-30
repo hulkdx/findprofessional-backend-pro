@@ -44,7 +44,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 			ProfileImage: "image.someurl.com",
 		}
 		proId := int64(2)
-		date := time.Now().UTC()
+		date := time.Date(2024, 1, 1, 10, 30, 20, 0, time.UTC)
 		d0 := insertUser(db, user)
 		defer d0()
 		d1 := insertPro(db, professional.Professional{ID: proId})
@@ -62,8 +62,6 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		}
 		d2 := insertReview(db, reviews...)
 		defer d2()
-
-		OutputSQL(db, "Select * FROM professional_review")
 
 		request := NewJsonRequest("GET", "/professional", nil)
 		response := httptest.NewRecorder()
