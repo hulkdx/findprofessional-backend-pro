@@ -22,6 +22,8 @@ var (
 		'id', r.id,
 		'rate', r.rate,
 		'contentText', r.content_text,
+		'createdAt', r.created_at,
+		'updatedAt', r.updated_at,
 		'user', json_build_object(
 			'id', u.id,
 			'email', u.email,
