@@ -16,7 +16,7 @@ var (
 	p.price_currency,
 	p.profile_image_url,
 	p.description,
-	AVG(rate)::numeric(10,2) AS rating,
+	AVG(r.rate)::numeric(10,2) AS rating,
 	jsonb_agg(a) FILTER (WHERE a.id IS NOT NULL),
 	jsonb_agg(json_build_object(
 		'id', r.id,
