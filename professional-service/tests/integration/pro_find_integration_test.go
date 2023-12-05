@@ -37,7 +37,7 @@ func FindProfessionalTest(t *testing.T, db *sql.DB) {
 		}
 		request := NewJsonRequest("GET", fmt.Sprintf("/professional/%d", id), nil)
 		response := httptest.NewRecorder()
-		d1 := insertPro(db, *record)
+		d1 := insertPro(t, db, *record)
 		defer d1()
 		// Act
 		handler.ServeHTTP(response, request)

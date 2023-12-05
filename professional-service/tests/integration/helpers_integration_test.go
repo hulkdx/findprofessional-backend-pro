@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http/httptest"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
@@ -27,16 +27,16 @@ func Int(i int) *int {
 
 // Database helpers
 
-func OutputSQL(db *sql.DB, query string) {
+func OutputSQL(t *testing.T, db *sql.DB, query string) {
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer rows.Close()
 
 	columns, err := rows.Columns()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	values := make([]sql.RawBytes, len(columns))
@@ -50,7 +50,7 @@ func OutputSQL(db *sql.DB, query string) {
 
 	for rows.Next() {
 		if err := rows.Scan(valuePtrs...); err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 
 		var rowStrings []string
@@ -66,15 +66,15 @@ func OutputSQL(db *sql.DB, query string) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 }
 
-func insertEmptyPro(db *sql.DB) func() {
-	return insertPro(db, professional.Professional{})
+func insertEmptyPro(t *testing.T, db *sql.DB) func() {
+	return insertPro(t, db, professional.Professional{})
 }
 
-func insertPro(db *sql.DB, pro ...professional.Professional) func() {
+func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func() {
 
 	query := `INSERT INTO "professionals"
 	(id,"email","password","first_name","last_name","coach_type","price_number","price_currency", "created_at", "updated_at") VALUES
@@ -82,12 +82,12 @@ func insertPro(db *sql.DB, pro ...professional.Professional) func() {
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -112,12 +112,12 @@ func insertPro(db *sql.DB, pro ...professional.Professional) func() {
 		)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	return func() {
@@ -125,19 +125,19 @@ func insertPro(db *sql.DB, pro ...professional.Professional) func() {
 	}
 }
 
-func insertAvailability(db *sql.DB, availabilities ...professional.Availability) func() {
+func insertAvailability(t *testing.T, db *sql.DB, availabilities ...professional.Availability) func() {
 	query := `INSERT INTO "professional_availability" 
 	("professional_id", "date", "from", "to", "created_at", "updated_at") VALUES
 	($1, $2, $3, $4, $5, $6)`
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -152,12 +152,12 @@ func insertAvailability(db *sql.DB, availabilities ...professional.Availability)
 		)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	return func() {
@@ -165,14 +165,14 @@ func insertAvailability(db *sql.DB, availabilities ...professional.Availability)
 	}
 }
 
-func insertReview(db *sql.DB, review ...professional.Review) func() {
+func insertReview(t *testing.T, db *sql.DB, review ...professional.Review) func() {
 	query := `INSERT INTO "professional_review" 
 	("professional_id", "user_id", "rate", "created_at", "updated_at", "content_text", "id") VALUES
 	($1, $2, $3, $4, $5, $6, $7)`
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	for _, r := range review {
@@ -187,12 +187,12 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 			r.ID,
 		)
 		if err != nil {
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	return func() {
@@ -200,27 +200,27 @@ func insertReview(db *sql.DB, review ...professional.Review) func() {
 	}
 }
 
-func insertUserWithId(db *sql.DB, userId ...int) func() {
+func insertUserWithId(t *testing.T, db *sql.DB, userId ...int) func() {
 	u := []user.User{}
 	for _, id := range userId {
 		u = append(u, user.User{ID: id, Email: fmt.Sprint(id)})
 	}
-	return insertUser(db, u...)
+	return insertUser(t, db, u...)
 }
 
-func insertUser(db *sql.DB, user ...user.User) func() {
+func insertUser(t *testing.T, db *sql.DB, user ...user.User) func() {
 	query := `INSERT INTO "users"
 	(id, email, password, first_name, last_name, profile_image, created_at, updated_at) VALUES
 	($1, $2, '', $3, $4, $5, $6, $7)`
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -236,12 +236,12 @@ func insertUser(db *sql.DB, user ...user.User) func() {
 		)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal(err)
+			t.Fatal(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	return func() {
