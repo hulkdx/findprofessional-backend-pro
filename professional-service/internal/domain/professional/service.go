@@ -3,10 +3,13 @@ package professional
 import (
 	"context"
 	"errors"
+	"fmt"
 )
 
+const REVIEW_LIMIT = 3
+
 var (
-	filterQuery = `
+	filterQuery = fmt.Sprintf(`
 	p.id,
 	p.email,
 	p.first_name,
@@ -31,8 +34,10 @@ var (
 			'lastName', u.last_name,
 			'profileImage', u.profile_image
 		)
-		)) FILTER (WHERE r.id IS NOT NULL)
-`
+		)) FILTER (WHERE r.id IS NOT NULL AND r.row_num <= %d)
+		`,
+		REVIEW_LIMIT,
+	)
 	filterItems = func(pro *Professional) []any {
 		return []any{
 			&pro.ID,
