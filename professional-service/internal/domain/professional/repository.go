@@ -31,8 +31,16 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 
 func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
 	query := fmt.Sprintf(`
+	WITH professional_review_cte AS
+	(
+    SELECT
+			*, 
+			ROW_NUMBER() OVER (PARTITION BY professional_id ORDER BY created_at) AS row_num
+    FROM professional_review
+	)
+
 	SELECT %s FROM professionals p
-	LEFT JOIN professional_review r
+	LEFT JOIN professional_review_cte r
 		ON p.id=r.professional_id
 	LEFT JOIN users u
 		ON r.user_id=u.id
@@ -49,8 +57,16 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 
 func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
 	query := fmt.Sprintf(`
+	WITH professional_review_cte AS
+	(
+    SELECT
+			*, 
+			ROW_NUMBER() OVER (PARTITION BY professional_id ORDER BY created_at) AS row_num
+    FROM professional_review
+	)
+
 	SELECT %s FROM professionals p
-	LEFT JOIN professional_review r
+	LEFT JOIN professional_review_cte r
 		ON p.id=r.professional_id
 	LEFT JOIN users u
 		ON r.user_id=u.id
