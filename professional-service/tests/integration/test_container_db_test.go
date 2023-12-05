@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"testing"
 
 	"github.com/docker/go-connections/nat"
 	_ "github.com/lib/pq"
@@ -14,7 +14,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func InitDb() (*sql.DB, func()) {
+func InitDb(t *testing.T) (*sql.DB, func()) {
 	ctx := context.Background()
 
 	// Create a PostgreSQL container
@@ -32,17 +32,17 @@ func InitDb() (*sql.DB, func()) {
 		Started: true,
 	})
 	if err != nil {
-		log.Fatal("Failed to start PostgreSQL container: ", err)
+		t.Fatal("Failed to start PostgreSQL container: ", err)
 	}
 
 	// Get the container's host and port
 	host, err := postgresContainer.Host(ctx)
 	if err != nil {
-		log.Fatal("Failed to get PostgreSQL container host: ", err)
+		t.Fatal("Failed to get PostgreSQL container host: ", err)
 	}
 	port, err := postgresContainer.MappedPort(ctx, nat.Port("5432"))
 	if err != nil {
-		log.Fatal("Failed to get PostgreSQL container port: ", err)
+		t.Fatal("Failed to get PostgreSQL container port: ", err)
 	}
 
 	// Construct the PostgreSQL connection string
@@ -51,11 +51,11 @@ func InitDb() (*sql.DB, func()) {
 	// Connect to the PostgreSQL container
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
-		log.Fatal("Failed to connect to PostgreSQL: ", err)
+		t.Fatal("Failed to connect to PostgreSQL: ", err)
 	}
-	integrationDbTables(db)
+	err = integrationDbTables(db)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	return db, func() {

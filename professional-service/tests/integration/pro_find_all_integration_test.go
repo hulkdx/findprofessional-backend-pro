@@ -48,7 +48,7 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 				PriceCurrency: String(""),
 			},
 		}
-		d1 := insertPro(db, records...)
+		d1 := insertPro(t, db, records...)
 		defer d1()
 		expected := []professional.Professional{
 			{

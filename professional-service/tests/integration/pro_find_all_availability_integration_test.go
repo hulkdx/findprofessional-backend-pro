@@ -20,7 +20,7 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB) {
 	t.Run("empty availability", func(t *testing.T) {
 		// Arrange
 		expected := []professional.Availability{}
-		d1 := insertEmptyPro(db)
+		d1 := insertEmptyPro(t, db)
 		defer d1()
 
 		request := NewJsonRequest("GET", "/professional", nil)
@@ -58,8 +58,8 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB) {
 			},
 		}
 
-		d1 := insertEmptyPro(db)
-		d2 := insertAvailability(db, expected...)
+		d1 := insertEmptyPro(t, db)
+		d2 := insertAvailability(t, db, expected...)
 		defer d2()
 		defer d1()
 
@@ -95,8 +95,8 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *sql.DB) {
 				To:   civil.Time{Hour: 16, Minute: 00},
 			},
 		}
-		d1 := insertEmptyPro(db)
-		d2 := insertAvailability(db, records...)
+		d1 := insertEmptyPro(t, db)
+		d2 := insertAvailability(t, db, records...)
 		defer d2()
 		defer d1()
 

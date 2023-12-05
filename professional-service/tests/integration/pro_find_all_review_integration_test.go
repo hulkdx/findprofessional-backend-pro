@@ -18,7 +18,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 
 	t.Run("empty review", func(t *testing.T) {
 		// Arrange
-		d1 := insertEmptyPro(db)
+		d1 := insertEmptyPro(t, db)
 		defer d1()
 
 		request := NewJsonRequest("GET", "/professional", nil)
@@ -45,9 +45,9 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		}
 		proId := int64(2)
 		date := time.Date(2024, 1, 1, 10, 30, 20, 0, time.UTC)
-		d0 := insertUser(db, user)
+		d0 := insertUser(t, db, user)
 		defer d0()
-		d1 := insertPro(db, professional.Professional{ID: proId})
+		d1 := insertPro(t, db, professional.Professional{ID: proId})
 		defer d1()
 		reviews := []professional.Review{
 			{
@@ -60,7 +60,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 				UpdatedAt:      date,
 			},
 		}
-		d2 := insertReview(db, reviews...)
+		d2 := insertReview(t, db, reviews...)
 		defer d2()
 
 		request := NewJsonRequest("GET", "/professional", nil)

@@ -36,7 +36,7 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 			ID:    int64(id),
 			Email: "emailofidone@email.com",
 		}
-		d1 := insertPro(db, *record)
+		d1 := insertPro(t, db, *record)
 		defer d1()
 
 		requestBody := `{ "email": "new@email.com" }`

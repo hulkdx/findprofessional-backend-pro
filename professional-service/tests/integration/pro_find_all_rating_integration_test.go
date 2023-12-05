@@ -28,7 +28,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 				UpdatedAt: time.Now(),
 			},
 		}
-		d1 := insertPro(db, professional_records...)
+		d1 := insertPro(t, db, professional_records...)
 		defer d1()
 
 		userId := []int{
@@ -37,7 +37,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 			4,
 			5,
 		}
-		d2 := insertUserWithId(db, userId...)
+		d2 := insertUserWithId(t, db, userId...)
 		defer d2()
 
 		rating_records := []professional.Review{
@@ -66,7 +66,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 				Rate:           5,
 			},
 		}
-		d3 := insertReview(db, rating_records...)
+		d3 := insertReview(t, db, rating_records...)
 		defer d3()
 
 		request := NewJsonRequest("GET", "/professional", nil)
@@ -95,7 +95,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 				UpdatedAt: time.Now(),
 			},
 		}
-		d1 := insertPro(db, professional_records...)
+		d1 := insertPro(t, db, professional_records...)
 		defer d1()
 
 		request := NewJsonRequest("GET", "/professional", nil)

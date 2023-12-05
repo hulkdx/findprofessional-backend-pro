@@ -5,7 +5,7 @@ import (
 )
 
 func TestIntegrations(t *testing.T) {
-	db, closeDb := InitDb()
+	db, closeDb := InitDb(t)
 	defer closeDb()
 
 	t.Run("FindAllProfessionalTest", func(t *testing.T) {
