@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -86,4 +87,80 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, response_model[0].Review[0].CreatedAt, date)
 		assert.Equal(t, response_model[0].Review[0].UpdatedAt, date)
 	})
+
+	t.Run("limit reviews by 3", func(t *testing.T) {
+		testCases := []struct {
+			reviewCount     int
+			expectedReviews int
+		}{
+			{
+				reviewCount:     1,
+				expectedReviews: 1,
+			},
+			{
+				reviewCount:     2,
+				expectedReviews: 2,
+			},
+			{
+				reviewCount:     3,
+				expectedReviews: 3,
+			},
+			{
+				reviewCount:     4,
+				expectedReviews: 3,
+			},
+			{
+				reviewCount:     5,
+				expectedReviews: 3,
+			},
+		}
+		for _, tc := range testCases {
+			t.Run(fmt.Sprintf("when %d reviews in the db, api response has %d review count", tc.reviewCount, tc.expectedReviews), func(t *testing.T) {
+				// Arrange
+				d := createReviews(t, db, tc.reviewCount)
+				defer d()
+				request := NewJsonRequest("GET", "/professional", nil)
+				response := httptest.NewRecorder()
+				// Act
+				handler.ServeHTTP(response, request)
+				// Assert
+				response_model := []professional.Professional{}
+				Unmarshal(response, &response_model)
+				assert.Equal(t, len(response_model[0].Review), tc.expectedReviews)
+			})
+		}
+	})
+
+}
+
+func createReviews(t *testing.T, db *sql.DB, count int) func() {
+	proId := int64(2)
+	d1 := insertPro(t, db, professional.Professional{ID: proId})
+
+	userIds := []int{}
+	for i := 1; i <= count; i++ {
+		userIds = append(userIds, i)
+	}
+	d2 := insertUserWithId(t, db, userIds...)
+
+	var reviews []professional.Review
+	for i := 0; i < count; i++ {
+		review := professional.Review{
+			ID:             int64(i),
+			UserID:         int64(userIds[i]),
+			ProfessionalID: proId,
+			Rate:           4,
+			ContentText:    String("It was a good review!"),
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+		}
+		reviews = append(reviews, review)
+	}
+	d3 := insertReview(t, db, reviews...)
+
+	return func() {
+		d3()
+		d2()
+		d1()
+	}
 }
