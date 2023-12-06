@@ -19,6 +19,7 @@ type Professional struct {
 	PriceCurrency   *string        `json:"priceCurrency,omitempty"`
 	ProfileImageUrl *string        `json:"profileImageUrl,omitempty"`
 	Description     *string        `json:"description,omitempty"`
+	ReviewSize      int64          `json:"reviewSize"`
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
 	Review          Reviews        `json:"reviews,omitempty"`

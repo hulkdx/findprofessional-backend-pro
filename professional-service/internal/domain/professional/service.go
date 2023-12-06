@@ -20,6 +20,7 @@ var (
 	p.profile_image_url,
 	p.description,
 	AVG(r.rate)::numeric(10,2) AS rating,
+	COUNT(r),
 	jsonb_agg(a) FILTER (WHERE a.id IS NOT NULL),
 	jsonb_agg(json_build_object(
 		'id', r.id,
@@ -50,6 +51,7 @@ var (
 			&pro.ProfileImageUrl,
 			&pro.Description,
 			&pro.Rating,
+			&pro.ReviewSize,
 			&pro.Availability,
 			&pro.Review,
 		}

@@ -90,28 +90,34 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 
 	t.Run("limit reviews by 3", func(t *testing.T) {
 		testCases := []struct {
-			reviewCount     int
-			expectedReviews int
+			reviewCount        int
+			expectedReviews    int
+			expectedReviewSize int64
 		}{
 			{
-				reviewCount:     1,
-				expectedReviews: 1,
+				reviewCount:        1,
+				expectedReviews:    1,
+				expectedReviewSize: 1,
 			},
 			{
-				reviewCount:     2,
-				expectedReviews: 2,
+				reviewCount:        2,
+				expectedReviews:    2,
+				expectedReviewSize: 2,
 			},
 			{
-				reviewCount:     3,
-				expectedReviews: 3,
+				reviewCount:        3,
+				expectedReviews:    3,
+				expectedReviewSize: 3,
 			},
 			{
-				reviewCount:     4,
-				expectedReviews: 3,
+				reviewCount:        4,
+				expectedReviews:    3,
+				expectedReviewSize: 4,
 			},
 			{
-				reviewCount:     5,
-				expectedReviews: 3,
+				reviewCount:        5,
+				expectedReviews:    3,
+				expectedReviewSize: 5,
 			},
 		}
 		for _, tc := range testCases {
@@ -127,6 +133,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 				response_model := []professional.Professional{}
 				Unmarshal(response, &response_model)
 				assert.Equal(t, len(response_model[0].Review), tc.expectedReviews)
+				assert.Equal(t, response_model[0].ReviewSize, tc.expectedReviewSize)
 			})
 		}
 	})
