@@ -28,4 +28,8 @@ func TestIntegrations(t *testing.T) {
 	t.Run("UpdateProfessionalTest", func(t *testing.T) {
 		UpdateProfessionalTest(t, db)
 	})
+
+	t.Run("ReviewFindAll", func(t *testing.T) {
+		ReviewFindAll(t, db)
+	})
 }

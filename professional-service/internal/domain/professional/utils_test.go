@@ -3,11 +3,13 @@ package professional
 import "context"
 
 type FakeRepository struct {
-	findAllSuccess  []Professional
-	findAllError    error
-	findByIdSuccess Professional
-	findByIdError   error
-	updateError     error
+	findAllSuccess       []Professional
+	findAllError         error
+	findByIdSuccess      Professional
+	findByIdError        error
+	updateError          error
+	findAllReviewSuccess Reviews
+	findAllReviewError   error
 }
 
 func (r *FakeRepository) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
@@ -20,6 +22,10 @@ func (r *FakeRepository) FindById(ctx context.Context, id string, filterQuery st
 
 func (r *FakeRepository) Update(ctx context.Context, id string, p UpdateRequest) error {
 	return r.updateError
+}
+
+func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
+	return r.findAllReviewSuccess, r.findAllReviewError
 }
 
 type MockUserServiceAlwaysAuthenticated struct {
