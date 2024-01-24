@@ -15,6 +15,7 @@ type Repository interface {
 	FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error)
 	FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error)
 	Update(ctx context.Context, id string, p UpdateRequest) error
+	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 }
 
 type repositoryImpl struct {
@@ -92,6 +93,61 @@ func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest)
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
+	offset := (page - 1) * pageSize
+
+	query := `
+		SELECT 
+			pr.id,
+			pr.rate,
+			pr.content_text,
+			pr.created_at,
+			pr.updated_at,
+			u.id,
+			u.email,
+			u.first_name,
+			u.last_name,
+			u.profile_image
+		FROM professional_review pr
+		LEFT JOIN users u ON pr.user_id = u.id
+		WHERE pr.professional_id = $1
+		ORDER BY pr.created_at DESC
+		LIMIT $2 OFFSET $3
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, professionalID, pageSize, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	reviews := make(Reviews, 0)
+
+	for rows.Next() {
+		var review Review
+
+		err := rows.Scan(
+			&review.ID,
+			&review.Rate,
+			&review.ContentText,
+			&review.CreatedAt,
+			&review.UpdatedAt,
+			&review.User.ID,
+			&review.User.Email,
+			&review.User.FirstName,
+			&review.User.LastName,
+			&review.User.ProfileImage,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		reviews = append(reviews, review)
+	}
+
+	return reviews, nil
 }
 
 func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, query string, args ...any) ([]Professional, error) {

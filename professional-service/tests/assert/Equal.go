@@ -59,6 +59,18 @@ func EqualJSON(t *testing.T, a string, e any) {
 	}
 }
 
+func NotEqualJSON(t *testing.T, a string, e any) {
+	j, err := json.Marshal(e)
+	if err != nil {
+		panic(err)
+	}
+	actual := strings.TrimSpace(a)
+	expected := strings.TrimSpace(string(j))
+	if reflect.DeepEqual(actual, expected) {
+		t.Fatalf("\nEqualJSON\nExpected %v\nActual   %v", expected, actual)
+	}
+}
+
 func Equal(t *testing.T, actual, expected any) {
 	if objectsAreEqual(actual, expected) {
 		return
