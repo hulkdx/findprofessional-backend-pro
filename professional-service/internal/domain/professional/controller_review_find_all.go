@@ -39,7 +39,7 @@ func (c *Controller) FindAllReview(w http.ResponseWriter, r *http.Request) {
 
 	response, err := c.service.FindAllReview(r.Context(), professionalId, page, pageSize)
 	if err != nil {
-		utils.WriteGeneralError(w, err)
+		utils.WriteGeneralError(w, utils.ErrUnknown)
 		return
 	}
 	utils.WriteJSON(w, http.StatusOK, response)
