@@ -41,7 +41,7 @@ func ReviewFindAll(t *testing.T, db *sql.DB) {
 			Email:        "test_user@gmail.com",
 			FirstName:    "user first name",
 			LastName:     "user last name",
-			ProfileImage: "image.someurl.com",
+			ProfileImage: String("image.someurl.com"),
 		}
 		professionalId := int64(2)
 		date := time.Date(2024, 1, 1, 10, 30, 20, 0, time.UTC)
