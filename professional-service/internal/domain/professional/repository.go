@@ -48,6 +48,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
 			AND a.date > '%s'
+	WHERE p.price_currency IS NOT NULL AND
+				p.price_number   IS NOT NULL
 	GROUP BY p.id
 	`,
 		filterQuery,

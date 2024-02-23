@@ -45,10 +45,15 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 			ProfileImage: String("image.someurl.com"),
 		}
 		proId := int64(2)
+		pro := professional.Professional{
+			ID:            proId,
+			PriceNumber:   Int(0),
+			PriceCurrency: String(""),
+		}
 		date := time.Date(2024, 1, 1, 10, 30, 20, 0, time.UTC)
 		d0 := insertUser(t, db, user)
 		defer d0()
-		d1 := insertPro(t, db, professional.Professional{ID: proId})
+		d1 := insertPro(t, db, pro)
 		defer d1()
 		reviews := []professional.Review{
 			{
@@ -142,7 +147,12 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 
 func createReviews(t *testing.T, db *sql.DB, count int) func() {
 	proId := int64(2)
-	d1 := insertPro(t, db, professional.Professional{ID: proId})
+	pro := professional.Professional{
+		ID:            proId,
+		PriceNumber:   Int(0),
+		PriceCurrency: String(""),
+	}
+	d1 := insertPro(t, db, pro)
 
 	userIds := []int{}
 	for i := 1; i <= count; i++ {
