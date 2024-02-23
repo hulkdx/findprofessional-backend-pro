@@ -21,11 +21,13 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 		expected_rating := "5.00"
 		professional_records := []professional.Professional{
 			{
-				ID:        1,
-				Email:     "test1@gmail.com",
-				Password:  "some_hex_value2",
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				ID:            1,
+				Email:         "test1@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 			},
 		}
 		d1 := insertPro(t, db, professional_records...)
@@ -88,11 +90,13 @@ func FindAllRatingProfessionalTest(t *testing.T, db *sql.DB) {
 
 		professional_records := []professional.Professional{
 			{
-				ID:        1,
-				Email:     "test1@gmail.com",
-				Password:  "some_hex_value2",
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				ID:            1,
+				Email:         "test1@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   Int(0),
+				PriceCurrency: String(""),
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 			},
 		}
 		d1 := insertPro(t, db, professional_records...)

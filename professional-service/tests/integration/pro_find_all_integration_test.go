@@ -70,4 +70,50 @@ func FindAllProfessionalTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, response.Code, http.StatusOK)
 		assert.EqualAnyOrderJSON(t, response.Body.String(), expected)
 	})
+
+	t.Run("hide professional with null PriceNumber or PriceCurrency", func(t *testing.T) {
+		// Arrange
+		records := []professional.Professional{
+			{
+				ID:            1,
+				Email:         "test1@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   Int(0),
+				PriceCurrency: String("USD"),
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
+			},
+			{
+				ID:            2,
+				Email:         "test2@gmail.com",
+				Password:      "some_hex_value2",
+				PriceNumber:   nil,
+				PriceCurrency: String(""),
+			},
+			{
+				ID:            3,
+				Email:         "test3@gmail.com",
+				Password:      "some_hex_value3",
+				PriceNumber:   Int(50),
+				PriceCurrency: nil,
+			},
+		}
+		d1 := insertPro(t, db, records...)
+		defer d1()
+		expected := []professional.Professional{
+			{
+				ID:            1,
+				Email:         "test1@gmail.com",
+				PriceNumber:   Int(0),
+				PriceCurrency: String("USD"),
+			},
+		}
+		request := NewJsonRequest("GET", "/professional", nil)
+		response := httptest.NewRecorder()
+		// Act
+		handler.ServeHTTP(response, request)
+		// Assert
+		assert.Equal(t, response.Code, http.StatusOK)
+		assert.EqualAnyOrderJSON(t, response.Body.String(), expected)
+	})
 }

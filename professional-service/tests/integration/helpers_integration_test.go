@@ -71,7 +71,10 @@ func OutputSQL(t *testing.T, db *sql.DB, query string) {
 }
 
 func insertEmptyPro(t *testing.T, db *sql.DB) func() {
-	return insertPro(t, db, professional.Professional{})
+	return insertPro(t, db, professional.Professional{
+		PriceNumber:   Int(0),
+		PriceCurrency: String(""),
+	})
 }
 
 func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func() {
@@ -92,12 +95,6 @@ func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func(
 	defer stmt.Close()
 
 	for _, p := range pro {
-		if p.PriceNumber == nil {
-			p.PriceNumber = Int(0)
-		}
-		if p.PriceCurrency == nil {
-			p.PriceCurrency = String("")
-		}
 		_, err := stmt.Exec(
 			p.ID,
 			p.Email,
