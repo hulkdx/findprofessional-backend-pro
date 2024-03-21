@@ -29,7 +29,7 @@ func TestIntegrations(t *testing.T) {
 		UpdateProfessionalTest(t, db)
 	})
 
-	t.Run("ReviewFindAll", func(t *testing.T) {
-		ReviewFindAll(t, db)
+	t.Run("ReviewFindAllTest", func(t *testing.T) {
+		ReviewFindAllTest(t, db)
 	})
 }

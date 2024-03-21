@@ -14,7 +14,7 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 )
 
-func ReviewFindAll(t *testing.T, db *sql.DB) {
+func ReviewFindAllTest(t *testing.T, db *sql.DB) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("empty review", func(t *testing.T) {

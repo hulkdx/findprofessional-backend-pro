@@ -67,7 +67,6 @@ func TestUpdateProfessional(t *testing.T) {
 		for _, email := range invalidEmails {
 			// Arrange
 			id := 1
-			fmt.Println(email)
 			requestBody := fmt.Sprintf(`{ "email": "%s" }`, email)
 			request := updateRequest(id, requestBody)
 			response := httptest.NewRecorder()
