@@ -32,4 +32,8 @@ func TestIntegrations(t *testing.T) {
 	t.Run("ReviewFindAllTest", func(t *testing.T) {
 		ReviewFindAllTest(t, db)
 	})
+
+	t.Run("CreateProTest", func(t *testing.T) {
+		CreateProTest(t, db)
+	})
 }

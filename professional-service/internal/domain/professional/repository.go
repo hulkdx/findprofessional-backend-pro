@@ -14,6 +14,7 @@ type FilterItems func(pro *Professional) []any
 type Repository interface {
 	FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error)
 	FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error)
+	Create(context.Context, CreateRequest) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 }
@@ -187,4 +188,35 @@ func (r *repositoryImpl) findOne(ctx context.Context, filterItems FilterItems, q
 		return Professional{}, sql.ErrNoRows
 	}
 	return professionals[0], nil
+}
+
+func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) error {
+	query := `
+		INSERT INTO professionals (
+			email,
+			password,
+			first_name,
+			last_name,
+			coach_type,
+			description,
+			created_at,
+			updated_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING id
+	`
+
+	var id int64
+	row := r.db.QueryRowContext(ctx, query,
+		request.Email,
+		request.Password,
+		request.FirstName,
+		request.LastName,
+		request.CoachType,
+		request.AboutMe,
+		r.timeProvider.Now(),
+		r.timeProvider.Now(),
+	)
+	err := row.Scan(&id)
+	return err
 }

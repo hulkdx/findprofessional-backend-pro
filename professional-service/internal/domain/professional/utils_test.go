@@ -10,6 +10,7 @@ type FakeRepository struct {
 	updateError          error
 	findAllReviewSuccess Reviews
 	findAllReviewError   error
+	createError          error
 }
 
 func (r *FakeRepository) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
@@ -26,6 +27,10 @@ func (r *FakeRepository) Update(ctx context.Context, id string, p UpdateRequest)
 
 func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
 	return r.findAllReviewSuccess, r.findAllReviewError
+}
+
+func (r *FakeRepository) Create(ctx context.Context, request CreateRequest) error {
+	return r.createError
 }
 
 type MockUserServiceAlwaysAuthenticated struct {

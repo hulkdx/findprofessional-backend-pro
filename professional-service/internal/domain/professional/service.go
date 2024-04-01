@@ -84,14 +84,14 @@ func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, er
 	return s.repository.FindById(ctx, id, filterQuery, filterItems)
 }
 
+func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
+	return s.repository.Create(ctx, r)
+}
+
 func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
 	return s.repository.Update(ctx, id, p)
 }
 
 func (s *serviceImpl) FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error) {
 	return s.repository.FindAllReview(ctx, professionalId, page, pageSize)
-}
-
-func (s *serviceImpl) Create(context.Context, CreateRequest) error {
-	return nil
 }
