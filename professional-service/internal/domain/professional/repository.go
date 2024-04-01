@@ -11,9 +11,61 @@ import (
 
 type FilterItems func(pro *Professional) []any
 
+const REVIEW_LIMIT = 3
+
+var (
+	filterQuery = fmt.Sprintf(`
+	p.id,
+	p.email,
+	p.first_name,
+	p.last_name,
+	p.coach_type,
+	p.price_number,
+	p.price_currency,
+	p.profile_image_url,
+	p.description,
+	AVG(r.rate)::numeric(10,2) AS rating,
+	COUNT(r),
+	jsonb_agg(a) FILTER (WHERE a.id IS NOT NULL),
+	jsonb_agg(json_build_object(
+		'id', r.id,
+		'rate', r.rate,
+		'contentText', r.content_text,
+		'createdAt', r.created_at,
+		'updatedAt', r.updated_at,
+		'user', json_build_object(
+			'id', u.id,
+			'email', u.email,
+			'firstName', u.first_name,
+			'lastName', u.last_name,
+			'profileImage', u.profile_image
+		)
+		)) FILTER (WHERE r.id IS NOT NULL AND r.row_num <= %d)
+		`,
+		REVIEW_LIMIT,
+	)
+	filterItems = func(pro *Professional) []any {
+		return []any{
+			&pro.ID,
+			&pro.Email,
+			&pro.FirstName,
+			&pro.LastName,
+			&pro.CoachType,
+			&pro.PriceNumber,
+			&pro.PriceCurrency,
+			&pro.ProfileImageUrl,
+			&pro.Description,
+			&pro.Rating,
+			&pro.ReviewSize,
+			&pro.Availability,
+			&pro.Review,
+		}
+	}
+)
+
 type Repository interface {
-	FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error)
-	FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error)
+	FindAll(ctx context.Context) ([]Professional, error)
+	FindById(ctx context.Context, id string) (Professional, error)
 	Create(context.Context, CreateRequest) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
@@ -31,7 +83,7 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 	}
 }
 
-func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
+func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 	query := fmt.Sprintf(`
 	WITH professional_review_cte AS
 	(
@@ -59,7 +111,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context, filterQuery string, filter
 	return r.find(ctx, filterItems, query)
 }
 
-func (r *repositoryImpl) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
+func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional, error) {
 	query := fmt.Sprintf(`
 	WITH professional_review_cte AS
 	(

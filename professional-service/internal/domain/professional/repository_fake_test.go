@@ -13,11 +13,11 @@ type FakeRepository struct {
 	createError          error
 }
 
-func (r *FakeRepository) FindAll(ctx context.Context, filterQuery string, filterItems FilterItems) ([]Professional, error) {
+func (r *FakeRepository) FindAll(ctx context.Context) ([]Professional, error) {
 	return r.findAllSuccess, r.findAllError
 }
 
-func (r *FakeRepository) FindById(ctx context.Context, id string, filterQuery string, filterItems FilterItems) (Professional, error) {
+func (r *FakeRepository) FindById(ctx context.Context, id string) (Professional, error) {
 	return r.findByIdSuccess, r.findByIdError
 }
 
