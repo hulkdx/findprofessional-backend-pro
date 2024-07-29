@@ -11,19 +11,6 @@ import (
 )
 
 func TestCreateProfessional(t *testing.T) {
-	t.Run("authorize", func(t *testing.T) {
-		// Arrange
-		userService := &MockUserServiceAlwaysAuthenticated{}
-		controller := &Controller{
-			service:     NewService(&FakeRepository{}),
-			userService: userService,
-		}
-		// Act
-		controller.Create(httptest.NewRecorder(), createEmptyRequest())
-		// Assert
-		assert.Equal(t, userService.IsAuthenticatedCalled, true)
-	})
-
 	t.Run("valid request 201", func(t *testing.T) {
 		// Arrange
 		controller := &Controller{

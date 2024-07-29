@@ -74,14 +74,15 @@ func insertEmptyPro(t *testing.T, db *sql.DB) func() {
 	return insertPro(t, db, professional.Professional{
 		PriceNumber:   Int(0),
 		PriceCurrency: String(""),
+		Pending:       false,
 	})
 }
 
 func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func() {
 
 	query := `INSERT INTO "professionals"
-	(id,"email","password","first_name","last_name","coach_type","price_number","price_currency", "created_at", "updated_at") VALUES
-	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+	(id,"email","password","first_name","last_name","coach_type","price_number","price_currency", "pending", "created_at", "updated_at") VALUES
+	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -104,6 +105,7 @@ func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func(
 			p.CoachType,
 			p.PriceNumber,
 			p.PriceCurrency,
+			p.Pending,
 			p.CreatedAt,
 			p.UpdatedAt,
 		)

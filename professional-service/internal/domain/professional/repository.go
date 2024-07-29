@@ -11,7 +11,7 @@ import (
 type Repository interface {
 	FindAll(ctx context.Context) ([]Professional, error)
 	FindById(ctx context.Context, id string) (Professional, error)
-	Create(context.Context, CreateRequest) error
+	Create(ctx context.Context, request CreateRequest, pending bool) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 }
@@ -99,7 +99,7 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 	return reviews, nil
 }
 
-func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) error {
+func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pending bool) error {
 	query := `
 		INSERT INTO professionals (
 			email,
@@ -108,10 +108,13 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) erro
 			last_name,
 			coach_type,
 			description,
+			price_number,
+			price_currency,
+			pending,
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING id
 	`
 
@@ -123,6 +126,9 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) erro
 		request.LastName,
 		request.CoachType,
 		request.AboutMe,
+		request.Price,
+		request.PriceCurrency,
+		pending,
 		r.timeProvider.Now(),
 		r.timeProvider.Now(),
 	)

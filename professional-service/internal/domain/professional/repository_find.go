@@ -61,7 +61,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 		AND a.date > '%s'
 
 	WHERE p.price_currency IS NOT NULL AND
-				p.price_number   IS NOT NULL
+				p.price_number   IS NOT NULL AND
+				p.pending        = false
 	
 	GROUP BY p.id
 	`,

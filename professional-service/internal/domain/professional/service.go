@@ -29,7 +29,8 @@ func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, er
 }
 
 func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
-	return s.repository.Create(ctx, r)
+	pending := true
+	return s.repository.Create(ctx, r, pending)
 }
 
 func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
