@@ -1,6 +1,6 @@
 module github.com/hulkdx/findprofessional-backend-pro/professional-service
 
-go 1.21
+go 1.22
 
 require (
 	cloud.google.com/go v0.115.0

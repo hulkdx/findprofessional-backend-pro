@@ -1,6 +1,6 @@
 ![Build](https://img.shields.io/github/actions/workflow/status/hulkdx/findprofessional-backend-pro/push.yml?branch=main)
 [![Docker Status](https://badgen.net/docker/size/hulkdx/ff-pro/v1/amd64?icon=docker&label=docker&url)](https://hub.docker.com/repository/docker/hulkdx/ff-pro)
-[![Golang](https://img.shields.io/badge/golang-1.21.3-blue.svg?logo=go)](https://go.dev/)
+[![Golang](https://img.shields.io/badge/golang-1.22.5-blue.svg?logo=go)](https://go.dev/)
 
 # Professional microservice
 
@@ -14,9 +14,8 @@ Requirements
 
 To start development, run `make dev`
 
-## Deployment
-
-## Troubleshooting
+## How to upgrade go version
+Check [this](https://github.com/hulkdx/findprofessional-backend-pro/commit/af66c3d722d3553ff01137072d7c5077471415a7) commit
 
 ## TODO
 - Host swagger docs to some url
