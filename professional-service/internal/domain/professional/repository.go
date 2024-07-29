@@ -108,10 +108,12 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) erro
 			last_name,
 			coach_type,
 			description,
+			price_number,
+			price_currency,
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id
 	`
 
@@ -123,6 +125,8 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest) erro
 		request.LastName,
 		request.CoachType,
 		request.AboutMe,
+		request.Price,
+		request.PriceCurrency,
 		r.timeProvider.Now(),
 		r.timeProvider.Now(),
 	)

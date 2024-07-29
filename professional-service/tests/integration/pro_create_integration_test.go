@@ -19,12 +19,15 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 	t.Run("not found a record, create a new record", func(t *testing.T) {
 		// Arrange
 		bodyRequest := professional.CreateRequest{
-			Email:     "test@gmail.com",
-			Password:  "P@ssw0rd123",
-			FirstName: "John",
-			LastName:  "Doe",
-			SkypeId:   "john_doe_skype",
-			AboutMe:   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Email:         "test@gmail.com",
+			Password:      "P@ssw0rd123",
+			FirstName:     "John",
+			LastName:      "Doe",
+			SkypeId:       "john_doe_skype",
+			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:         500,
+			PriceCurrency: "USD",
+			CoachType:     "Lifecoach",
 		}
 		request := createProRequest(bodyRequest)
 		response := httptest.NewRecorder()
