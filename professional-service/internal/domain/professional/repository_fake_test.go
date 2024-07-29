@@ -29,7 +29,7 @@ func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64
 	return r.findAllReviewSuccess, r.findAllReviewError
 }
 
-func (r *FakeRepository) Create(ctx context.Context, request CreateRequest) error {
+func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pending bool) error {
 	return r.createError
 }
 
