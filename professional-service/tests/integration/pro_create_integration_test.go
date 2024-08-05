@@ -61,6 +61,31 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 		result := getPendingFromDatabase(db)
 		assert.Equal(t, *result, true)
 	})
+
+	t.Run("found a record, then return 409 status", func(t *testing.T) {
+		// Arrange
+		bodyRequest := professional.CreateRequest{
+			Email:         "test@gmail.com",
+			Password:      "P@ssw0rd123",
+			FirstName:     "John",
+			LastName:      "Doe",
+			SkypeId:       "john_doe_skype",
+			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:         500,
+			PriceCurrency: "USD",
+			CoachType:     "Lifecoach",
+		}
+		defer db.Exec(`DELETE FROM professionals`)
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, createProRequest(bodyRequest))
+		assert.Equal(t, response.Code, http.StatusCreated)
+
+		response = httptest.NewRecorder()
+		// Act
+		handler.ServeHTTP(response, createProRequest(bodyRequest))
+		// Asserts
+		assert.Equal(t, response.Code, http.StatusConflict)
+	})
 }
 
 func createProRequest(body professional.CreateRequest) *http.Request {

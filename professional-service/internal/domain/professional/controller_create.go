@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/lib/pq"
 )
 
 func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +19,11 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.service.Create(r.Context(), request); err != nil {
-		utils.WriteGeneralError(w, utils.ErrUnknown)
+		if err, ok := err.(*pq.Error); ok && err.Code == "23505" {
+			utils.WriteError(w, http.StatusConflict, "")
+		} else {
+			utils.WriteGeneralError(w, utils.ErrUnknown)
+		}
 		return
 	}
 
