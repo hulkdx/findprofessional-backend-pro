@@ -23,7 +23,7 @@ type Professional struct {
 	Rating          *string        `json:"rating,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
 	Review          Reviews        `json:"reviews,omitempty"`
-	Pending         bool           `json:-`
+	Pending         bool           `json:"-"`
 	CreatedAt       time.Time      `json:"createdAt,omitempty"`
 	UpdatedAt       time.Time      `json:"updatedAt,omitempty"`
 }
