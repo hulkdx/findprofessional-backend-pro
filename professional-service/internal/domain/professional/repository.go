@@ -30,18 +30,7 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
 	query := "UPDATE professionals SET email = $1, updated_at = $2 WHERE id = $3"
-	result, err := r.db.ExecContext(ctx, query, p.Email, time.Now(), id)
-	if err != nil {
-		return err
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-	return nil
+	return r.performUpdate(ctx, query, p.Email, time.Now(), id)
 }
 
 func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
