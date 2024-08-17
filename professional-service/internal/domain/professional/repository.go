@@ -30,18 +30,7 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
 	query := "UPDATE professionals SET email = $1, updated_at = $2 WHERE id = $3"
-	result, err := r.db.ExecContext(ctx, query, p.Email, time.Now(), id)
-	if err != nil {
-		return err
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-	return nil
+	return performUpdate(r.db, ctx, query, p.Email, time.Now(), id)
 }
 
 func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
@@ -100,6 +89,17 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 }
 
 func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pending bool) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
 	query := `
 		INSERT INTO professionals (
 			email,
@@ -118,8 +118,8 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 		RETURNING id
 	`
 
-	var id int64
-	row := r.db.QueryRowContext(ctx, query,
+	var professionalId int64
+	row := tx.QueryRowContext(ctx, query,
 		request.Email,
 		request.Password,
 		request.FirstName,
@@ -132,6 +132,23 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 		r.timeProvider.Now(),
 		r.timeProvider.Now(),
 	)
-	err := row.Scan(&id)
-	return err
+	err = row.Scan(&professionalId)
+	if err != nil {
+		return err
+	}
+
+	query = "UPDATE users SET professional_id = $1, updated_at = $2 WHERE email = $3"
+	err = performUpdateTx(
+		tx,
+		ctx,
+		query,
+		professionalId,
+		r.timeProvider.Now(),
+		request.Email,
+	)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

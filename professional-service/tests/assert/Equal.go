@@ -79,6 +79,13 @@ func Equal(t *testing.T, actual, expected any) {
 	t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
 }
 
+func NotEqual(t *testing.T, actual, expected any) {
+	if objectsAreEqual(actual, expected) {
+		t.Helper()
+		t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
+	}
+}
+
 func objectsAreEqual(actual, expected any) bool {
 	if expected == nil || actual == nil {
 		return expected == actual
