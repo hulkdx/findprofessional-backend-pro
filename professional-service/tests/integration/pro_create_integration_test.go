@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 )
@@ -30,6 +31,16 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			CoachType:     "Lifecoach",
 		}
 		defer db.Exec(`DELETE FROM professionals`)
+
+		user := user.User{
+			ID:        1,
+			Email:     bodyRequest.Email,
+			FirstName: bodyRequest.FirstName,
+			LastName:  bodyRequest.LastName,
+		}
+		d0 := insertUser(t, db, user)
+		defer d0()
+
 		request := createProRequest(bodyRequest)
 		response := httptest.NewRecorder()
 		// Act
@@ -52,6 +63,16 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			CoachType:     "Lifecoach",
 		}
 		defer db.Exec(`DELETE FROM professionals`)
+
+		user := user.User{
+			ID:        1,
+			Email:     bodyRequest.Email,
+			FirstName: bodyRequest.FirstName,
+			LastName:  bodyRequest.LastName,
+		}
+		d0 := insertUser(t, db, user)
+		defer d0()
+
 		request := createProRequest(bodyRequest)
 		response := httptest.NewRecorder()
 		// Act
@@ -76,6 +97,16 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			CoachType:     "Lifecoach",
 		}
 		defer db.Exec(`DELETE FROM professionals`)
+
+		user := user.User{
+			ID:        1,
+			Email:     bodyRequest.Email,
+			FirstName: bodyRequest.FirstName,
+			LastName:  bodyRequest.LastName,
+		}
+		d0 := insertUser(t, db, user)
+		defer d0()
+
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, createProRequest(bodyRequest))
 		assert.Equal(t, response.Code, http.StatusCreated)
