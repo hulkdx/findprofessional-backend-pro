@@ -82,7 +82,7 @@ func Equal(t *testing.T, actual, expected any) {
 func NotEqual(t *testing.T, actual, expected any) {
 	if objectsAreEqual(actual, expected) {
 		t.Helper()
-		t.Fatalf("\nExpected %v\nActual   %v", expected, actual)
+		t.Fatalf("NotEqual\nExpected %v\nActual   %v", expected, actual)
 	}
 }
 

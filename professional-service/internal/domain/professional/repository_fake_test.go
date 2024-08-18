@@ -10,6 +10,7 @@ type FakeRepository struct {
 	updateError          error
 	findAllReviewSuccess Reviews
 	findAllReviewError   error
+	createRequestCalled  CreateRequest
 	createError          error
 }
 
@@ -30,6 +31,7 @@ func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64
 }
 
 func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pending bool) error {
+	r.createRequestCalled = request
 	return r.createError
 }
 
