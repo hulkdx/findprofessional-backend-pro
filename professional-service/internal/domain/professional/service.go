@@ -2,6 +2,8 @@ package professional
 
 import (
 	"context"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
@@ -30,6 +32,11 @@ func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, er
 
 func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
 	pending := true
+	hash, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	r.Password = string(hash)
 	return s.repository.Create(ctx, r, pending)
 }
 
