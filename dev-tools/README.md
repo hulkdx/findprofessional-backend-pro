@@ -1,5 +1,4 @@
-# Local development
-Tools that is required for local development, running everything (e.g. db, service, ect) on the local machine.
+This directory contains all tools that are required for local development.
 
-Currently it is used:
+Currently, it is using:
 - [skaffold](https://skaffold.dev)

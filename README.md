@@ -12,6 +12,17 @@ Requirements
 - [Minikube](https://minikube.sigs.k8s.io/docs/start/) (or any other localhost kubernetes)
 - [Skaffold](https://skaffold.dev/docs/install/)
 
+### How to start local development
+- Start docker
+- Start Minikube
+```sh
+minikube start
+```
+- start skaffold
+```sh
+make dev
+```
+
 To start development, run `make dev`
 
 ## How to upgrade go version
