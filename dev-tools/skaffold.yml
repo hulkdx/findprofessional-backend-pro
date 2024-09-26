@@ -16,7 +16,7 @@ build:
         EOF
       dependencies:
         paths:
-          - "**/*"
+          - "**/professional-service/**"
 
 manifests:
   kustomize:
