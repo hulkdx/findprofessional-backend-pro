@@ -43,3 +43,7 @@ func (m *MockUserServiceAlwaysAuthenticated) IsAuthenticated(context.Context, st
 	m.IsAuthenticatedCalled = true
 	return true
 }
+
+func (m *MockUserServiceAlwaysAuthenticated) Login(ctx context.Context, email string, password string) (string, error) {
+	return "", nil
+}

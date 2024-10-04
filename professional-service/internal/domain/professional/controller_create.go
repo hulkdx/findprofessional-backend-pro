@@ -17,8 +17,9 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	ctx := r.Context()
 
-	if err := c.service.Create(r.Context(), request); err != nil {
+	if err := c.service.Create(ctx, request); err != nil {
 		if err, ok := err.(*pq.Error); ok && err.Code == "23505" {
 			utils.WriteError(w, http.StatusConflict, "")
 		} else {
@@ -27,6 +28,13 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resp, err := c.userService.Login(ctx, request.Email, request.Password)
+	if err != nil {
+		utils.WriteGeneralError(w, utils.ErrUnknown)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(resp))
 }

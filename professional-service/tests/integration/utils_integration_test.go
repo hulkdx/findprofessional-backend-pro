@@ -31,6 +31,10 @@ func (m *MockUserService) IsAuthenticated(ctx context.Context, auth string) bool
 	return true
 }
 
+func (m *MockUserService) Login(ctx context.Context, email string, password string) (string, error) {
+	return "", nil
+}
+
 type FakeTimeProvider struct {
 	NowTime time.Time
 }
