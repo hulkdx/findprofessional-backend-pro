@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 
@@ -12,9 +14,12 @@ import (
 )
 
 const publicKeyPath = "/config/rsa.public.key"
+const baseUrl = "http://user-service:8080"
+const loginUrl = baseUrl + "/auth/login"
 
 type Service interface {
 	IsAuthenticated(ctx context.Context, auth string) bool
+	Login(ctx context.Context, email string, password string) (string, error)
 }
 
 type serviceImpl struct {
@@ -67,4 +72,28 @@ func isValidAccessToken(accessToken string, publicKey *rsa.PublicKey) bool {
 		return false
 	}
 	return token.Valid
+}
+
+func (s *serviceImpl) Login(ctx context.Context, email, password string) (string, error) {
+	loginReq := fmt.Sprintf(`{"email": "%s", "password": "%s"}`, email, password)
+
+	byt, err := httpRequest(ctx, http.MethodPost, loginUrl, strings.NewReader(loginReq))
+	return string(byt), err
+}
+
+func httpRequest(ctx context.Context, method, url string, body io.Reader) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
+	return io.ReadAll(res.Body)
 }
