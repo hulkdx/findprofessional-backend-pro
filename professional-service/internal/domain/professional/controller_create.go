@@ -19,9 +19,12 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if err := c.service.Create(ctx, request); err != nil {
-		if err == utils.ErrDuplicate {
-			utils.WriteError(w, http.StatusConflict, "")
-		} else {
+		switch err {
+		case utils.ErrDuplicate:
+			utils.WriteError(w, http.StatusConflict, "Duplicate user")
+		case utils.ErrNotFoundUser:
+			utils.WriteError(w, http.StatusNotFound, "Not found user")
+		default:
 			utils.WriteGeneralError(w, utils.ErrUnknown)
 		}
 		return

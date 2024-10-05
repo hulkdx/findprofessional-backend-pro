@@ -2,11 +2,14 @@ package professional
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var pgErrUniqueViolation pq.ErrorCode = "23505"
 
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
@@ -41,11 +44,12 @@ func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
 	r.Password = string(hash)
 
 	err = s.repository.Create(ctx, r, pending)
-	//
-	// 23005 means unique_violation, defined in pq.Error
-	//
-	if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+
+	if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == pgErrUniqueViolation {
 		return utils.ErrDuplicate
+	}
+	if err == sql.ErrNoRows {
+		return utils.ErrNotFoundUser
 	}
 	return err
 }
