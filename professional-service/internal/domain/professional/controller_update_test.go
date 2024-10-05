@@ -88,6 +88,6 @@ func updateController(updateError error) *Controller {
 }
 
 func updateRequest(id int, body string) *http.Request {
-	request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", 400), strings.NewReader(body))
+	request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(body))
 	return request
 }

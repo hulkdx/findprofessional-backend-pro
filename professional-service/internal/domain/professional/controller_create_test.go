@@ -33,11 +33,6 @@ func TestCreateProfessional(t *testing.T) {
 	})
 }
 
-func createEmptyRequest() *http.Request {
-	request, _ := http.NewRequest("PUT", "/professional", nil)
-	return request
-}
-
 func createRequest(body *CreateRequest) *http.Request {
 	jsonData, _ := json.Marshal(body)
 	request, _ := http.NewRequest("PUT", "/professional", strings.NewReader(string(jsonData)))
