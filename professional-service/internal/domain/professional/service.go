@@ -3,6 +3,8 @@ package professional
 import (
 	"context"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -37,7 +39,15 @@ func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
 		return err
 	}
 	r.Password = string(hash)
-	return s.repository.Create(ctx, r, pending)
+
+	err = s.repository.Create(ctx, r, pending)
+	//
+	// 23005 means unique_violation, defined in pq.Error
+	//
+	if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+		return utils.ErrDuplicate
+	}
+	return err
 }
 
 func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
