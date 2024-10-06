@@ -12,6 +12,7 @@ build:
         cat <<EOF | docker build --tag=$IMAGE -f - "$BUILD_CONTEXT"
             FROM golang:1.22.5-alpine
             COPY build/app app
+            ENV DEBUG=true
             ENTRYPOINT [ "./app" ]
         EOF
       dependencies:
