@@ -76,3 +76,7 @@ func getDsn(url string, username string, password string) string {
 	restUrl := strings.Split(url, "postgresql://")[1]
 	return fmt.Sprintf("postgresql://%s:%s@%s", username, password, restUrl)
 }
+
+func IsDebug() bool {
+	return os.Getenv("DEBUG") == "true"
+}
