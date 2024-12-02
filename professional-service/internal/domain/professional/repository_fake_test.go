@@ -47,3 +47,7 @@ func (m *MockUserServiceAlwaysAuthenticated) IsAuthenticated(context.Context, st
 func (m *MockUserServiceAlwaysAuthenticated) Login(ctx context.Context, email string, password string) (string, error) {
 	return "", nil
 }
+
+func (m *MockUserServiceAlwaysAuthenticated) GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error) {
+	return nil, nil
+}
