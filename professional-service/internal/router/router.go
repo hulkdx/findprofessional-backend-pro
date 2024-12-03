@@ -15,7 +15,7 @@ func Handler(controller *professional.Controller) http.Handler {
 	router.Get("/professional", controller.FindAll)
 	router.Put("/professional", controller.Create)
 	router.Get("/professional/{id}", controller.Find)
-	router.Post("/professional/{id}", controller.Update)
+	router.Post("/professional", controller.Update)
 
 	router.Get("/professional/{id}/review", controller.FindAllReview)
 
