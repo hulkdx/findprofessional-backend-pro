@@ -20,18 +20,17 @@ func TestUpdateProfessional(t *testing.T) {
 			userService: userService,
 		}
 		// Act
-		controller.Update(httptest.NewRecorder(), updateRequest(1, ""))
+		controller.Update(httptest.NewRecorder(), updateRequest(""))
 		// Assert
-		assert.Equal(t, userService.IsAuthenticatedCalled, true)
+		assert.Equal(t, userService.GetAuthenticatedUserIdCalled, true)
 	})
 
 	t.Run("not found the id", func(t *testing.T) {
 		// Arrange
-		id := 1
 		requestBody := `{ "email": "new@email.com" }`
-		request := updateRequest(id, requestBody)
+		request := updateRequest(requestBody)
 		response := httptest.NewRecorder()
-		controller := updateController(sql.ErrNoRows)
+		controller := createUpdateController(sql.ErrNoRows)
 		// Act
 		controller.Update(response, request)
 		// Assert
@@ -45,11 +44,10 @@ func TestUpdateProfessional(t *testing.T) {
 		}
 		for _, email := range validEmails {
 			// Arrange
-			id := 1
 			requestBody := fmt.Sprintf(`{ "email": "%s" }`, email)
-			request := updateRequest(id, requestBody)
+			request := updateRequest(requestBody)
 			response := httptest.NewRecorder()
-			controller := updateController(nil)
+			controller := createUpdateController(nil)
 			// Act
 			controller.Update(response, request)
 			// Assert
@@ -66,11 +64,10 @@ func TestUpdateProfessional(t *testing.T) {
 		}
 		for _, email := range invalidEmails {
 			// Arrange
-			id := 1
 			requestBody := fmt.Sprintf(`{ "email": "%s" }`, email)
-			request := updateRequest(id, requestBody)
+			request := updateRequest(requestBody)
 			response := httptest.NewRecorder()
-			controller := updateController(nil)
+			controller := createUpdateController(nil)
 			// Act
 			controller.Update(response, request)
 			// Assert
@@ -79,7 +76,7 @@ func TestUpdateProfessional(t *testing.T) {
 	})
 }
 
-func updateController(updateError error) *Controller {
+func createUpdateController(updateError error) *Controller {
 	repository := &FakeRepository{updateError: updateError}
 	return &Controller{
 		service:     NewService(repository),
@@ -87,7 +84,7 @@ func updateController(updateError error) *Controller {
 	}
 }
 
-func updateRequest(id int, body string) *http.Request {
-	request, _ := http.NewRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(body))
+func updateRequest(body string) *http.Request {
+	request, _ := http.NewRequest("POST", "/professional", strings.NewReader(body))
 	return request
 }

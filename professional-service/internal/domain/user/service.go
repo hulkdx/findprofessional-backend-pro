@@ -21,7 +21,7 @@ const loginUrl = baseUrl + "/auth/login"
 type Service interface {
 	IsAuthenticated(ctx context.Context, auth string) bool
 	Login(ctx context.Context, email string, password string) (string, error)
-	GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error)
+	GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error)
 }
 
 type serviceImpl struct {
@@ -104,19 +104,19 @@ func httpRequest(ctx context.Context, method, url string, body io.Reader) ([]byt
 	return io.ReadAll(res.Body)
 }
 
-func (s *serviceImpl) GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error) {
+func (s *serviceImpl) GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error) {
 	accessTokenString := getAccessTokenFromAuthHeader(auth)
 	accessToken, err := getAccessToken(accessTokenString, s.publicKey)
 	if err != nil {
-		return nil, err
+		return -2, err
 	}
 	subject, err := accessToken.Claims.GetSubject()
 	if err != nil {
-		return nil, err
+		return -2, err
 	}
 	idInt, err := strconv.ParseInt(subject, 10, 64)
 	if err != nil {
-		return nil, err
+		return -2, err
 	}
-	return &idInt, nil
+	return idInt, nil
 }

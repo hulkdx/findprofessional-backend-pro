@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"database/sql"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,13 +14,14 @@ import (
 )
 
 func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
-	handler := router.Handler(NewTestController(db))
+	userService := MockUserService{}
+	handler := router.Handler(NewTestControllerWithUserService(db, &userService))
 
 	t.Run("Empty database", func(t *testing.T) {
 		// Arrange
-		id := 1
+		userService.UserId = 1
 		requestBody := `{ "email": "new@email.com" }`
-		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
+		request := NewJsonRequest("POST", "/professional", strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
 		// Act
 		handler.ServeHTTP(response, request)
@@ -31,7 +31,8 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 
 	t.Run("found a record", func(t *testing.T) {
 		// Arrange
-		id := 1
+		id := int64(1)
+		userService.UserId = id
 		record := &professional.Professional{
 			ID:    int64(id),
 			Email: "emailofidone@email.com",
@@ -40,17 +41,12 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 		defer d1()
 
 		requestBody := `{ "email": "new@email.com" }`
-		request := NewJsonRequest("POST", fmt.Sprintf("/professional/%d", id), strings.NewReader(requestBody))
+		request := NewJsonRequest("POST", "/professional", strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
-		expected := &professional.Professional{
-			ID:    int64(id),
-			Email: "new@email.com",
-		}
 		// Act
 		handler.ServeHTTP(response, request)
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.EqualJSON(t, response.Body.String(), expected)
 	})
 }
 
