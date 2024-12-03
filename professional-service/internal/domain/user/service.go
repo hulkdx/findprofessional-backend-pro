@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -20,6 +21,7 @@ const loginUrl = baseUrl + "/auth/login"
 type Service interface {
 	IsAuthenticated(ctx context.Context, auth string) bool
 	Login(ctx context.Context, email string, password string) (string, error)
+	GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error)
 }
 
 type serviceImpl struct {
@@ -61,13 +63,17 @@ func getAccessTokenFromAuthHeader(auth string) string {
 	return accessToken
 }
 
-func isValidAccessToken(accessToken string, publicKey *rsa.PublicKey) bool {
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+func getAccessToken(accessToken string, publicKey *rsa.PublicKey) (*jwt.Token, error) {
+	return jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return publicKey, nil
 	})
+}
+
+func isValidAccessToken(accessToken string, publicKey *rsa.PublicKey) bool {
+	token, err := getAccessToken(accessToken, publicKey)
 	if err != nil {
 		return false
 	}
@@ -96,4 +102,21 @@ func httpRequest(ctx context.Context, method, url string, body io.Reader) ([]byt
 		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
 	return io.ReadAll(res.Body)
+}
+
+func (s *serviceImpl) GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error) {
+	accessTokenString := getAccessTokenFromAuthHeader(auth)
+	accessToken, err := getAccessToken(accessTokenString, s.publicKey)
+	if err != nil {
+		return nil, err
+	}
+	subject, err := accessToken.Claims.GetSubject()
+	if err != nil {
+		return nil, err
+	}
+	idInt, err := strconv.ParseInt(subject, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return &idInt, nil
 }
