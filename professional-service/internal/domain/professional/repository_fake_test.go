@@ -36,7 +36,8 @@ func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pend
 }
 
 type MockUserServiceAlwaysAuthenticated struct {
-	IsAuthenticatedCalled bool
+	IsAuthenticatedCalled        bool
+	GetAuthenticatedUserIdCalled bool
 }
 
 func (m *MockUserServiceAlwaysAuthenticated) IsAuthenticated(context.Context, string) bool {
@@ -48,6 +49,7 @@ func (m *MockUserServiceAlwaysAuthenticated) Login(ctx context.Context, email st
 	return "", nil
 }
 
-func (m *MockUserServiceAlwaysAuthenticated) GetAuthenticatedUserId(ctx context.Context, auth string) (*int64, error) {
-	return nil, nil
+func (m *MockUserServiceAlwaysAuthenticated) GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error) {
+	m.GetAuthenticatedUserIdCalled = true
+	return -2, nil
 }

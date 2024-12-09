@@ -5,21 +5,21 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	auth := r.Header.Get("Authorization")
-	if !c.userService.IsAuthenticated(r.Context(), auth) {
+
+	userId, err := c.userService.GetAuthenticatedUserId(ctx, auth)
+	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
 		return
 	}
 
-	id := chi.URLParam(r, "id")
-
 	updateRequest := UpdateRequest{}
-	err := utils.ReadJSON(r, &updateRequest)
+	err = utils.ReadJSON(r, &updateRequest)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, "Invalid request body")
 		return
@@ -30,7 +30,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.service.Update(r.Context(), id, updateRequest)
+	err = c.service.Update(ctx, strconv.FormatInt(userId, 10), UpdateRequest{})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.WriteJSON(w, http.StatusNotFound, "")
@@ -39,10 +39,6 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	idInt, _ := strconv.ParseInt(id, 10, 64)
-	response := Professional{
-		ID:    idInt,
-		Email: updateRequest.Email,
-	}
-	utils.WriteJSON(w, http.StatusOK, response)
+
+	utils.WriteJSON(w, http.StatusOK, "")
 }
