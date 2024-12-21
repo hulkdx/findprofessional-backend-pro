@@ -30,7 +30,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.service.Update(ctx, strconv.FormatInt(userId, 10), UpdateRequest{})
+	err = c.service.Update(ctx, strconv.FormatInt(userId, 10), updateRequest)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.WriteJSON(w, http.StatusNotFound, "")

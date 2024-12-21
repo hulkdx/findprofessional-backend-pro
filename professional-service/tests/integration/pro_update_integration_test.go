@@ -40,7 +40,19 @@ func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
 		d1 := insertPro(t, db, *record)
 		defer d1()
 
-		requestBody := `{ "email": "new@email.com" }`
+		requestBody := `
+			{
+				"email": "test@gmail.com",
+				"firstName": "John",
+				"lastName": "Doe",
+				"coachType": "Fitness Coach",
+				"priceNumber": 100,
+				"priceCurrency": "USD",
+				"profileImageUrl": "http://example.com/images/john.jpg",
+				"description": "Experienced fitness coach with 10 years of experience.",
+				"skypeId": "bla.skype"
+			}
+		`
 		request := NewJsonRequest("POST", "/professional", strings.NewReader(requestBody))
 		response := httptest.NewRecorder()
 		// Act
