@@ -29,8 +29,37 @@ func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
 }
 
 func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest) error {
-	query := "UPDATE professionals SET email = $1, updated_at = $2 WHERE id = $3"
-	return performUpdate(r.db, ctx, query, p.Email, time.Now(), id)
+	query := "UPDATE professionals SET updated_at = $2, first_name = $3, last_name = $4, coach_type = $5"
+	args := []any{
+		id,
+		time.Now(),
+		p.FirstName,
+		p.LastName,
+		p.CoachType,
+	}
+	if p.Email != nil {
+		query += ", email = $6"
+		args = append(args, *p.Email)
+	}
+	if p.Price != nil && p.PriceCurrency != nil {
+		query += ", price_number = $7, price_currency = $8"
+		args = append(args, p.Price, p.PriceCurrency)
+	}
+	if p.ProfileImageUrl != nil {
+		query += ", profile_image_url = $9"
+		args = append(args, *p.ProfileImageUrl)
+	}
+	if p.Description != nil {
+		query += ", description = $10"
+		args = append(args, *p.Description)
+	}
+	if p.SkypeId != nil {
+		query += ", skype_id = $11"
+		args = append(args, *p.SkypeId)
+	}
+
+	query += " WHERE id = $1"
+	return performUpdate(r.db, ctx, query, args...)
 }
 
 func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
