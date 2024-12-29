@@ -14,6 +14,7 @@ type Repository interface {
 	Create(ctx context.Context, request CreateRequest, pending bool) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
+	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
 }
 
 type repositoryImpl struct {
@@ -180,4 +181,8 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 	}
 
 	return tx.Commit()
+}
+
+func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+	return nil, nil
 }

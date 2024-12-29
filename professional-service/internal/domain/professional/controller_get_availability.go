@@ -15,4 +15,11 @@ func (c *Controller) GetAvailability(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
 		return
 	}
+
+	response, err := c.service.GetAvailability(ctx, userId)
+	if err != nil {
+		utils.WriteGeneralError(w, utils.ErrUnknown)
+		return
+	}
+	utils.WriteJSON(w, http.StatusOK, response)
 }
