@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
@@ -184,5 +185,39 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 }
 
 func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
-	return nil, nil
+	query := "SELECT p.id, p.date, p.from, p.to, p.created_at, p.updated_at FROM professional_availability p WHERE professional_id = $1 AND date > $2"
+	rows, err := r.db.QueryContext(ctx, query,
+		professionalId,
+		r.timeProvider.Now().Format("2006-01-01"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	availabilities := make(Availabilities, 0)
+	for rows.Next() {
+		var availability Availability
+		var date time.Time
+		var from time.Time
+		var to time.Time
+
+		err := rows.Scan(
+			&availability.ID,
+			&date,
+			&from,
+			&to,
+			&availability.CreatedAt,
+			&availability.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		availability.Date = civil.Date{Year: date.Year(), Month: date.Month(), Day: date.Day()}
+		availability.From = civil.Time{Hour: from.Hour(), Minute: from.Minute(), Second: from.Second()}
+		availability.To = civil.Time{Hour: to.Hour(), Minute: to.Minute(), Second: to.Second()}
+
+		availabilities = append(availabilities, availability)
+	}
+
+	return availabilities, nil
 }
