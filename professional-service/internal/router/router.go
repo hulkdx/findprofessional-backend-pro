@@ -12,12 +12,21 @@ func Handler(controller *professional.Controller) http.Handler {
 
 	router.Use(ContentTypeJsonMiddleware)
 
-	router.Get("/professional", controller.FindAll)
-	router.Put("/professional", controller.Create)
-	router.Get("/professional/{id}", controller.Find)
-	router.Post("/professional", controller.Update)
-
-	router.Get("/professional/{id}/review", controller.FindAllReview)
+	normalUser(router, controller)
+	proUser(router, controller)
 
 	return router
+}
+
+func normalUser(router *chi.Mux, controller *professional.Controller) {
+	router.Get("/professional", controller.FindAll)
+	router.Get("/professional/{id}", controller.Find)
+	router.Get("/professional/{id}/review", controller.FindAllReview)
+}
+
+func proUser(router *chi.Mux, controller *professional.Controller) {
+	// register a new pro
+	router.Put("/professional", controller.Create)
+	// update pro profile information
+	router.Post("/professional", controller.Update)
 }
