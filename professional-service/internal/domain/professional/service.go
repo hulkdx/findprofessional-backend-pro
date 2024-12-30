@@ -17,6 +17,7 @@ type Service interface {
 	Create(context.Context, CreateRequest) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
+	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
 }
 
 type serviceImpl struct {
@@ -60,4 +61,8 @@ func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) er
 
 func (s *serviceImpl) FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error) {
 	return s.repository.FindAllReview(ctx, professionalId, page, pageSize)
+}
+
+func (s *serviceImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+	return s.repository.GetAvailability(ctx, professionalId)
 }

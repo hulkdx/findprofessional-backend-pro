@@ -35,6 +35,10 @@ func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pend
 	return r.createError
 }
 
+func (m *FakeRepository) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+	return nil, nil
+}
+
 type MockUserServiceAlwaysAuthenticated struct {
 	IsAuthenticatedCalled        bool
 	GetAuthenticatedUserIdCalled bool
