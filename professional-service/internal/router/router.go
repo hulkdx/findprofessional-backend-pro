@@ -31,4 +31,6 @@ func proUser(router *chi.Mux, controller *professional.Controller) {
 	router.Post("/professional", controller.Update)
 	// get availability information from time schedules of current pro user
 	router.Get("/professional/availability", controller.GetAvailability)
+	// update availability of current pro user
+	router.Post("/professional/availability", controller.UpdateAvailability)
 }

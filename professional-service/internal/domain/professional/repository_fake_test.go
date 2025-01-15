@@ -39,6 +39,12 @@ func (m *FakeRepository) GetAvailability(ctx context.Context, professionalId int
 	return nil, nil
 }
 
+func (m *FakeRepository) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+	return nil
+}
+
+// --------------------------------
+
 type MockUserServiceAlwaysAuthenticated struct {
 	IsAuthenticatedCalled        bool
 	GetAuthenticatedUserIdCalled bool
@@ -56,4 +62,8 @@ func (m *MockUserServiceAlwaysAuthenticated) Login(ctx context.Context, email st
 func (m *MockUserServiceAlwaysAuthenticated) GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error) {
 	m.GetAuthenticatedUserIdCalled = true
 	return -2, nil
+}
+
+func (m *MockUserServiceAlwaysAuthenticated) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+	return nil
 }
