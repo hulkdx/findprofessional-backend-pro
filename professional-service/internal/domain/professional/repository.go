@@ -2,6 +2,7 @@ package professional
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -16,6 +17,7 @@ type Repository interface {
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
+	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
 }
 
 type repositoryImpl struct {
@@ -146,7 +148,7 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 			updated_at
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-		RETURNING id
+		RETURNING id;
 	`
 
 	var professionalId int64
@@ -169,16 +171,17 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 	}
 
 	query = "UPDATE users SET professional_id = $1, updated_at = $2 WHERE email = $3"
-	err = performUpdateTx(
-		tx,
-		ctx,
-		query,
+	result, err := tx.Exec(ctx, query,
 		professionalId,
 		r.timeProvider.Now(),
 		request.Email,
 	)
 	if err != nil {
 		return err
+	}
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 
 	return tx.Commit(ctx)
@@ -228,4 +231,54 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	}
 
 	return availabilities, nil
+}
+
+func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+
+	// rows := make([][]interface{}, len(entries))
+
+	// for i, e := range entries {
+	// 	tsRange := pgtype.Range[pgtype.Timestamp]{
+	// 		Lower: pgtype.Timestamp{
+	// 			Time:             e.Start,
+	// 			InfinityModifier: pgtype.Finite,
+	// 			Valid:            true,
+	// 		},
+	// 		Upper: pgtype.Timestamp{
+	// 			Time:             e.End,
+	// 			Valid:            true,
+	// 			InfinityModifier: pgtype.Finite,
+	// 		},
+	// 		LowerType: pgtype.Inclusive,
+	// 		UpperType: pgtype.Exclusive,
+	// 		Valid:     true,
+	// 	}
+
+	// 	rows[i] = []interface{}{
+	// 		e.ProfessionalID,
+	// 		tsRange,     // The tsrange
+	// 		e.CreatedAt, // timestamptz
+	// 		e.UpdatedAt, // timestamptz
+	// 	}
+	// }
+	// columns := []string{
+	// 	"professional_id",
+	// 	"availability",
+	// 	"created_at",
+	// 	"updated_at",
+	// }
+	// count, err := r.db.CopyFrom(
+	// 	ctx,
+	// 	pgx.Identifier{"professional_availability"},
+	// 	columns,
+	// 	pgx.CopyFromRows(rows),
+	// )
+	// if err != nil {
+	// 	return err
+	// }
+	// if count != int64(len(rows)) {
+	// 	return sql.ErrNoRows
+	// }
+
+	return nil
 }
