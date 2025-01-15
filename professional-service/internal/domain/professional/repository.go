@@ -3,10 +3,12 @@ package professional
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/lib/pq"
 )
 
 type Repository interface {
@@ -16,6 +18,7 @@ type Repository interface {
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
+	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
 }
 
 type repositoryImpl struct {
@@ -220,4 +223,54 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	}
 
 	return availabilities, nil
+}
+
+func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+	txn, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	stmt, err := txn.PrepareContext(ctx, pq.CopyIn(
+		"professional_availability",
+		"professional_id",
+		"date",
+		"from",
+		"to",
+		"created_at",
+		"updated_at",
+	))
+	if err != nil {
+		return err
+	}
+
+	for _, a := range availability.Items {
+		_, err = stmt.ExecContext(
+			ctx,
+			professionalId,
+			a.Date,
+			a.From,
+			a.To,
+			r.timeProvider.Now(),
+			r.timeProvider.Now(),
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = stmt.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+	err = stmt.Close()
+	if err != nil {
+		return err
+	}
+	err = txn.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
 }
