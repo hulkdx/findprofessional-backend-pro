@@ -126,8 +126,8 @@ func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func(
 
 func insertAvailability(t *testing.T, db *sql.DB, availabilities ...professional.Availability) func() {
 	query := `INSERT INTO "professional_availability" 
-	("professional_id", "date", "from", "to", "created_at", "updated_at") VALUES
-	($1, $2, $3, $4, $5, $6)`
+	("professional_id", "availability", "created_at", "updated_at") VALUES
+	($1, $2, $3, $4)`
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -143,9 +143,7 @@ func insertAvailability(t *testing.T, db *sql.DB, availabilities ...professional
 	for _, a := range availabilities {
 		_, err := stmt.Exec(
 			a.ProfessionalID,
-			a.Date.String(),
-			a.From.String(),
-			a.To.String(),
+			fmt.Sprintf("[%s %s,%s %s)", a.Date.String(), a.From.String(), a.Date.String(), a.To.String()),
 			a.CreatedAt,
 			a.UpdatedAt,
 		)

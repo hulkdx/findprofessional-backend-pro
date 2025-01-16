@@ -32,7 +32,13 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 		p.description,
 		AVG(r.rate)::numeric(10,2) AS rating,
 		COUNT(r),
-		jsonb_agg(a) FILTER (WHERE a.id IS NOT NULL),
+		jsonb_agg(json_build_object(
+			'date', LOWER(a.availability)::DATE,
+			'from', LOWER(a.availability)::TIME,
+			'to', UPPER(a.availability)::TIME,
+			'createdAt', a.created_at,
+			'updatedAt', a.updated_at
+			)) FILTER (WHERE a.id IS NOT NULL),
 		jsonb_agg(json_build_object(
 			'id', r.id,
 			'rate', r.rate,
@@ -58,7 +64,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 	-- availability
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
-		AND a.date > '%s'
+		AND LOWER(a.availability) > '%s'
 
 	WHERE p.price_currency IS NOT NULL AND
 				p.price_number   IS NOT NULL AND
