@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -44,4 +45,21 @@ func WriteError(w http.ResponseWriter, code int, error string) {
 
 func WriteGeneralError(w http.ResponseWriter, error error) {
 	WriteError(w, http.StatusInternalServerError, error.Error())
+}
+
+func Unmarshal(data any, v any) error {
+	if data == nil {
+		return nil
+	}
+
+	// pgx 				return string for data
+	// database/sql 	return []byte for data
+	switch d := data.(type) {
+	case []byte:
+		return json.Unmarshal(d, v)
+	case string:
+		return json.Unmarshal([]byte(d), v)
+	default:
+		return fmt.Errorf("Availabilities.Scan: unsupported type: %T", data)
+	}
 }

@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
@@ -38,36 +37,30 @@ func OutputSQL(t *testing.T, db *pgxpool.Pool, query string) {
 	}
 	defer rows.Close()
 
+	// Collect column names
 	fieldDescs := rows.FieldDescriptions()
 	columns := make([]string, len(fieldDescs))
 	for i, fd := range fieldDescs {
 		columns[i] = string(fd.Name)
 	}
-
-	values := make([]sql.RawBytes, len(columns))
-	valuePtrs := make([]interface{}, len(columns))
-
-	for i := range columns {
-		valuePtrs[i] = &values[i]
-	}
-
-	fmt.Println(strings.Join(columns, "\t\t")) // Print column names
+	fmt.Println(strings.Join(columns, "\t\t"))
 
 	for rows.Next() {
-		if err := rows.Scan(valuePtrs...); err != nil {
+		// rowValues is a slice of interface{}
+		rowValues, err := rows.Values()
+		if err != nil {
 			t.Fatal(err)
 		}
 
 		var rowStrings []string
-		for _, raw := range values {
-			if raw == nil {
+		for _, val := range rowValues {
+			if val == nil {
 				rowStrings = append(rowStrings, "NULL")
 			} else {
-				rowStrings = append(rowStrings, string(raw))
+				rowStrings = append(rowStrings, fmt.Sprintf("%v", val))
 			}
 		}
-		rowString := strings.Join(rowStrings, "\t\t")
-		fmt.Println(rowString)
+		fmt.Println(strings.Join(rowStrings, "\t\t"))
 	}
 
 	if err := rows.Err(); err != nil {

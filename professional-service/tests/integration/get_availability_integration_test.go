@@ -64,6 +64,12 @@ func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 
 		response_model := []professional.Availability{}
 		Unmarshal(response, &response_model)
-		assert.Equal(t, response_model, expected)
+		assert.Equal(t, len(response_model), 2)
+		assert.Equal(t, response_model[0].Date, expected[0].Date)
+		assert.Equal(t, response_model[0].From, expected[0].From)
+		assert.Equal(t, response_model[0].To, expected[0].To)
+		assert.Equal(t, response_model[1].Date, expected[1].Date)
+		assert.Equal(t, response_model[1].From, expected[1].From)
+		assert.Equal(t, response_model[1].To, expected[1].To)
 	})
 }

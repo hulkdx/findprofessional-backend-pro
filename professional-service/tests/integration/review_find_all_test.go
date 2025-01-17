@@ -83,7 +83,7 @@ func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 		assert.Equal(t, res.User.FirstName, user.FirstName)
 		assert.Equal(t, res.User.LastName, user.LastName)
 		assert.Equal(t, res.User.ProfileImage, user.ProfileImage)
-		assert.Equal(t, res.CreatedAt, date)
-		assert.Equal(t, res.UpdatedAt, date)
+		assert.Equal(t, res.CreatedAt.UTC(), date.UTC())
+		assert.Equal(t, res.UpdatedAt.UTC(), date.UTC())
 	})
 }
