@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func Unmarshal(response *httptest.ResponseRecorder, output any) {
@@ -27,16 +29,19 @@ func Int(i int) *int {
 
 // Database helpers
 
-func OutputSQL(t *testing.T, db *sql.DB, query string) {
-	rows, err := db.Query(query)
+func OutputSQL(t *testing.T, db *pgxpool.Pool, query string) {
+	ctx := context.Background()
+
+	rows, err := db.Query(ctx, query)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		t.Fatal(err)
+	fieldDescs := rows.FieldDescriptions()
+	columns := make([]string, len(fieldDescs))
+	for i, fd := range fieldDescs {
+		columns[i] = string(fd.Name)
 	}
 
 	values := make([]sql.RawBytes, len(columns))
@@ -70,7 +75,7 @@ func OutputSQL(t *testing.T, db *sql.DB, query string) {
 	}
 }
 
-func insertEmptyPro(t *testing.T, db *sql.DB) func() {
+func insertEmptyPro(t *testing.T, db *pgxpool.Pool) func() {
 	return insertPro(t, db, professional.Professional{
 		PriceNumber:   Int(0),
 		PriceCurrency: String(""),
@@ -78,25 +83,20 @@ func insertEmptyPro(t *testing.T, db *sql.DB) func() {
 	})
 }
 
-func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func() {
+func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional) func() {
+	ctx := context.Background()
 
 	query := `INSERT INTO "professionals"
 	(id,"email","password","first_name","last_name","coach_type","price_number","price_currency", "pending", "created_at", "updated_at") VALUES
 	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stmt.Close()
 
 	for _, p := range pro {
-		_, err := stmt.Exec(
+		_, err := tx.Exec(ctx, query,
 			p.ID,
 			p.Email,
 			p.Password,
@@ -110,71 +110,85 @@ func insertPro(t *testing.T, db *sql.DB, pro ...professional.Professional) func(
 			p.UpdatedAt,
 		)
 		if err != nil {
-			tx.Rollback()
+			tx.Rollback(ctx)
 			t.Fatal(err)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
 
 	return func() {
-		db.Exec(`DELETE FROM professionals`)
+		db.Exec(ctx, `DELETE FROM professionals`)
 	}
 }
 
-func insertAvailability(t *testing.T, db *sql.DB, availabilities ...professional.Availability) func() {
-	query := `INSERT INTO "professional_availability" 
-	("professional_id", "availability", "created_at", "updated_at") VALUES
-	($1, $2, $3, $4)`
+func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...professional.Availability) func() {
+	ctx := context.Background()
 
-	tx, err := db.Begin()
+	query := `
+        INSERT INTO "professional_availability"
+            ("professional_id", "availability", "created_at", "updated_at")
+        VALUES
+            ($1, $2, $3, $4)
+    `
+
+	tx, err := pool.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stmt.Close()
 
 	for _, a := range availabilities {
-		_, err := stmt.Exec(
+		// Convert the date/time to a Postgres range string,
+		// e.g. [2025-01-10 09:00:00,2025-01-10 10:00:00)
+		availabilityRange := fmt.Sprintf("[%s %s,%s %s)",
+			a.Date.String(),
+			a.From.String(),
+			a.Date.String(),
+			a.To.String(),
+		)
+
+		_, execErr := tx.Exec(ctx, query,
 			a.ProfessionalID,
-			fmt.Sprintf("[%s %s,%s %s)", a.Date.String(), a.From.String(), a.Date.String(), a.To.String()),
+			availabilityRange,
 			a.CreatedAt,
 			a.UpdatedAt,
 		)
-		if err != nil {
-			tx.Rollback()
-			t.Fatal(err)
+		if execErr != nil {
+			_ = tx.Rollback(ctx)
+			t.Fatal(execErr)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
 
 	return func() {
-		defer db.Exec(`DELETE FROM professional_availability; DELETE FROM professionals;`)
+		// Clean up both availability & professionals
+		_, _ = pool.Exec(ctx, `DELETE FROM professional_availability; DELETE FROM professionals;`)
 	}
 }
 
-func insertReview(t *testing.T, db *sql.DB, review ...professional.Review) func() {
-	query := `INSERT INTO "professional_review" 
-	("professional_id", "user_id", "rate", "created_at", "updated_at", "content_text", "id") VALUES
-	($1, $2, $3, $4, $5, $6, $7)`
+// insertReview inserts Reviews in a single transaction.
+func insertReview(t *testing.T, pool *pgxpool.Pool, review ...professional.Review) func() {
+	ctx := context.Background()
 
-	tx, err := db.Begin()
+	query := `
+        INSERT INTO "professional_review"
+            ("professional_id", "user_id", "rate", "created_at", "updated_at", "content_text", "id")
+        VALUES
+            ($1, $2, $3, $4, $5, $6, $7)
+    `
+
+	tx, err := pool.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, r := range review {
-		_, err := db.Exec(
-			query,
+		_, execErr := tx.Exec(ctx, query,
 			r.ProfessionalID,
 			r.UserID,
 			r.Rate,
@@ -183,46 +197,52 @@ func insertReview(t *testing.T, db *sql.DB, review ...professional.Review) func(
 			r.ContentText,
 			r.ID,
 		)
-		if err != nil {
-			t.Fatal(err)
+		if execErr != nil {
+			_ = tx.Rollback(ctx)
+			t.Fatal(execErr)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
 
 	return func() {
-		defer db.Exec(`DELETE FROM professional_review;`)
+		_, _ = pool.Exec(ctx, `DELETE FROM professional_review;`)
 	}
 }
 
-func insertUserWithId(t *testing.T, db *sql.DB, userId ...int) func() {
-	u := []user.User{}
-	for _, id := range userId {
-		u = append(u, user.User{ID: id, Email: fmt.Sprint(id)})
+// insertUserWithId inserts users that have their ID = email, for example.
+func insertUserWithId(t *testing.T, pool *pgxpool.Pool, userIDs ...int) func() {
+	users := []user.User{}
+	for _, id := range userIDs {
+		// example: Email set to string of the ID
+		users = append(users, user.User{
+			ID:    id,
+			Email: fmt.Sprint(id),
+		})
 	}
-	return insertUser(t, db, u...)
+	return insertUser(t, pool, users...)
 }
 
-func insertUser(t *testing.T, db *sql.DB, user ...user.User) func() {
-	query := `INSERT INTO "users"
-	(id, email, password, first_name, last_name, profile_image, created_at, updated_at) VALUES
-	($1, $2, '', $3, $4, $5, $6, $7)`
+// insertUser inserts one or more users in a single transaction.
+func insertUser(t *testing.T, pool *pgxpool.Pool, users ...user.User) func() {
+	ctx := context.Background()
 
-	tx, err := db.Begin()
+	query := `
+        INSERT INTO "users"
+            (id, email, password, first_name, last_name, profile_image, created_at, updated_at)
+        VALUES
+            ($1, $2, '', $3, $4, $5, $6, $7)
+    `
+
+	tx, err := pool.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	stmt, err := tx.Prepare(query)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stmt.Close()
-
-	for _, u := range user {
-		_, err := stmt.Exec(
+	for _, u := range users {
+		_, execErr := tx.Exec(ctx, query,
 			u.ID,
 			u.Email,
 			u.FirstName,
@@ -231,17 +251,17 @@ func insertUser(t *testing.T, db *sql.DB, user ...user.User) func() {
 			time.Now(),
 			time.Now(),
 		)
-		if err != nil {
-			tx.Rollback()
-			t.Fatal(err)
+		if execErr != nil {
+			_ = tx.Rollback(ctx)
+			t.Fatal(execErr)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
 
 	return func() {
-		defer db.Exec(`DELETE FROM users;`)
+		_, _ = pool.Exec(ctx, `DELETE FROM users;`)
 	}
 }

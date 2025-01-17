@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,9 +10,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func GetAvailabilityTest(t *testing.T, db *sql.DB) {
+func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 	timeProvider := &FakeTimeProvider{}
 	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider))
 

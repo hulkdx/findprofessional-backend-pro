@@ -2,11 +2,11 @@ package professional
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repository interface {
@@ -19,11 +19,11 @@ type Repository interface {
 }
 
 type repositoryImpl struct {
-	db           *sql.DB
+	db           *pgxpool.Pool
 	timeProvider utils.TimeProvider
 }
 
-func NewRepository(db *sql.DB, timeProvider utils.TimeProvider) Repository {
+func NewRepository(db *pgxpool.Pool, timeProvider utils.TimeProvider) Repository {
 	return &repositoryImpl{
 		db,
 		timeProvider,
@@ -86,7 +86,7 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 		LIMIT $2 OFFSET $3
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, professionalID, pageSize, offset)
+	rows, err := r.db.Query(ctx, query, professionalID, pageSize, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -120,14 +120,15 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 }
 
 func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pending bool) error {
-	tx, err := r.db.BeginTx(ctx, nil)
+	// TODO: check tx
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			tx.Rollback(ctx)
 		}
 	}()
 
@@ -150,7 +151,7 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 	`
 
 	var professionalId int64
-	row := tx.QueryRowContext(ctx, query,
+	row := tx.QueryRow(ctx, query,
 		request.Email,
 		request.Password,
 		request.FirstName,
@@ -181,7 +182,7 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 		return err
 	}
 
-	return tx.Commit()
+	return tx.Commit(ctx)
 }
 
 func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
@@ -196,7 +197,7 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	WHERE
 		professional_id = $1 AND
 		LOWER(availability) > $2`
-	rows, err := r.db.QueryContext(ctx, query,
+	rows, err := r.db.Query(ctx, query,
 		professionalId,
 		r.timeProvider.Now().Format("2006-01-01"),
 	)

@@ -2,33 +2,33 @@ package integration_test
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewTestController(db *sql.DB) *professional.Controller {
+func NewTestController(db *pgxpool.Pool) *professional.Controller {
 	fakeTime := &FakeTimeProvider{
 		time.Now(),
 	}
 	return NewTestControllerWithTimeProvider(db, fakeTime)
 }
 
-func NewTestControllerWithUserService(db *sql.DB, userService user.Service) *professional.Controller {
+func NewTestControllerWithUserService(db *pgxpool.Pool, userService user.Service) *professional.Controller {
 	fakeTime := &FakeTimeProvider{
 		time.Now(),
 	}
 	return NewTestControllerWithTimeProviderWithUserService(db, fakeTime, userService)
 }
 
-func NewTestControllerWithTimeProvider(db *sql.DB, timeProvider utils.TimeProvider) *professional.Controller {
+func NewTestControllerWithTimeProvider(db *pgxpool.Pool, timeProvider utils.TimeProvider) *professional.Controller {
 	return NewTestControllerWithTimeProviderWithUserService(db, timeProvider, &MockUserService{})
 }
 
-func NewTestControllerWithTimeProviderWithUserService(db *sql.DB, timeProvider utils.TimeProvider, userService user.Service) *professional.Controller {
+func NewTestControllerWithTimeProviderWithUserService(db *pgxpool.Pool, timeProvider utils.TimeProvider, userService user.Service) *professional.Controller {
 	controller := professional.NewController(
 		professional.NewService(professional.NewRepository(db, timeProvider)),
 		userService,

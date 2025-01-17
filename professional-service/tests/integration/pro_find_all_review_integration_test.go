@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -12,9 +11,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
+func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("empty review", func(t *testing.T) {
@@ -145,7 +145,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *sql.DB) {
 
 }
 
-func createReviews(t *testing.T, db *sql.DB, count int) func() {
+func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {
 	proId := int64(2)
 	pro := professional.Professional{
 		ID:            proId,

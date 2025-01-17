@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -12,9 +13,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func CreateProTest(t *testing.T, db *sql.DB) {
+func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("not found a record, create a new record", func(t *testing.T) {
@@ -30,7 +32,7 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			PriceCurrency: "USD",
 			CoachType:     "Lifecoach",
 		}
-		defer db.Exec(`DELETE FROM professionals`)
+		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
 		user := user.User{
 			ID:        1,
@@ -62,7 +64,7 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			PriceCurrency: "USD",
 			CoachType:     "Lifecoach",
 		}
-		defer db.Exec(`DELETE FROM professionals`)
+		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
 		user := user.User{
 			ID:        1,
@@ -96,7 +98,7 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			PriceCurrency: "USD",
 			CoachType:     "Lifecoach",
 		}
-		defer db.Exec(`DELETE FROM professionals`)
+		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
 		user := user.User{
 			ID:        1,
@@ -131,7 +133,7 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 			PriceCurrency: "USD",
 			CoachType:     "Lifecoach",
 		}
-		defer db.Exec(`DELETE FROM professionals`)
+		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
 		user := user.User{
 			ID:        1,
@@ -149,7 +151,7 @@ func CreateProTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, response.Code, http.StatusCreated)
 
 		var responseProfessionalId int64 = -1
-		db.QueryRow("SELECT professional_id from users WHERE email=$1", bodyRequest.Email).Scan(&responseProfessionalId)
+		db.QueryRow(context.Background(), "SELECT professional_id from users WHERE email=$1", bodyRequest.Email).Scan(&responseProfessionalId)
 		assert.NotEqual(t, responseProfessionalId, -1)
 	})
 }
@@ -160,8 +162,8 @@ func createProRequest(body professional.CreateRequest) *http.Request {
 	return NewJsonRequest("PUT", "/professional", &buf)
 }
 
-func getPendingFromDatabase(db *sql.DB) *bool {
+func getPendingFromDatabase(db *pgxpool.Pool) *bool {
 	var pending sql.NullBool
-	db.QueryRow("SELECT pending FROM professionals").Scan(&pending)
+	db.QueryRow(context.Background(), "SELECT pending FROM professionals").Scan(&pending)
 	return &pending.Bool
 }
