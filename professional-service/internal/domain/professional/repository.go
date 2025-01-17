@@ -185,7 +185,17 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 }
 
 func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
-	query := "SELECT p.id, p.date, p.from, p.to, p.created_at, p.updated_at FROM professional_availability p WHERE professional_id = $1 AND date > $2"
+	query := `
+		SELECT
+			id,
+			LOWER(availability),
+			UPPER(availability),
+			created_at,
+			updated_at
+	FROM professional_availability
+	WHERE
+		professional_id = $1 AND
+		LOWER(availability) > $2`
 	rows, err := r.db.QueryContext(ctx, query,
 		professionalId,
 		r.timeProvider.Now().Format("2006-01-01"),
@@ -197,13 +207,11 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	availabilities := make(Availabilities, 0)
 	for rows.Next() {
 		var availability Availability
-		var date time.Time
 		var from time.Time
 		var to time.Time
 
 		err := rows.Scan(
 			&availability.ID,
-			&date,
 			&from,
 			&to,
 			&availability.CreatedAt,
@@ -212,9 +220,9 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 		if err != nil {
 			return nil, err
 		}
-		availability.Date = civil.Date{Year: date.Year(), Month: date.Month(), Day: date.Day()}
-		availability.From = civil.Time{Hour: from.Hour(), Minute: from.Minute(), Second: from.Second()}
-		availability.To = civil.Time{Hour: to.Hour(), Minute: to.Minute(), Second: to.Second()}
+		availability.Date = civil.DateOf(from)
+		availability.From = civil.TimeOf(from)
+		availability.To = civil.TimeOf(to)
 
 		availabilities = append(availabilities, availability)
 	}
