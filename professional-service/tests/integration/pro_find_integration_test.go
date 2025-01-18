@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -10,9 +9,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func FindProfessionalTest(t *testing.T, db *sql.DB) {
+func FindProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("Empty database", func(t *testing.T) {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
-
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/db"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
@@ -18,9 +17,11 @@ import (
 
 func main() {
 	logger.Debug("Server started")
+
+	ctx := context.Background()
 	cfg := config.Load()
 
-	database := db.Connect(cfg.Database)
+	database := db.Connect(ctx, cfg.Database)
 	defer db.Close(database)
 
 	handler := router.Handler(professional.NewControllerFromDB(database))

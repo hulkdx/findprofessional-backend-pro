@@ -1,30 +1,27 @@
 package db
 
 import (
-	"database/sql"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
+	"context"
 
-	_ "github.com/lib/pq"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Connect(cfg config.DatabaseConfig) *sql.DB {
-	db, err := sql.Open("postgres", cfg.Dsn)
+func Connect(ctx context.Context, cfg config.DatabaseConfig) *pgxpool.Pool {
+	db, err := pgxpool.New(ctx, cfg.Dsn)
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.Ping(ctx)
 	if err != nil {
 		defer Close(db)
 		panic(err)
 	}
-	err = db.Ping()
-	if err != nil {
-		defer Close(db)
-		panic(err)
-	}
+
 	return db
 }
 
-func Close(db *sql.DB) {
-	err := db.Close()
-	if err != nil {
-		logger.Error("Database close error:", err)
-	}
+func Close(db *pgxpool.Pool) {
+	db.Close()
 }

@@ -165,7 +165,7 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional,
 }
 
 func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, query string, args ...any) ([]Professional, error) {
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

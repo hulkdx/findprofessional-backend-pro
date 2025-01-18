@@ -1,11 +1,11 @@
 package professional
 
 import (
-	"encoding/json"
 	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type Professional struct {
@@ -41,19 +41,13 @@ type Availability struct {
 type Availabilities []Availability
 
 func (ls *Availabilities) Scan(src any) error {
-	if src == nil {
-		return nil
-	}
-	return json.Unmarshal(src.([]byte), ls)
+	return utils.Unmarshal(src, ls)
 }
 
 type Reviews []Review
 
 func (ls *Reviews) Scan(src any) error {
-	if src == nil {
-		return nil
-	}
-	return json.Unmarshal(src.([]byte), ls)
+	return utils.Unmarshal(src, ls)
 }
 
 type Review struct {

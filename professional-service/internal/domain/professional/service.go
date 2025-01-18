@@ -5,11 +5,11 @@ import (
 	"database/sql"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var pgErrUniqueViolation pq.ErrorCode = "23505"
+var pgErrUniqueViolation = "23505"
 
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
@@ -46,7 +46,7 @@ func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
 
 	err = s.repository.Create(ctx, r, pending)
 
-	if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == pgErrUniqueViolation {
+	if pqErr, ok := err.(*pgconn.PgError); ok && pqErr.Code == pgErrUniqueViolation {
 		return utils.ErrDuplicate
 	}
 	if err == sql.ErrNoRows {

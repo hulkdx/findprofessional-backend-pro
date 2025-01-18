@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"database/sql"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,9 +10,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func UpdateProfessionalTest(t *testing.T, db *sql.DB) {
+func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	userService := MockUserService{}
 	handler := router.Handler(NewTestControllerWithUserService(db, &userService))
 

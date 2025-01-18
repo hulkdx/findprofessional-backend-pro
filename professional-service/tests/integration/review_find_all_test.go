@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -12,9 +11,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ReviewFindAllTest(t *testing.T, db *sql.DB) {
+func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 	handler := router.Handler(NewTestController(db))
 
 	t.Run("empty review", func(t *testing.T) {
@@ -83,7 +83,7 @@ func ReviewFindAllTest(t *testing.T, db *sql.DB) {
 		assert.Equal(t, res.User.FirstName, user.FirstName)
 		assert.Equal(t, res.User.LastName, user.LastName)
 		assert.Equal(t, res.User.ProfileImage, user.ProfileImage)
-		assert.Equal(t, res.CreatedAt, date)
-		assert.Equal(t, res.UpdatedAt, date)
+		assert.Equal(t, res.CreatedAt.UTC(), date.UTC())
+		assert.Equal(t, res.UpdatedAt.UTC(), date.UTC())
 	})
 }
