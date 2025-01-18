@@ -8,7 +8,6 @@ require (
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jackc/pgx/v5 v5.7.2
-	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.32.0
 )
 

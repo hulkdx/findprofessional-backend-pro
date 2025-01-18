@@ -5,8 +5,6 @@ import (
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	_ "github.com/lib/pq"
 )
 
 func Connect(ctx context.Context, cfg config.DatabaseConfig) *pgxpool.Pool {

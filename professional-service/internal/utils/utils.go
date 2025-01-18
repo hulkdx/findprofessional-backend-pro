@@ -52,8 +52,8 @@ func Unmarshal(data any, v any) error {
 		return nil
 	}
 
-	// pgx 				return string for data
-	// database/sql 	return []byte for data
+	// pgx              return string for data
+	// database/sql     return []byte for data
 	switch d := data.(type) {
 	case []byte:
 		return json.Unmarshal(d, v)

@@ -120,7 +120,6 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 }
 
 func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pending bool) error {
-	// TODO: check tx
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
