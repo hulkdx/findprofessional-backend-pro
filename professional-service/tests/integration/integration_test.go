@@ -40,4 +40,8 @@ func TestIntegrations(t *testing.T) {
 	t.Run("GetAvailabilityTest", func(t *testing.T) {
 		GetAvailabilityTest(t, db)
 	})
+
+	t.Run("AddAvailabilityTest", func(t *testing.T) {
+		AddAvailabilityTest(t, db)
+	})
 }
