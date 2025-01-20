@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -234,51 +235,39 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 }
 
 func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+	now := r.timeProvider.Now()
+	rows := make([][]interface{}, len(availability.Items))
+	for i, e := range availability.Items {
+		tsRange, err := utils.ConvertToTsRange(e.Date, e.From, e.To)
+		if err != nil {
+			return err
+		}
+		rows[i] = []interface{}{
+			professionalId,
+			tsRange,
+			now,
+			now,
+		}
+	}
 
-	// rows := make([][]interface{}, len(entries))
-
-	// for i, e := range entries {
-	// 	tsRange := pgtype.Range[pgtype.Timestamp]{
-	// 		Lower: pgtype.Timestamp{
-	// 			Time:             e.Start,
-	// 			InfinityModifier: pgtype.Finite,
-	// 			Valid:            true,
-	// 		},
-	// 		Upper: pgtype.Timestamp{
-	// 			Time:             e.End,
-	// 			Valid:            true,
-	// 			InfinityModifier: pgtype.Finite,
-	// 		},
-	// 		LowerType: pgtype.Inclusive,
-	// 		UpperType: pgtype.Exclusive,
-	// 		Valid:     true,
-	// 	}
-
-	// 	rows[i] = []interface{}{
-	// 		e.ProfessionalID,
-	// 		tsRange,     // The tsrange
-	// 		e.CreatedAt, // timestamptz
-	// 		e.UpdatedAt, // timestamptz
-	// 	}
-	// }
-	// columns := []string{
-	// 	"professional_id",
-	// 	"availability",
-	// 	"created_at",
-	// 	"updated_at",
-	// }
-	// count, err := r.db.CopyFrom(
-	// 	ctx,
-	// 	pgx.Identifier{"professional_availability"},
-	// 	columns,
-	// 	pgx.CopyFromRows(rows),
-	// )
-	// if err != nil {
-	// 	return err
-	// }
-	// if count != int64(len(rows)) {
-	// 	return sql.ErrNoRows
-	// }
+	columns := []string{
+		"professional_id",
+		"availability",
+		"created_at",
+		"updated_at",
+	}
+	count, err := r.db.CopyFrom(
+		ctx,
+		pgx.Identifier{"professional_availability"},
+		columns,
+		pgx.CopyFromRows(rows),
+	)
+	if err != nil {
+		return err
+	}
+	if count != int64(len(rows)) {
+		return sql.ErrNoRows
+	}
 
 	return nil
 }
