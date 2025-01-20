@@ -8,11 +8,11 @@ import (
 )
 
 func ConvertToTsRange(date string, from string, to string) (*pgtype.Range[pgtype.Timestamp], error) {
-	lowerTime, err := time.Parse("2006-01-02 15:00:00", fmt.Sprintf("%s %s", date, from))
+	lowerTime, err := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s %s", date, from))
 	if err != nil {
 		return nil, err
 	}
-	upperTime, err := time.Parse("2006-01-02 15:00:00", fmt.Sprintf("%s %s", date, to))
+	upperTime, err := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s %s", date, to))
 	if err != nil {
 		return nil, err
 	}

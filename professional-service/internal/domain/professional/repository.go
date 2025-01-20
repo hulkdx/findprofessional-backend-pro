@@ -235,6 +235,20 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 }
 
 func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
+	tx, err := r.db.Begin(ctx)
+	txDone := false
+
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if txDone {
+			tx.Commit(ctx)
+		} else {
+			tx.Rollback(ctx)
+		}
+	}()
+
 	now := r.timeProvider.Now()
 	rows := make([][]interface{}, len(availability.Items))
 	for i, e := range availability.Items {
@@ -250,13 +264,23 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 		}
 	}
 
+	//
+	// Might be inefficient to delete everything and add them again,
+	// but if this is causing issue change the client so it only returns the values that needs to be updated
+	//
+	query := `DELETE FROM professional_availability WHERE professional_id = $1`
+	_, err = tx.Exec(ctx, query, professionalId)
+	if err != nil {
+		return err
+	}
+
 	columns := []string{
 		"professional_id",
 		"availability",
 		"created_at",
 		"updated_at",
 	}
-	count, err := r.db.CopyFrom(
+	count, err := tx.CopyFrom(
 		ctx,
 		pgx.Identifier{"professional_availability"},
 		columns,
@@ -269,5 +293,6 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 		return sql.ErrNoRows
 	}
 
+	txDone = true
 	return nil
 }
