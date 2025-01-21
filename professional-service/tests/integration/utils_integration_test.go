@@ -1,7 +1,11 @@
 package integration_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
@@ -59,4 +63,16 @@ type FakeTimeProvider struct {
 
 func (p *FakeTimeProvider) Now() time.Time {
 	return p.NowTime
+}
+
+func NewJsonRequest(method, url string, body io.Reader) *http.Request {
+	request, _ := http.NewRequest(method, url, body)
+	request.Header.Set("Content-Type", "application/json")
+	return request
+}
+
+func NewJsonRequestBody(method, url string, body any) *http.Request {
+	var buf bytes.Buffer
+	json.NewEncoder(&buf).Encode(body)
+	return NewJsonRequest(method, url, &buf)
 }

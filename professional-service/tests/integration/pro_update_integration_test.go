@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -60,10 +59,4 @@ func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
 	})
-}
-
-func NewJsonRequest(method, url string, body io.Reader) *http.Request {
-	request, _ := http.NewRequest(method, url, body)
-	request.Header.Set("Content-Type", "application/json")
-	return request
 }
