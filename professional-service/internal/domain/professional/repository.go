@@ -251,6 +251,8 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 
 	now := r.timeProvider.Now()
 	rows := make([][]interface{}, len(availability.Items))
+	onlyOnce := true
+
 	for i, e := range availability.Items {
 		tsRange, err := utils.ConvertToTsRange(e.Date, e.From, e.To)
 		if err != nil {
@@ -263,14 +265,20 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 			now,
 		}
 
-		//
-		// Might be inefficient to delete everything and add them again,
-		// but if this is causing issue change the client so it only returns the values that needs to be updated
-		//
-		query := `DELETE FROM professional_availability WHERE professional_id = $1 AND availability && $2`
-		_, err = tx.Exec(ctx, query, professionalId, tsRange)
-		if err != nil {
-			return err
+		// Client: returns same dates for all records
+		if onlyOnce {
+			//
+			// Might be inefficient to delete everything and add them again,
+			// but if this is causing issue change the client so it only returns the values that needs to be updated
+			//
+			query := `DELETE FROM professional_availability WHERE
+				professional_id = $1 AND
+				availability && tsrange($2::DATE, $2::DATE + 1);`
+
+			_, err = tx.Exec(ctx, query, professionalId, e.Date)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
