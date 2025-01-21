@@ -190,4 +190,18 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		assert.Equal(t, response_model[0].From.String(), newAvailability.Items[0].From)
 		assert.Equal(t, response_model[0].To.String(), newAvailability.Items[0].To)
 	})
+
+	t.Run("on empty request body response should fail with", func(t *testing.T) {
+		// Arrange
+		d1 := insertEmptyPro(t, db)
+		defer d1()
+		defer db.Exec(context.Background(), `DELETE FROM professional_availability`)
+
+		request := NewJsonRequestBody("POST", "/professional/availability", nil)
+		response := httptest.NewRecorder()
+		// Act
+		handler.ServeHTTP(response, request)
+		// Asserts
+		assert.Equal(t, response.Code, http.StatusBadRequest)
+	})
 }

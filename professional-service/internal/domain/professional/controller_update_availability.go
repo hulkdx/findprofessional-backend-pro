@@ -30,8 +30,8 @@ func (c *Controller) UpdateAvailability(w http.ResponseWriter, r *http.Request) 
 
 	err = c.service.UpdateAvailability(ctx, userId, requestBody)
 	if err != nil {
-		utils.WriteGeneralError(w, err)
+		utils.WriteGeneralError(w, utils.ErrUnknown)
 		return
 	}
-	utils.WriteJSON(w, http.StatusOK, "{}")
+	utils.WriteJSON(w, http.StatusOK, "")
 }
