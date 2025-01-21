@@ -236,11 +236,11 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 
 func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
 	tx, err := r.db.Begin(ctx)
-	txDone := false
-
 	if err != nil {
 		return err
 	}
+
+	txDone := false
 	defer func() {
 		if txDone {
 			tx.Commit(ctx)
@@ -267,6 +267,7 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 
 		// Client: returns same dates for all records
 		if onlyOnce {
+			onlyOnce = false
 			//
 			// Might be inefficient to delete everything and add them again,
 			// but if this is causing issue change the client so it only returns the values that needs to be updated
