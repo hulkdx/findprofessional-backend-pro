@@ -262,16 +262,16 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 			now,
 			now,
 		}
-	}
 
-	//
-	// Might be inefficient to delete everything and add them again,
-	// but if this is causing issue change the client so it only returns the values that needs to be updated
-	//
-	query := `DELETE FROM professional_availability WHERE professional_id = $1`
-	_, err = tx.Exec(ctx, query, professionalId)
-	if err != nil {
-		return err
+		//
+		// Might be inefficient to delete everything and add them again,
+		// but if this is causing issue change the client so it only returns the values that needs to be updated
+		//
+		query := `DELETE FROM professional_availability WHERE professional_id = $1 AND availability && $2`
+		_, err = tx.Exec(ctx, query, professionalId, tsRange)
+		if err != nil {
+			return err
+		}
 	}
 
 	columns := []string{
