@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+const (
+	DEFAULT_SERVER_PORT          = "8081"
+	DEFAULT_SERVER_READ_TIMEOUT  = 1 * time.Second
+	DEFAULT_SERVER_WRITE_TIMEOUT = 1 * time.Second
+	DEFAULT_SERVER_IDLE_TIMEOUT  = 30 * time.Second
+)
+
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
@@ -30,10 +37,10 @@ type DatabaseConfig struct {
 func Load() *Config {
 	cfg := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("server_port", "8081"),
-			ReadTimeout:  getEnvTime("server_read_timeout", 1*time.Second),
-			WriteTimeout: getEnvTime("server_write_timeout", 1*time.Second),
-			IdleTimeout:  getEnvTime("server_idle_timeout", 30*time.Second),
+			Port:         getEnv("server_port", DEFAULT_SERVER_PORT),
+			ReadTimeout:  getEnvTime("server_read_timeout", DEFAULT_SERVER_READ_TIMEOUT),
+			WriteTimeout: getEnvTime("server_write_timeout", DEFAULT_SERVER_WRITE_TIMEOUT),
+			IdleTimeout:  getEnvTime("server_idle_timeout", DEFAULT_SERVER_IDLE_TIMEOUT),
 		},
 		Database: DatabaseConfig{
 			getDsn(
