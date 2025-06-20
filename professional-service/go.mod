@@ -1,12 +1,13 @@
 module github.com/hulkdx/findprofessional-backend-pro/professional-service
 
-go 1.22
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
 	cloud.google.com/go v0.118.0
 	github.com/docker/go-connections v0.5.0
-	github.com/go-chi/chi/v5 v5.2.0
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jackc/pgx/v5 v5.7.2
