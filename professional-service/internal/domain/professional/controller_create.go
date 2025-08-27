@@ -43,7 +43,7 @@ func parseCreateRequest(r *http.Request) (CreateRequest, error) {
 	if err := utils.ReadJSON(r, &request); err != nil {
 		return CreateRequest{}, err
 	}
-	if err := utils.IsValid(request); err != nil {
+	if err := utils.Validate(request); err != nil {
 		return CreateRequest{}, err
 	}
 	return request, nil
