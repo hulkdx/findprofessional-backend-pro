@@ -4,16 +4,24 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Handler(controller *professional.Controller) http.Handler {
+func NewHandler(database *pgxpool.Pool) http.Handler {
+	proController := professional.NewControllerFromDB(database)
+	bookingController := &booking.Controller{}
+	return Handler(proController, bookingController)
+}
+
+func Handler(proController *professional.Controller, bookingController *booking.Controller) http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(ContentTypeJsonMiddleware)
 
-	normalUser(router, controller)
-	proUser(router, controller)
+	normalUser(router, proController)
+	proUser(router, proController)
 
 	return router
 }

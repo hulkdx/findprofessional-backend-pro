@@ -14,7 +14,7 @@ import (
 
 func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	userService := MockUserService{}
-	handler := router.Handler(NewTestControllerWithUserService(db, &userService))
+	handler := router.Handler(NewTestControllerWithUserService(db, &userService), nil)
 
 	t.Run("Empty database", func(t *testing.T) {
 		// Arrange
