@@ -17,7 +17,7 @@ func TestCreateBooking(t *testing.T) {
 		// Act
 		controller.Create(httptest.NewRecorder(), httptest.NewRequest(http.MethodPost, "/booking", nil))
 		// Assert
-		assert.Equal(t, userService.IsAuthenticatedCalled, true)
+		assert.Equal(t, userService.GetAuthenticatedUserIdCalled, true)
 	})
 }
 
@@ -42,4 +42,8 @@ func (m *MockUserServiceAlwaysAuthenticated) GetAuthenticatedUserId(ctx context.
 }
 
 type FakeRepository struct {
+}
+
+func (r FakeRepository) GetPriceAndCurrency(ctx context.Context, proId string) (int64, string, error) {
+	return 5000, "eur", nil
 }

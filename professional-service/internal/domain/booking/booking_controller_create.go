@@ -11,7 +11,8 @@ import (
 func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	auth := r.Header.Get("Authorization")
-	if !c.userService.IsAuthenticated(ctx, auth) {
+	userId, err := c.userService.GetAuthenticatedUserId(ctx, auth)
+	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, "unauthorised")
 		return
 	}
@@ -23,7 +24,7 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	booking, err := c.service.Create(ctx, proID, createBookingRequest)
+	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest)
 	if err != nil {
 		utils.WriteGeneralError(w, utils.ErrUnknown)
 		return
