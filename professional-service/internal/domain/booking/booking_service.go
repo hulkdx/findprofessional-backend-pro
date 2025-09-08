@@ -2,7 +2,8 @@ package booking
 
 import (
 	"context"
-	"errors"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type BookingService struct {
@@ -21,7 +22,10 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 		return nil, err
 	}
 
-	// TODO: Insert booking into the database as holding state (next step)
+	err = s.repository.InsertBooking(ctx, userId, proId, req)
+	if err != nil {
+		return nil, err
+	}
 	// TODO: Call payment service to create a payment intent (later)
 	return nil, nil
 }
@@ -29,14 +33,14 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 func (s *BookingService) validate(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error {
 	priceNumber, currency, err := s.repository.GetPriceAndCurrency(ctx, proId)
 	if err != nil {
-		return err
+		return utils.ErrValidationDatabase
 	}
 	amountsInCents := priceNumber * int64(len(req.Slots))
 	if amountsInCents != req.AmountInCents {
-		return errors.New("invalid amount_in_cents")
+		return utils.ErrAmountInCentsMismatch
 	}
 	if currency != req.Currency {
-		return errors.New("invalid currency")
+		return utils.ErrCurrencyMismatch
 	}
 	return nil
 }

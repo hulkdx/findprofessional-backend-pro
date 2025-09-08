@@ -26,7 +26,12 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 
 	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest)
 	if err != nil {
-		utils.WriteGeneralError(w, utils.ErrUnknown)
+		switch err {
+		case utils.ErrAmountInCentsMismatch, utils.ErrCurrencyMismatch, utils.ErrValidationDatabase:
+			utils.WriteError(w, http.StatusBadRequest, err.Error())
+		default:
+			utils.WriteGeneralError(w, utils.ErrUnknown)
+		}
 		return
 	}
 	fmt.Printf("Booking created: %+v\n", booking)

@@ -1,10 +1,9 @@
 package booking
 
-import "time"
-
 type Slot struct {
-	Start time.Time `json:"start"  validate:"required"`
-	End   time.Time `json:"end"  validate:"required"`
+	Date string `json:"date" validate:"required,max=50"`
+	From string `json:"from" validate:"required,max=50"`
+	To   string `json:"to" validate:"required,max=50"`
 }
 
 type CreateBookingRequest struct {
@@ -23,3 +22,12 @@ type CreateBookingResponse struct {
 	EphemeralKey  string `json:"ephemeral_key"`
 	HoldExpiresAt string `json:"hold_expires_at"`
 }
+
+// TODO: create a enum class for booking status
+type BookingStatus string
+
+const (
+	BookingStatusHold      BookingStatus = "hold"
+	BookingStatusCompleted               = "completed"
+	BookingStatusCanceled                = "canceled"
+)

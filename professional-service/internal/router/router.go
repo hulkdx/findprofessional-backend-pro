@@ -24,7 +24,7 @@ func NewHandler(database *pgxpool.Pool) http.Handler {
 	bookingController := booking.NewController(
 		userService,
 		booking.NewService(
-			booking.NewRepository(database),
+			booking.NewRepository(database, timeProvider),
 		),
 	)
 	return Handler(proController, bookingController)

@@ -47,3 +47,7 @@ type FakeRepository struct {
 func (r FakeRepository) GetPriceAndCurrency(ctx context.Context, proId string) (int64, string, error) {
 	return 5000, "eur", nil
 }
+
+func (r FakeRepository) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error {
+	return nil
+}
