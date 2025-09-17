@@ -11,12 +11,14 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 	timeProvider := &FakeTimeProvider{}
-	handler := router.Handler(NewTestController(db), NewTestBookingController(db, timeProvider))
+	userId := 1
+	handler := router.Handler(NewTestController(db), NewTestBookingController(db, timeProvider, userId))
 
 	t.Run("valid request", func(t *testing.T) {
 		// Arrange
@@ -33,6 +35,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		}
 		d1 := insertPro(t, db, records...)
 		defer d1()
+		d2 := insertUserWithId(t, db, userId)
+		defer d2()
 
 		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
 			Slots: []booking.Slot{
@@ -158,9 +162,9 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 	})
 }
 
-func NewTestBookingController(db *pgxpool.Pool, timeProvider utils.TimeProvider) *booking.BookingController {
+func NewTestBookingController(db *pgxpool.Pool, timeProvider utils.TimeProvider, userId int) *booking.BookingController {
 	repository := booking.NewRepository(db, timeProvider)
-	service := booking.NewService(repository)
-	userService := &MockUserService{UserId: 1}
+	service := booking.NewService(repository, &mocks.FakePaymentService{})
+	userService := &MockUserService{UserId: int64(userId)}
 	return booking.NewController(userService, service)
 }

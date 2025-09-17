@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 )
 
 func TestCreateBooking(t *testing.T) {
 	t.Run("authorize", func(t *testing.T) {
 		// Arrange
 		userService := &MockUserServiceAlwaysAuthenticated{}
-		controller := NewController(userService, NewService(FakeRepository{}))
+		controller := NewController(userService, NewService(FakeRepository{}, &mocks.FakePaymentService{}))
 		// Act
 		controller.Create(httptest.NewRecorder(), httptest.NewRequest(http.MethodPost, "/booking", nil))
 		// Assert

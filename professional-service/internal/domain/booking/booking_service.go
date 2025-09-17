@@ -3,21 +3,24 @@ package booking
 import (
 	"context"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type BookingService struct {
-	repository Repository
+	repository     Repository
+	paymentService payment.PaymentService
 }
 
-func NewService(repository Repository) *BookingService {
+func NewService(repository Repository, paymentService payment.PaymentService) *BookingService {
 	return &BookingService{
-		repository: repository,
+		repository:     repository,
+		paymentService: paymentService,
 	}
 }
 
 func (s *BookingService) Create(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (*CreateBookingResponse, error) {
-	err := s.validate(ctx, userId, proId, req)
+	err := s.validate(ctx, proId, req)
 	if err != nil {
 		return nil, err
 	}
@@ -26,11 +29,15 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Call payment service to create a payment intent (later)
+
+	err = s.paymentService.CreatePaymentIntent(ctx, userId, req.AmountInCents, req.Currency)
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
-func (s *BookingService) validate(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error {
+func (s *BookingService) validate(ctx context.Context, proId string, req CreateBookingRequest) error {
 	priceNumber, currency, err := s.repository.GetPriceAndCurrency(ctx, proId)
 	if err != nil {
 		return utils.ErrValidationDatabase

@@ -62,7 +62,7 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 			currency,
 			idempotency_key,
 			created_at,
-			updated_at,
+			updated_at
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;
 	`
