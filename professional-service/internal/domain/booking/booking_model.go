@@ -20,11 +20,10 @@ type CreateBookingResponse struct {
 	PaymentIntentResponse payment.PaymentIntentResponse `json:"payment_intent_response"`
 }
 
-// TODO: create a enum class for booking status
 type BookingStatus string
 
 const (
 	BookingStatusHold      BookingStatus = "hold"
-	BookingStatusCompleted               = "completed"
-	BookingStatusCanceled                = "canceled"
+	BookingStatusCompleted BookingStatus = "completed"
+	BookingStatusCanceled  BookingStatus = "canceled"
 )
