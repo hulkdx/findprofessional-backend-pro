@@ -10,7 +10,7 @@ import (
 
 type Repository interface {
 	GetPriceAndCurrency(ctx context.Context, proId string) (int64, string, error)
-	InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error
+	InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (int64, error)
 }
 
 type repositoryImpl struct {
@@ -36,12 +36,12 @@ func (r *repositoryImpl) GetPriceAndCurrency(ctx context.Context, proId string) 
 	return priceNumber, priceCurrency, nil
 }
 
-func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error {
+func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (int64, error) {
 	status := BookingStatusHold
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	txDone := false
@@ -79,7 +79,7 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 	var bookingId int64
 	err = row.Scan(&bookingId)
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	rows := make([][]any, len(req.Slots))
@@ -87,7 +87,7 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 	for i, slot := range req.Slots {
 		tsRange, err := utils.ConvertToTsRange(slot.Date, slot.From, slot.To)
 		if err != nil {
-			return err
+			return -1, err
 		}
 		rows[i] = []any{
 			bookingId,
@@ -114,9 +114,9 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 		pgx.CopyFromRows(rows),
 	)
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	txDone = true
-	return nil
+	return bookingId, nil
 }

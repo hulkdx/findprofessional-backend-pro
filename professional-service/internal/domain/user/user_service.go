@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -40,10 +39,8 @@ func NewService() Service {
 		logger.Error("Failed to parse public key file: ", err)
 	}
 	return &serviceImpl{
-		publicKey: publicKey,
-		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		publicKey:  publicKey,
+		httpClient: utils.CreateDefaultAppHttpClient(),
 	}
 }
 
@@ -88,7 +85,7 @@ func isValidAccessToken(accessToken string, publicKey *rsa.PublicKey) bool {
 func (s *serviceImpl) Login(ctx context.Context, email, password string) (string, error) {
 	loginReq := fmt.Sprintf(`{"email": "%s", "password": "%s"}`, email, password)
 
-	return utils.DoHttpRequest(
+	return utils.DoHttpRequestAsString(
 		ctx,
 		s.httpClient,
 		http.MethodPost,

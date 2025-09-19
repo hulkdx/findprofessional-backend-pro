@@ -25,16 +25,19 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 		return nil, err
 	}
 
-	err = s.repository.InsertBooking(ctx, userId, proId, req)
+	bookingId, err := s.repository.InsertBooking(ctx, userId, proId, req)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.paymentService.CreatePaymentIntent(ctx, userId, req.AmountInCents, req.Currency)
+	paymentIntentResponse, err := s.paymentService.CreatePaymentIntent(ctx, userId, req.AmountInCents, req.Currency)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return &CreateBookingResponse{
+		BookingID:             bookingId,
+		PaymentIntentResponse: *paymentIntentResponse,
+	}, nil
 }
 
 func (s *BookingService) validate(ctx context.Context, proId string, req CreateBookingRequest) error {

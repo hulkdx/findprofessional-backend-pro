@@ -1,5 +1,7 @@
 package booking
 
+import "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
+
 type Slot struct {
 	Date string `json:"date" validate:"required,max=50"`
 	From string `json:"from" validate:"required,max=50"`
@@ -14,13 +16,8 @@ type CreateBookingRequest struct {
 }
 
 type CreateBookingResponse struct {
-	BookingID     string `json:"booking_id"`
-	AmountInCents int64  `json:"amount_in_cents"`
-	Currency      string `json:"currency"`
-	ClientSecret  string `json:"client_secret"`
-	CustomerID    string `json:"customer_id"`
-	EphemeralKey  string `json:"ephemeral_key"`
-	HoldExpiresAt string `json:"hold_expires_at"`
+	BookingID             int64                         `json:"booking_id"`
+	PaymentIntentResponse payment.PaymentIntentResponse `json:"payment_intent_response"`
 }
 
 // TODO: create a enum class for booking status

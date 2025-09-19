@@ -49,6 +49,6 @@ func (r FakeRepository) GetPriceAndCurrency(ctx context.Context, proId string) (
 	return 5000, "eur", nil
 }
 
-func (r FakeRepository) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) error {
-	return nil
+func (r FakeRepository) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (int64, error) {
+	return 1, nil
 }
