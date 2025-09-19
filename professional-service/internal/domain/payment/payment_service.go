@@ -26,10 +26,10 @@ func NewService() PaymentService {
 }
 
 type PaymentIntentResponse struct {
-	PaymentIntent  string `json:"paymentIntent"`
-	EphemeralKey   string `json:"ephemeralKey"`
+	PaymentIntent  string `json:"payment_intent"`
+	EphemeralKey   string `json:"ephemeral_key"`
 	Customer       string `json:"customer"`
-	PublishableKey string `json:"publishableKey"`
+	PublishableKey string `json:"publishable_key"`
 }
 
 func (s *paymentServiceImpl) CreatePaymentIntent(ctx context.Context, userId int64, amountInCents int64, currency string) (*PaymentIntentResponse, error) {
