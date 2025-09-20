@@ -64,5 +64,11 @@ func proUser(router *chi.Mux, controller *professional.Controller) {
 }
 
 func normalUserBooking(router *chi.Mux, controller *booking.BookingController) {
+	//
+	// Create a booking for a professional using stripe payment intent
+	// ---
+	// Request: booking_model.CreateBookingRequest
+	// Response: booking_model.CreateBookingResponse
+	//
 	router.Post("/professional/{id}/booking", controller.Create)
 }
