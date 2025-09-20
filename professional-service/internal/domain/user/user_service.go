@@ -91,6 +91,7 @@ func (s *serviceImpl) Login(ctx context.Context, email, password string) (string
 		http.MethodPost,
 		loginUrl,
 		loginReq,
+		&http.Header{},
 	)
 }
 

@@ -23,9 +23,10 @@ func DoHttpRequestAsString(
 	method string,
 	url string,
 	body string,
+	header *http.Header,
 ) (string, error) {
 	bodyReader := strings.NewReader(body)
-	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, bodyReader)
+	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, bodyReader, header)
 	if err != nil {
 		return "", err
 	}
@@ -44,13 +45,14 @@ func DoHttpRequestAsStruct(
 	url string,
 	body any,
 	responseStruct any,
+	header *http.Header,
 ) error {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(body)
 	if err != nil {
 		return err
 	}
-	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, &buf)
+	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, &buf, header)
 	if err != nil {
 		return err
 	}
@@ -64,11 +66,13 @@ func DoHttpRequestAsReader(
 	method string,
 	url string,
 	body io.Reader,
+	header *http.Header,
 ) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
+	req.Header = *header
 	req.Header.Set("Content-Type", "application/json")
 	res, err := httpClient.Do(req)
 	if err != nil {

@@ -12,7 +12,12 @@ import (
 const baseUrl = "http://payment-service:8082"
 
 type PaymentService interface {
-	CreatePaymentIntent(ctx context.Context, userId int64, amountInCents int64, currency string) (*booking_model.PaymentIntentResponse, error)
+	CreatePaymentIntent(
+		ctx context.Context,
+		userId int64,
+		amountInCents int64,
+		currency string,
+	) (*booking_model.PaymentIntentResponse, error)
 }
 
 type paymentServiceImpl struct {
@@ -25,13 +30,20 @@ func NewService() PaymentService {
 	}
 }
 
-func (s *paymentServiceImpl) CreatePaymentIntent(ctx context.Context, userId int64, amountInCents int64, currency string) (*booking_model.PaymentIntentResponse, error) {
+func (s *paymentServiceImpl) CreatePaymentIntent(
+	ctx context.Context,
+	userId int64,
+	amountInCents int64,
+	currency string,
+) (*booking_model.PaymentIntentResponse, error) {
 	url := fmt.Sprintf("%s/payments/create-intent", baseUrl)
 	request := &PaymentRequest{
 		AmountsInCents: amountInCents,
 		Currency:       currency,
 	}
 	var response booking_model.PaymentIntentResponse
-	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response)
+	requestHeader := &http.Header{}
+	// TODO: requestHeader.Set("Authorization")
+	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response, requestHeader)
 	return &response, err
 }
