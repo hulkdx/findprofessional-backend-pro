@@ -24,7 +24,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
-	err = utils.Validate(updateRequest)
+	err = utils.Validate(&updateRequest)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return

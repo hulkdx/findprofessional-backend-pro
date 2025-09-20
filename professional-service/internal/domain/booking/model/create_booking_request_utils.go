@@ -11,7 +11,7 @@ func ParseCreateRequest(r *http.Request) (*CreateBookingRequest, error) {
 	if err := utils.ReadJSON(r, &request); err != nil {
 		return nil, err
 	}
-	if err := utils.Validate(request); err != nil {
+	if err := utils.Validate(&request); err != nil {
 		return nil, err
 	}
 	return &request, nil

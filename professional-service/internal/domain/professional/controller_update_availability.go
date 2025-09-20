@@ -22,7 +22,7 @@ func (c *Controller) UpdateAvailability(w http.ResponseWriter, r *http.Request) 
 		utils.WriteError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
-	err = utils.Validate(requestBody)
+	err = utils.Validate(&requestBody)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
