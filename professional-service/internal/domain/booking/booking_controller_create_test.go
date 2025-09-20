@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 )
@@ -49,6 +50,6 @@ func (r FakeRepository) GetPriceAndCurrency(ctx context.Context, proId string) (
 	return 5000, "eur", nil
 }
 
-func (r FakeRepository) InsertBooking(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (int64, error) {
+func (r FakeRepository) InsertBooking(ctx context.Context, userId int64, proId string, req booking_model.CreateBookingRequest) (int64, error) {
 	return 1, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
+	_ "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
@@ -37,13 +38,13 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Booking created: %+v\n", booking)
 }
 
-func parseCreateRequest(r *http.Request) (CreateBookingRequest, error) {
-	request := CreateBookingRequest{}
+func parseCreateRequest(r *http.Request) (booking_model.CreateBookingRequest, error) {
+	request := booking_model.CreateBookingRequest{}
 	if err := utils.ReadJSON(r, &request); err != nil {
-		return CreateBookingRequest{}, err
+		return booking_model.CreateBookingRequest{}, err
 	}
 	if err := utils.Validate(request); err != nil {
-		return CreateBookingRequest{}, err
+		return booking_model.CreateBookingRequest{}, err
 	}
 	return request, nil
 }

@@ -1,4 +1,4 @@
-package booking
+package booking_model
 
 import "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 

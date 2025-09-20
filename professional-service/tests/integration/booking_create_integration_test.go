@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
+	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -38,8 +39,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		d2 := insertUserWithId(t, db, userId)
 		defer d2()
 
-		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
-			Slots: []booking.Slot{
+		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
+			Slots: []booking_model.Slot{
 				{Date: "2023-01-01", From: "10:00:00", To: "11:00:00"},
 			},
 			IdempotencyKey: "test-key",
@@ -72,8 +73,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		d1 := insertPro(t, db, records...)
 		defer d1()
 
-		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
-			Slots: []booking.Slot{
+		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
+			Slots: []booking_model.Slot{
 				{Date: "2023-01-01", From: "10:00:00", To: "11:00:00"},
 				{Date: "2023-01-01", From: "12:00:00", To: "13:00:00"},
 			},
@@ -97,7 +98,7 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		d1 := insertEmptyPro(t, db)
 		defer d1()
 
-		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
+		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
 			IdempotencyKey: "test-key",
 			AmountInCents:  1000,
 			Currency:       "USD",
@@ -117,8 +118,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		d1 := insertEmptyPro(t, db)
 		defer d1()
 
-		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
-			Slots: []booking.Slot{{
+		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
+			Slots: []booking_model.Slot{{
 				Date: "2023-01-01",
 				From: "10:00:00",
 				To:   "11:00:00",
@@ -142,8 +143,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		d1 := insertEmptyPro(t, db)
 		defer d1()
 
-		request := NewJsonRequestBody("POST", "/professional/1/booking", booking.CreateBookingRequest{
-			Slots: []booking.Slot{{
+		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
+			Slots: []booking_model.Slot{{
 				Date: "2023-01-01",
 				From: "10:00:00",
 				To:   "11:00:00",

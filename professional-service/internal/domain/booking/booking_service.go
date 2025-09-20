@@ -3,6 +3,7 @@ package booking
 import (
 	"context"
 
+	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
@@ -19,7 +20,7 @@ func NewService(repository Repository, paymentService payment.PaymentService) *B
 	}
 }
 
-func (s *BookingService) Create(ctx context.Context, userId int64, proId string, req CreateBookingRequest) (*CreateBookingResponse, error) {
+func (s *BookingService) Create(ctx context.Context, userId int64, proId string, req booking_model.CreateBookingRequest) (*booking_model.CreateBookingResponse, error) {
 	err := s.validate(ctx, proId, req)
 	if err != nil {
 		return nil, err
@@ -34,13 +35,13 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 	if err != nil {
 		return nil, err
 	}
-	return &CreateBookingResponse{
+	return &booking_model.CreateBookingResponse{
 		BookingID:             bookingId,
 		PaymentIntentResponse: *paymentIntentResponse,
 	}, nil
 }
 
-func (s *BookingService) validate(ctx context.Context, proId string, req CreateBookingRequest) error {
+func (s *BookingService) validate(ctx context.Context, proId string, req booking_model.CreateBookingRequest) error {
 	priceNumber, currency, err := s.repository.GetPriceAndCurrency(ctx, proId)
 	if err != nil {
 		return utils.ErrValidationDatabase
