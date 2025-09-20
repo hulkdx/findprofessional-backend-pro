@@ -67,6 +67,7 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;
 	`
+	now := r.timeProvider.Now()
 	row := tx.QueryRow(ctx, query,
 		userId,
 		proId,
@@ -74,8 +75,8 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 		req.AmountInCents,
 		req.Currency,
 		req.IdempotencyKey,
-		r.timeProvider.Now(),
-		r.timeProvider.Now(),
+		now,
+		now,
 	)
 	var bookingId int64
 	err = row.Scan(&bookingId)
@@ -84,7 +85,6 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 	}
 
 	rows := make([][]any, len(req.Slots))
-	now := r.timeProvider.Now()
 	for i, slot := range req.Slots {
 		tsRange, err := utils.ConvertToTsRange(slot.Date, slot.From, slot.To)
 		if err != nil {
