@@ -13,7 +13,7 @@ import (
 )
 
 func FindAllProfessionalTest(t *testing.T, db *pgxpool.Pool) {
-	handler := router.Handler(NewTestController(db))
+	handler := router.Handler(NewTestController(db), nil)
 
 	t.Run("Empty professionals", func(t *testing.T) {
 		// Arrange

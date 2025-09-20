@@ -7,10 +7,11 @@ import (
 	"time"
 )
 
+// TODO: Change timeouts for production
 const (
 	DEFAULT_SERVER_PORT          = "8081"
-	DEFAULT_SERVER_READ_TIMEOUT  = 1 * time.Second
-	DEFAULT_SERVER_WRITE_TIMEOUT = 1 * time.Second
+	DEFAULT_SERVER_READ_TIMEOUT  = 10 * time.Second
+	DEFAULT_SERVER_WRITE_TIMEOUT = 20 * time.Second
 	DEFAULT_SERVER_IDLE_TIMEOUT  = 30 * time.Second
 )
 

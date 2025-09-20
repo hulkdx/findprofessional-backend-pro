@@ -15,7 +15,7 @@ import (
 )
 
 func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
-	handler := router.Handler(NewTestController(db))
+	handler := router.Handler(NewTestController(db), nil)
 
 	t.Run("empty review", func(t *testing.T) {
 		// Arrange

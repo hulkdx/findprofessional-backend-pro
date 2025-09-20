@@ -15,7 +15,7 @@ import (
 
 func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 	timeProvider := &FakeTimeProvider{}
-	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider))
+	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider), nil)
 
 	t.Run("empty availability", func(t *testing.T) {
 		// Arrange

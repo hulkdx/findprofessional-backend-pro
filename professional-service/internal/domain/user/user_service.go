@@ -4,13 +4,13 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
@@ -25,7 +25,8 @@ type Service interface {
 }
 
 type serviceImpl struct {
-	publicKey *rsa.PublicKey
+	publicKey  *rsa.PublicKey
+	httpClient *http.Client
 }
 
 func NewService() Service {
@@ -38,7 +39,8 @@ func NewService() Service {
 		logger.Error("Failed to parse public key file: ", err)
 	}
 	return &serviceImpl{
-		publicKey: publicKey,
+		publicKey:  publicKey,
+		httpClient: utils.CreateDefaultAppHttpClient(),
 	}
 }
 
@@ -83,25 +85,14 @@ func isValidAccessToken(accessToken string, publicKey *rsa.PublicKey) bool {
 func (s *serviceImpl) Login(ctx context.Context, email, password string) (string, error) {
 	loginReq := fmt.Sprintf(`{"email": "%s", "password": "%s"}`, email, password)
 
-	byt, err := httpRequest(ctx, http.MethodPost, loginUrl, strings.NewReader(loginReq))
-	return string(byt), err
-}
-
-func httpRequest(ctx context.Context, method, url string, body io.Reader) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
-	}
-	return io.ReadAll(res.Body)
+	return utils.DoHttpRequestAsString(
+		ctx,
+		s.httpClient,
+		http.MethodPost,
+		loginUrl,
+		loginReq,
+		&http.Header{},
+	)
 }
 
 func (s *serviceImpl) GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error) {

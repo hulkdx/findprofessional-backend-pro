@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/config"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/db"
@@ -24,7 +23,7 @@ func main() {
 	database := db.Connect(ctx, cfg.Database)
 	defer db.Close(database)
 
-	handler := router.Handler(professional.NewControllerFromDB(database))
+	handler := router.NewHandler(database)
 	server := newServer(cfg, handler)
 	<-listenAndServe(server)
 	err := shutdown(server)
