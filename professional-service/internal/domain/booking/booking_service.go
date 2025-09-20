@@ -21,7 +21,7 @@ func NewService(repository Repository, paymentService payment.PaymentService) *B
 	}
 }
 
-func (s *BookingService) Create(ctx context.Context, userId int64, proId string, req booking_model.CreateBookingRequest, auth string) (*booking_model.CreateBookingResponse, error) {
+func (s *BookingService) Create(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest, auth string) (*booking_model.CreateBookingResponse, error) {
 	err := s.validate(ctx, proId, req)
 	if err != nil {
 		logger.Error("validation error: %v", err)
@@ -45,7 +45,7 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 	}, nil
 }
 
-func (s *BookingService) validate(ctx context.Context, proId string, req booking_model.CreateBookingRequest) error {
+func (s *BookingService) validate(ctx context.Context, proId string, req *booking_model.CreateBookingRequest) error {
 	priceNumber, currency, err := s.repository.GetPriceAndCurrency(ctx, proId)
 	if err != nil {
 		return utils.ErrValidationDatabase

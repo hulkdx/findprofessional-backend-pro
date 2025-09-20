@@ -19,7 +19,7 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proID := chi.URLParam(r, "id")
-	createBookingRequest, err := parseCreateRequest(r)
+	createBookingRequest, err := booking_model.ParseCreateRequest(r)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
@@ -37,15 +37,4 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Debug("booking created:", booking)
 	utils.WriteJSON(w, http.StatusOK, booking)
-}
-
-func parseCreateRequest(r *http.Request) (booking_model.CreateBookingRequest, error) {
-	request := booking_model.CreateBookingRequest{}
-	if err := utils.ReadJSON(r, &request); err != nil {
-		return booking_model.CreateBookingRequest{}, err
-	}
-	if err := utils.Validate(request); err != nil {
-		return booking_model.CreateBookingRequest{}, err
-	}
-	return request, nil
 }

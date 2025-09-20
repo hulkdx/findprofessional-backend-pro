@@ -11,7 +11,7 @@ import (
 
 type Repository interface {
 	GetPriceAndCurrency(ctx context.Context, proId string) (int64, string, error)
-	InsertBooking(ctx context.Context, userId int64, proId string, req booking_model.CreateBookingRequest) (int64, error)
+	InsertBooking(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest) (int64, error)
 }
 
 type repositoryImpl struct {
@@ -37,7 +37,7 @@ func (r *repositoryImpl) GetPriceAndCurrency(ctx context.Context, proId string) 
 	return priceNumber, priceCurrency, nil
 }
 
-func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req booking_model.CreateBookingRequest) (int64, error) {
+func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest) (int64, error) {
 	status := booking_model.BookingStatusHold
 
 	tx, err := r.db.Begin(ctx)
