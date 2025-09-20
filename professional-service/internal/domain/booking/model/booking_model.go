@@ -1,7 +1,5 @@
 package booking_model
 
-import "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
-
 type Slot struct {
 	Date string `json:"date" validate:"required,max=50"`
 	From string `json:"from" validate:"required,max=50"`
@@ -16,8 +14,15 @@ type CreateBookingRequest struct {
 }
 
 type CreateBookingResponse struct {
-	BookingID             int64                         `json:"booking_id"`
-	PaymentIntentResponse payment.PaymentIntentResponse `json:"payment_intent_response"`
+	BookingID             int64                 `json:"booking_id"`
+	PaymentIntentResponse PaymentIntentResponse `json:"payment_intent_response"`
+}
+
+type PaymentIntentResponse struct {
+	PaymentIntent  string `json:"payment_intent"`
+	EphemeralKey   string `json:"ephemeral_key"`
+	Customer       string `json:"customer"`
+	PublishableKey string `json:"publishable_key"`
 }
 
 type BookingStatus string
