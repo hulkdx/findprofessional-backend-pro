@@ -1,12 +1,12 @@
 package booking
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
 func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,7 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest)
+	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest, auth)
 	if err != nil {
 		switch err {
 		case utils.ErrAmountInCentsMismatch, utils.ErrCurrencyMismatch, utils.ErrValidationDatabase:
@@ -35,7 +35,8 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Printf("Booking created: %+v\n", booking)
+	logger.Debug("booking created:", booking)
+	utils.WriteJSON(w, http.StatusOK, booking)
 }
 
 func parseCreateRequest(r *http.Request) (booking_model.CreateBookingRequest, error) {
