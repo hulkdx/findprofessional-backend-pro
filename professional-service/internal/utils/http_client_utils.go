@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,11 +20,12 @@ func CreateDefaultAppHttpClient() *http.Client {
 func DoHttpRequestAsString(
 	ctx context.Context,
 	httpClient *http.Client,
-	method,
-	url,
+	method string,
+	url string,
 	body string,
 ) (string, error) {
-	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, body)
+	bodyReader := strings.NewReader(body)
+	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, bodyReader)
 	if err != nil {
 		return "", err
 	}
@@ -34,15 +37,35 @@ func DoHttpRequestAsString(
 	return string(byt), nil
 }
 
+func DoHttpRequestAsStruct(
+	ctx context.Context,
+	httpClient *http.Client,
+	method string,
+	url string,
+	body any,
+	responseStruct any,
+) error {
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(body)
+	if err != nil {
+		return err
+	}
+	bodyResponse, err := DoHttpRequestAsReader(ctx, httpClient, method, url, &buf)
+	if err != nil {
+		return err
+	}
+	defer bodyResponse.Close()
+	return json.NewDecoder(bodyResponse).Decode(responseStruct)
+}
+
 func DoHttpRequestAsReader(
 	ctx context.Context,
 	httpClient *http.Client,
-	method,
-	url,
-	body string,
+	method string,
+	url string,
+	body io.Reader,
 ) (io.ReadCloser, error) {
-	bodyReader := strings.NewReader(body)
-	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
