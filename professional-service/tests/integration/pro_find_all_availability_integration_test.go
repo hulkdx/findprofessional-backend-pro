@@ -81,7 +81,7 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("should not show availabilities that are older than current time", func(t *testing.T) {
 		// Arrange
-		timeProvider.NowTime = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+		timeProvider.NowTime = time.Date(2025, 9, 24, 12, 12, 0, 0, time.UTC)
 
 		records := []professional.Availability{
 			{
@@ -93,6 +93,16 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 				Date: civil.Date{Year: 2020, Month: 11, Day: 4},
 				From: civil.Time{Hour: 15, Minute: 30},
 				To:   civil.Time{Hour: 16, Minute: 00},
+			},
+			{
+				Date: civil.Date{Year: 2025, Month: 9, Day: 23},
+				From: civil.Time{Hour: 5, Minute: 30},
+				To:   civil.Time{Hour: 6, Minute: 30},
+			},
+			{
+				Date: civil.Date{Year: 2025, Month: 9, Day: 24},
+				From: civil.Time{Hour: 11, Minute: 30},
+				To:   civil.Time{Hour: 12, Minute: 00},
 			},
 		}
 		d1 := insertEmptyPro(t, db)

@@ -73,7 +73,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 	GROUP BY p.id
 	`,
 		REVIEW_LIMIT,
-		r.timeProvider.Now().Format("2006-01-01"),
+		r.timeProvider.Now().Format("2006-01-02 15:04:05"),
 	)
 	filterItems := func(pro *Professional) []any {
 		return []any{
