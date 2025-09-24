@@ -44,6 +44,7 @@ func (s *paymentServiceImpl) CreatePaymentIntent(
 	var response booking_model.PaymentIntentResponse
 	requestHeader := &http.Header{}
 	requestHeader.Set("Authorization", auth)
+	requestHeader.Set("Idempotency-Key", req.IdempotencyKey)
 	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response, requestHeader)
 	return &response, err
 }
