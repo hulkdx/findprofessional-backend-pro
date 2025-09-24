@@ -202,7 +202,7 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 		LOWER(availability) > $2`
 	rows, err := r.db.Query(ctx, query,
 		professionalId,
-		r.timeProvider.Now().Format("2006-01-01"),
+		r.timeProvider.Now().Format("2006-01-02 15:04:05"),
 	)
 	if err != nil {
 		return nil, err
