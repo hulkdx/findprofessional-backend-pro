@@ -8,7 +8,5 @@ type CreateBookingRequest struct {
 }
 
 type Slot struct {
-	Date string `json:"date" validate:"required,max=50"`
-	From string `json:"from" validate:"required,max=50"`
-	To   string `json:"to" validate:"required,max=50"`
+	Id string `json:"date" validate:"required,max=50"`
 }
