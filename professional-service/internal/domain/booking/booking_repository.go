@@ -86,15 +86,9 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 
 	rows := make([][]any, len(req.Slots))
 	for i, slot := range req.Slots {
-		tsRange, err := utils.ConvertToTsRange(slot.Date, slot.From, slot.To)
-		if err != nil {
-			return -1, err
-		}
 		rows[i] = []any{
 			bookingId,
-			proId,
-			tsRange,
-			status,
+			slot.Id,
 			now,
 			now,
 		}
@@ -102,9 +96,7 @@ func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId 
 
 	columns := []string{
 		"booking_id",
-		"professional_id",
-		"slot",
-		"status",
+		"availability_id",
 		"created_at",
 		"updated_at",
 	}

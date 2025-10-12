@@ -51,7 +51,7 @@ func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		}
 
 		d1 := insertEmptyPro(t, db)
-		d2 := insertAvailability(t, db, expected...)
+		_, d2 := insertAvailability(t, db, expected...)
 		defer d2()
 		defer d1()
 

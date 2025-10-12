@@ -8,5 +8,5 @@ type CreateBookingRequest struct {
 }
 
 type Slot struct {
-	Id string `json:"date" validate:"required,max=50"`
+	Id int64 `json:"id" validate:"required"`
 }

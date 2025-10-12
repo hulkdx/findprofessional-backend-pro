@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
@@ -38,10 +39,20 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		defer d1()
 		d2 := insertUserWithId(t, db, userId)
 		defer d2()
+		availibility := []professional.Availability{
+			{
+				ProfessionalID: 1,
+				Date:           civil.Date{Year: 2025, Month: 1, Day: 1},
+				From:           civil.Time{Hour: 5, Minute: 30},
+				To:             civil.Time{Hour: 6, Minute: 30},
+			},
+		}
+		ids, d3 := insertAvailability(t, db, availibility...)
+		defer d3()
 
 		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
 			Slots: []booking_model.Slot{
-				{Date: "2023-01-01", From: "10:00:00", To: "11:00:00"},
+				{Id: ids[0]},
 			},
 			IdempotencyKey: "test-key",
 			AmountInCents:  1000,
@@ -75,8 +86,8 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 
 		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
 			Slots: []booking_model.Slot{
-				{Date: "2023-01-01", From: "10:00:00", To: "11:00:00"},
-				{Date: "2023-01-01", From: "12:00:00", To: "13:00:00"},
+				{Id: 0},
+				{Id: 1},
 			},
 			IdempotencyKey: "test-key",
 			AmountInCents:  1000,
@@ -120,9 +131,7 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 
 		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
 			Slots: []booking_model.Slot{{
-				Date: "2023-01-01",
-				From: "10:00:00",
-				To:   "11:00:00",
+				Id: 1,
 			}},
 			IdempotencyKey: "test-key",
 			AmountInCents:  1000,
@@ -145,9 +154,7 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 
 		request := NewJsonRequestBody("POST", "/professional/1/booking", booking_model.CreateBookingRequest{
 			Slots: []booking_model.Slot{{
-				Date: "2023-01-01",
-				From: "10:00:00",
-				To:   "11:00:00",
+				Id: 0,
 			}},
 			AmountInCents: 1000,
 			Currency:      "USD",

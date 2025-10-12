@@ -64,7 +64,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 				To:   civil.Time{Hour: 6, Minute: 30},
 			},
 		}
-		d2 := insertAvailability(t, db, databaseAvailability...)
+		_, d2 := insertAvailability(t, db, databaseAvailability...)
 
 		defer d1()
 		defer d2()
@@ -111,7 +111,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 				To:   civil.Time{Hour: 6, Minute: 30},
 			},
 		}
-		d2 := insertAvailability(t, db, databaseAvailability...)
+		_, d2 := insertAvailability(t, db, databaseAvailability...)
 
 		defer d1()
 		defer d2()
@@ -155,7 +155,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 				To:   civil.Time{Hour: 9, Minute: 30},
 			},
 		}
-		d2 := insertAvailability(t, db, databaseAvailability...)
+		_, d2 := insertAvailability(t, db, databaseAvailability...)
 
 		defer d1()
 		defer d2()
