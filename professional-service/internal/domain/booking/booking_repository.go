@@ -38,7 +38,7 @@ func (r *repositoryImpl) GetPriceAndCurrency(ctx context.Context, proId string) 
 }
 
 func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest) (int64, error) {
-	status := booking_model.BookingStatusHold
+	status := booking_model.BookingStatusProcessing
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {

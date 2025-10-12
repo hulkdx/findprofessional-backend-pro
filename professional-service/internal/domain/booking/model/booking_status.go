@@ -2,8 +2,11 @@ package booking_model
 
 type BookingStatus string
 
+// From this link: https://sameerahmed56.medium.com/an-uncomfortably-deep-dive-into-the-idempotency-key-67626c8d3f3d
 const (
-	BookingStatusHold      BookingStatus = "hold"
-	BookingStatusCompleted BookingStatus = "completed"
-	BookingStatusCanceled  BookingStatus = "canceled"
+	BookingStatusNonExistent BookingStatus = "non-existent"
+	BookingStatusProcessing  BookingStatus = "processing"
+	BookingStatusCompleted   BookingStatus = "completed"
+	BookingStatusFailed      BookingStatus = "failed"
+	BookingStatusExpired     BookingStatus = "expired"
 )
