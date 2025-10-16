@@ -117,7 +117,7 @@ func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional)
 	}
 }
 
-func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...professional.Availability) func() {
+func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...professional.Availability) ([]int64, func()) {
 	ctx := context.Background()
 
 	query := `
@@ -125,6 +125,7 @@ func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...prof
             ("professional_id", "availability", "created_at", "updated_at")
         VALUES
             ($1, $2, $3, $4)
+        RETURNING id
     `
 
 	tx, err := pool.Begin(ctx)
@@ -132,6 +133,7 @@ func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...prof
 		t.Fatal(err)
 	}
 
+	var ids []int64
 	for _, a := range availabilities {
 		// Convert the date/time to a Postgres range string,
 		// e.g. [2025-01-10 09:00:00,2025-01-10 10:00:00)
@@ -142,23 +144,25 @@ func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...prof
 			a.To.String(),
 		)
 
-		_, execErr := tx.Exec(ctx, query,
+		var id int64
+		execErr := tx.QueryRow(ctx, query,
 			a.ProfessionalID,
 			availabilityRange,
 			a.CreatedAt,
 			a.UpdatedAt,
-		)
+		).Scan(&id)
 		if execErr != nil {
 			_ = tx.Rollback(ctx)
 			t.Fatal(execErr)
 		}
+		ids = append(ids, id)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
 
-	return func() {
+	return ids, func() {
 		// Clean up both availability & professionals
 		_, _ = pool.Exec(ctx, `DELETE FROM professional_availability; DELETE FROM professionals;`)
 	}

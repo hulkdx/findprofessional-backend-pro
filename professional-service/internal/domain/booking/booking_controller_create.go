@@ -28,7 +28,11 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest, auth)
 	if err != nil {
 		switch err {
-		case utils.ErrAmountInCentsMismatch, utils.ErrCurrencyMismatch, utils.ErrValidationDatabase:
+		case utils.ErrAmountInCentsMismatch,
+			utils.ErrCurrencyMismatch,
+			utils.ErrValidationDatabase,
+			utils.ErrInvalidSlotSize:
+
 			utils.WriteError(w, http.StatusBadRequest, err.Error())
 		default:
 			utils.WriteGeneralError(w, utils.ErrUnknown)

@@ -34,7 +34,7 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 		return nil, err
 	}
 
-	paymentIntentResponse, err := s.paymentService.CreatePaymentIntent(ctx, userId, req.AmountInCents, req.Currency, auth)
+	paymentIntentResponse, err := s.paymentService.CreatePaymentIntent(ctx, userId, req, auth)
 	if err != nil {
 		logger.Error("paymentService CreatePaymentIntent error:", err)
 		return nil, err
@@ -46,6 +46,11 @@ func (s *BookingService) Create(ctx context.Context, userId int64, proId string,
 }
 
 func (s *BookingService) validate(ctx context.Context, proId string, req *booking_model.CreateBookingRequest) error {
+	slotSize := len(req.Slots)
+	if slotSize == 0 || slotSize > 10 {
+		return utils.ErrInvalidSlotSize
+	}
+
 	priceNumber, currency, err := s.repository.GetPriceAndCurrency(ctx, proId)
 	if err != nil {
 		return utils.ErrValidationDatabase
