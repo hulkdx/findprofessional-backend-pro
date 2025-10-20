@@ -12,18 +12,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const (
-	TIMEOUT = 2 * time.Minute
-	LIMIT   = 1000
-	GRACE   = 15 * time.Minute
-)
-
 func main() {
-	logger.Debug("booking-holds-ttl started")
+	timeout := utils.GetEnvTimeOrPanic("TTL_TIMEOUT")
+	grace := utils.GetEnvTimeOrPanic("TTL_GRACE")
+	limit := utils.GetEnvIntOrPanic("TTL_LIMIT")
 
-	timeout := TIMEOUT
-	grace := GRACE
-	limit := LIMIT
+	logger.Debug("booking-holds-ttl started")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
