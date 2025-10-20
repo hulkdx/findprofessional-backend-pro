@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -192,8 +191,8 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	query := `
 		SELECT
 			id,
-			LOWER(availability),
-			UPPER(availability),
+			LOWER(availability) AT TIME ZONE 'UTC',
+			UPPER(availability) AT TIME ZONE 'UTC',
 			created_at,
 			updated_at
 	FROM professional_availability
@@ -224,9 +223,8 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 		if err != nil {
 			return nil, err
 		}
-		availability.Date = civil.DateOf(from)
-		availability.From = civil.TimeOf(from)
-		availability.To = civil.TimeOf(to)
+		availability.From = from
+		availability.To = to
 
 		availabilities = append(availabilities, availability)
 	}
@@ -250,36 +248,37 @@ func (r *repositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 	}()
 
 	now := r.timeProvider.Now()
-	rows := make([][]interface{}, len(availability.Items))
-	onlyOnce := true
+	rows := make([][]any, len(availability.Items))
 
+	var min *time.Time
+	var max *time.Time
 	for i, e := range availability.Items {
-		tsRange, err := utils.ConvertToTsRange(e.Date, e.From, e.To)
+		if i == 0 {
+			min = &e.From
+			max = &e.To
+		} else {
+			min = utils.MinTime(min, &e.From)
+			max = utils.MaxTime(max, &e.To)
+		}
+
+		rows[i] = []any{
+			professionalId,
+			utils.ConvertToTstzrange(e.From, e.To),
+			now,
+			now,
+		}
+	}
+
+	if len(availability.Items) > 0 {
+		query := `
+			DELETE FROM professional_availability
+			WHERE
+				professional_id = $1 AND
+				availability && tstzrange($2, $3);
+		`
+		_, err = tx.Exec(ctx, query, professionalId, min, max)
 		if err != nil {
 			return err
-		}
-		rows[i] = []interface{}{
-			professionalId,
-			tsRange,
-			now,
-			now,
-		}
-
-		// Client: returns same dates for all records
-		if onlyOnce {
-			onlyOnce = false
-			//
-			// Might be inefficient to delete everything and add them again,
-			// but if this is causing issue change the client so it only returns the values that needs to be updated
-			//
-			query := `DELETE FROM professional_availability WHERE
-				professional_id = $1 AND
-				availability && tsrange($2::DATE, $2::DATE + 1);`
-
-			_, err = tx.Exec(ctx, query, professionalId, e.Date)
-			if err != nil {
-				return err
-			}
 		}
 	}
 
