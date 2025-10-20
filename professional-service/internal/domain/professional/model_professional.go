@@ -3,7 +3,6 @@ package professional
 import (
 	"time"
 
-	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
@@ -29,13 +28,12 @@ type Professional struct {
 }
 
 type Availability struct {
-	ID             int64      `json:"-"`
-	ProfessionalID int64      `json:"-"`
-	Date           civil.Date `json:"date,omitempty"`
-	From           civil.Time `json:"from,omitempty"`
-	To             civil.Time `json:"to,omitempty"`
-	CreatedAt      time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt      time.Time  `json:"updatedAt,omitempty"`
+	ID             int64     `json:"-"`
+	ProfessionalID int64     `json:"-"`
+	From           time.Time `json:"from,omitempty"`
+	To             time.Time `json:"to,omitempty"`
+	CreatedAt      time.Time `json:"createdAt,omitempty"`
+	UpdatedAt      time.Time `json:"updatedAt,omitempty"`
 }
 
 type Availabilities []Availability

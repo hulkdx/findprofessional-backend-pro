@@ -11,6 +11,7 @@ import (
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -133,14 +134,13 @@ func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...prof
 	}
 
 	for _, a := range availabilities {
-		// Convert the date/time to a Postgres range string,
-		// e.g. [2025-01-10 09:00:00,2025-01-10 10:00:00)
-		availabilityRange := fmt.Sprintf("[%s %s,%s %s)",
-			a.Date.String(),
-			a.From.String(),
-			a.Date.String(),
-			a.To.String(),
-		)
+		availabilityRange := pgtype.Range[pgtype.Timestamptz]{
+			Lower:     pgtype.Timestamptz{Time: a.From, Valid: true},
+			Upper:     pgtype.Timestamptz{Time: a.To, Valid: true},
+			LowerType: pgtype.Inclusive,
+			UpperType: pgtype.Exclusive,
+			Valid:     true,
+		}
 
 		_, execErr := tx.Exec(ctx, query,
 			a.ProfessionalID,

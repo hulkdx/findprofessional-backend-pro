@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
 func (c *Controller) UpdateAvailability(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +31,7 @@ func (c *Controller) UpdateAvailability(w http.ResponseWriter, r *http.Request) 
 
 	err = c.service.UpdateAvailability(ctx, userId, requestBody)
 	if err != nil {
+		logger.Error("Error UpdateAvailability", err)
 		utils.WriteGeneralError(w, utils.ErrUnknown)
 		return
 	}
