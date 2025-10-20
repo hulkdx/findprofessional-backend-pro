@@ -16,8 +16,8 @@ const (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
+	Server   *ServerConfig
+	Database *DatabaseConfig
 }
 
 type ServerConfig struct {
@@ -37,21 +37,25 @@ type DatabaseConfig struct {
 
 func Load() *Config {
 	cfg := &Config{
-		Server: ServerConfig{
+		Server: &ServerConfig{
 			Port:         getEnv("server_port", DEFAULT_SERVER_PORT),
 			ReadTimeout:  getEnvTime("server_read_timeout", DEFAULT_SERVER_READ_TIMEOUT),
 			WriteTimeout: getEnvTime("server_write_timeout", DEFAULT_SERVER_WRITE_TIMEOUT),
 			IdleTimeout:  getEnvTime("server_idle_timeout", DEFAULT_SERVER_IDLE_TIMEOUT),
 		},
-		Database: DatabaseConfig{
-			getDsn(
-				os.Getenv("postgres_url"),
-				os.Getenv("postgres_username"),
-				os.Getenv("postgres_password"),
-			),
-		},
+		Database: LoadDataBaseConfig(),
 	}
 	return cfg
+}
+
+func LoadDataBaseConfig() *DatabaseConfig {
+	return &DatabaseConfig{
+		getDsn(
+			os.Getenv("postgres_url"),
+			os.Getenv("postgres_username"),
+			os.Getenv("postgres_password"),
+		),
+	}
 }
 
 func getEnv(key string, def string) string {

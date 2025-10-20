@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Connect(ctx context.Context, cfg config.DatabaseConfig) *pgxpool.Pool {
+func Connect(ctx context.Context, cfg *config.DatabaseConfig) *pgxpool.Pool {
 	db, err := pgxpool.New(ctx, cfg.Dsn)
 	if err != nil {
 		panic(err)
