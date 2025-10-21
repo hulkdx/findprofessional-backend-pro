@@ -1,5 +1,10 @@
+ARG GO_VERSION
+ARG APP_CMD_PATH
+
 # --------------------------------  Build  -----------------------------------------
-FROM golang:1.23.0-alpine AS builder
+FROM golang:${GO_VERSION}-alpine AS builder
+ARG APP_CMD_PATH
+
 WORKDIR /src
 
 COPY professional-service/go.mod professional-service/go.sum ./
@@ -13,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     -trimpath \
     -ldflags "-s -w"\
     -buildvcs=false \
-    -o /out/app ./cmd/api
+    -o /out/app ${APP_CMD_PATH}
 
 # --------------------------------  Runtime  -----------------------------------------
 FROM alpine:latest

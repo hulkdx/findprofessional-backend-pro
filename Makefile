@@ -34,3 +34,10 @@ dev:
 clear-minikube-psql-cache:
 	@eval $$(minikube docker-env); \
 	docker volume rm --force psql_cache
+
+.PHONY: docker-build
+docker-build:
+	docker build -f Dockerfile \
+	--build-arg GO_VERSION=$(GO_VERSION) \
+	--build-arg APP_CMD_PATH=$(APP_CMD_PATH) \
+	-t $(DOCKER_IMAGE_NAME) .

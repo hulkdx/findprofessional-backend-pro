@@ -10,7 +10,7 @@ env:
 
 jobs:
   deploy:
-    name: build and deploy
+    name: docker build and deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - run: docker build . -t ${DOCKER_IMAGE_NAME}
+    - name: docker build
+      run: make docker-build-app
 
     - name: docker push
       run: |
