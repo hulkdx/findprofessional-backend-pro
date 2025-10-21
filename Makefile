@@ -32,3 +32,8 @@ dev:
 clear-minikube-psql-cache:
 	@eval $$(minikube docker-env); \
 	docker volume rm --force psql_cache
+
+.PHONY: build-booking-holds-ttl
+build-booking-holds-ttl: deps
+	@cd professional-service && \
+	go build -o ../build/build-booking-holds-ttl cmd/booking-holds-ttl/main.go
