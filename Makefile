@@ -1,3 +1,9 @@
+GO_VERSION := $(shell grep '^go ' professional-service/go.mod | awk '{print $$2}')
+
+.PHONY: print-go-version
+print-go-version:
+	@echo "Go version from go.mod: $(GO_VERSION)"
+
 .PHONY: deps
 deps:
 	@cd professional-service && \
@@ -12,10 +18,6 @@ test-deps:
 build: deps
 	@cd professional-service && \
 	go build -o ../build/app cmd/api/main.go
-
-.PHONY: run
-run: build
-	@./build/app
 
 .PHONY: test
 test: test-deps
@@ -32,8 +34,3 @@ dev:
 clear-minikube-psql-cache:
 	@eval $$(minikube docker-env); \
 	docker volume rm --force psql_cache
-
-.PHONY: build-booking-holds-ttl
-build-booking-holds-ttl: deps
-	@cd professional-service && \
-	go build -o ../build/build-booking-holds-ttl cmd/booking-holds-ttl/main.go
