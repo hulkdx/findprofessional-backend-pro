@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 // TODO: Change timeouts for production
@@ -16,8 +18,8 @@ const (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
+	Server   *ServerConfig
+	Database *DatabaseConfig
 }
 
 type ServerConfig struct {
@@ -37,41 +39,25 @@ type DatabaseConfig struct {
 
 func Load() *Config {
 	cfg := &Config{
-		Server: ServerConfig{
-			Port:         getEnv("server_port", DEFAULT_SERVER_PORT),
-			ReadTimeout:  getEnvTime("server_read_timeout", DEFAULT_SERVER_READ_TIMEOUT),
-			WriteTimeout: getEnvTime("server_write_timeout", DEFAULT_SERVER_WRITE_TIMEOUT),
-			IdleTimeout:  getEnvTime("server_idle_timeout", DEFAULT_SERVER_IDLE_TIMEOUT),
+		Server: &ServerConfig{
+			Port:         utils.GetEnv("server_port", DEFAULT_SERVER_PORT),
+			ReadTimeout:  utils.GetEnvTime("server_read_timeout", DEFAULT_SERVER_READ_TIMEOUT),
+			WriteTimeout: utils.GetEnvTime("server_write_timeout", DEFAULT_SERVER_WRITE_TIMEOUT),
+			IdleTimeout:  utils.GetEnvTime("server_idle_timeout", DEFAULT_SERVER_IDLE_TIMEOUT),
 		},
-		Database: DatabaseConfig{
-			getDsn(
-				os.Getenv("postgres_url"),
-				os.Getenv("postgres_username"),
-				os.Getenv("postgres_password"),
-			),
-		},
+		Database: LoadDataBaseConfig(),
 	}
 	return cfg
 }
 
-func getEnv(key string, def string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return def
+func LoadDataBaseConfig() *DatabaseConfig {
+	return &DatabaseConfig{
+		getDsn(
+			os.Getenv("postgres_url"),
+			os.Getenv("postgres_username"),
+			os.Getenv("postgres_password"),
+		),
 	}
-	return value
-}
-
-func getEnvTime(key string, def time.Duration) time.Duration {
-	str := os.Getenv(key)
-	if str == "" {
-		return def
-	}
-	duration, err := time.ParseDuration(str)
-	if err != nil {
-		panic(err)
-	}
-	return duration
 }
 
 func getDsn(url string, username string, password string) string {

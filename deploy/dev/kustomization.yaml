@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - ../base
-  - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/db.yml
+  - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/db.yaml
 
 secretGenerator:
 - name: secrets-env
