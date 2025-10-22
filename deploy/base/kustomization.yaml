@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - professional-service.yaml
+  - booking-holds-ttl.yaml

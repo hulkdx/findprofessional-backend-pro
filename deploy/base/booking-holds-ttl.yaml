@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: booking-holds-ttl
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: booking-holds-ttl
+              image: hulkdx/ff-pro-ttl:v1
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: secrets-env
+              env:
+                - name: TZ
+                  value: UTC
+                - name: TTL_TIMEOUT
+                  value: "60s"
+                - name: TTL_GRACE
+                  value: "30s"
+                - name: TTL_LIMIT
+                  value: "1000"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -62,9 +63,11 @@ func cleanup(
 		if err != nil {
 			return err
 		}
-		if res.RowsAffected() == 0 {
+		rows := res.RowsAffected()
+		if rows == 0 {
 			break
 		}
+		logger.Debug(fmt.Sprintf("Rows deleted: %d", rows))
 	}
 
 	return nil
