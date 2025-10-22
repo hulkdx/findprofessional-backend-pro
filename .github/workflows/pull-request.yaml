@@ -4,10 +4,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  API_DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/ff-pro:v1
-  TTL_DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/ff-pro-ttl:v1
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -29,26 +25,3 @@ jobs:
 
     - name: Build server
       run: make build
-
-    - name: docker build api
-      env:
-        DOCKER_IMAGE_NAME: ${{ env.API_DOCKER_IMAGE_NAME }}
-        APP_CMD_PATH: ./cmd/api
-      run: make docker-build
-
-    - name: docker build ttl
-      env:
-        DOCKER_IMAGE_NAME: ${{ env.TTL_DOCKER_IMAGE_NAME }}
-        APP_CMD_PATH: ./cmd/booking-holds-ttl 
-      run: make docker-build
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_API_KEY }}
-
-    - name: docker push
-      run: |
-        docker push ${API_DOCKER_IMAGE_NAME} &> /dev/null
-        docker push ${TTL_DOCKER_IMAGE_NAME} &> /dev/null

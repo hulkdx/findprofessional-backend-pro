@@ -16,7 +16,6 @@ spec:
           containers:
             - name: booking-holds-ttl
               image: hulkdx/ff-pro-ttl:v1
-              imagePullPolicy: Always
               envFrom:
                 - secretRef:
                     name: secrets-env
