@@ -2,12 +2,16 @@ package utils
 
 import "time"
 
-type TimeProvider interface {
-	Now() time.Time
+func MinTime(a *time.Time, b *time.Time) *time.Time {
+	if a.Before(*b) {
+		return a
+	}
+	return b
 }
 
-type RealTimeProvider struct{}
-
-func (p *RealTimeProvider) Now() time.Time {
-	return time.Now()
+func MaxTime(a *time.Time, b *time.Time) *time.Time {
+	if a.After(*b) {
+		return a
+	}
+	return b
 }

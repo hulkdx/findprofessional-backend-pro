@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
@@ -46,15 +45,13 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		expected := []professional.Availability{
 			{
 				ID:   0,
-				Date: civil.Date{Year: 2023, Month: 11, Day: 4},
-				From: civil.Time{Hour: 5, Minute: 30},
-				To:   civil.Time{Hour: 6, Minute: 30},
+				From: time.Date(2023, 11, 4, 5, 30, 0, 0, time.UTC),
+				To:   time.Date(2023, 11, 4, 6, 30, 0, 0, time.UTC),
 			},
 			{
 				ID:   0,
-				Date: civil.Date{Year: 2020, Month: 11, Day: 4},
-				From: civil.Time{Hour: 15, Minute: 30},
-				To:   civil.Time{Hour: 16, Minute: 00},
+				From: time.Date(2020, 11, 4, 15, 30, 0, 0, time.UTC),
+				To:   time.Date(2020, 11, 4, 16, 00, 0, 0, time.UTC),
 			},
 		}
 
@@ -85,24 +82,20 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 		records := []professional.Availability{
 			{
-				Date: civil.Date{Year: 2023, Month: 11, Day: 4},
-				From: civil.Time{Hour: 5, Minute: 30},
-				To:   civil.Time{Hour: 6, Minute: 30},
+				From: time.Date(2023, 11, 4, 5, 30, 0, 0, time.UTC),
+				To:   time.Date(2023, 11, 4, 6, 30, 0, 0, time.UTC),
 			},
 			{
-				Date: civil.Date{Year: 2020, Month: 11, Day: 4},
-				From: civil.Time{Hour: 15, Minute: 30},
-				To:   civil.Time{Hour: 16, Minute: 00},
+				From: time.Date(2020, 11, 4, 15, 30, 0, 0, time.UTC),
+				To:   time.Date(2020, 11, 4, 16, 00, 0, 0, time.UTC),
 			},
 			{
-				Date: civil.Date{Year: 2025, Month: 9, Day: 23},
-				From: civil.Time{Hour: 5, Minute: 30},
-				To:   civil.Time{Hour: 6, Minute: 30},
+				From: time.Date(2025, 9, 23, 5, 30, 0, 0, time.UTC),
+				To:   time.Date(2025, 9, 23, 6, 30, 0, 0, time.UTC),
 			},
 			{
-				Date: civil.Date{Year: 2025, Month: 9, Day: 24},
-				From: civil.Time{Hour: 11, Minute: 30},
-				To:   civil.Time{Hour: 12, Minute: 00},
+				From: time.Date(2025, 9, 24, 11, 30, 0, 0, time.UTC),
+				To:   time.Date(2025, 9, 24, 12, 00, 0, 0, time.UTC),
 			},
 		}
 		d1 := insertEmptyPro(t, db)

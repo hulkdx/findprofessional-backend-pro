@@ -1,5 +1,6 @@
-![Build](https://img.shields.io/github/actions/workflow/status/hulkdx/findprofessional-backend-pro/push.yml?branch=main)
+![Build](https://img.shields.io/github/actions/workflow/status/hulkdx/findprofessional-backend-pro/push.yaml?branch=main)
 [![Docker Status](https://badgen.net/docker/size/hulkdx/ff-pro/v1/amd64?icon=docker&label=docker&url)](https://hub.docker.com/repository/docker/hulkdx/ff-pro)
+[![TTL Docker Status](https://badgen.net/docker/size/hulkdx/ff-pro-ttl/v1/amd64?icon=docker&label=docker%20ttl&url)](https://hub.docker.com/repository/docker/hulkdx/ff-pro-ttl)
 [![Golang](https://img.shields.io/badge/golang-1.23.0-blue.svg?logo=go)](https://go.dev/)
 
 # Professional microservice
@@ -30,3 +31,14 @@ Check [this](https://github.com/hulkdx/findprofessional-backend-pro/commit/af66c
 
 ## TODO
 - Host swagger docs to some url
+
+# Booking Holds TTL
+Deletes expired rows from booking_holds (and their booking_hold_items via ON DELETE CASCADE) on a schedule so that previously held slots become visible/available again.
+
+This tool runs as a short-lived job with Kubernetes CronJob. It performs one sweep and exits with a success/failure code.
+
+## Why it exists
+- GET /professional endpoints hide a slot if there’s a non-expired hold.
+- When a client abandons payment or a flow fails, the hold expires.
+- To prevent an expired hold from blocking a slot, we periodically purge expired holds.
+- Purging only the parent booking_holds ensures items disappear automatically.

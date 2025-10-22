@@ -34,9 +34,8 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 		COUNT(r),
 		jsonb_agg(json_build_object(
 			'id', a.id,
-			'date', LOWER(a.availability)::DATE,
-			'from', LOWER(a.availability)::TIME,
-			'to', UPPER(a.availability)::TIME,
+			'from', LOWER(a.availability),
+			'to', UPPER(a.availability),
 			'createdAt', a.created_at,
 			'updatedAt', a.updated_at
 			)) FILTER (WHERE a.id IS NOT NULL),

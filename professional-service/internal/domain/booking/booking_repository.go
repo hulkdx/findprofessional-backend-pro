@@ -5,7 +5,6 @@ import (
 
 	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -38,78 +37,5 @@ func (r *repositoryImpl) GetPriceAndCurrency(ctx context.Context, proId string) 
 }
 
 func (r *repositoryImpl) InsertBooking(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest) (int64, error) {
-	status := booking_model.BookingStatusProcessing
-
-	tx, err := r.db.Begin(ctx)
-	if err != nil {
-		return -1, err
-	}
-
-	txDone := false
-	defer func() {
-		if txDone {
-			tx.Commit(ctx)
-		} else {
-			tx.Rollback(ctx)
-		}
-	}()
-
-	query := `
-		INSERT INTO bookings (
-			user_id,
-			professional_id,
-			status,
-			amount_in_cents,
-			currency,
-			idempotency_key,
-			created_at,
-			updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		RETURNING id;
-	`
-	now := r.timeProvider.Now()
-	row := tx.QueryRow(ctx, query,
-		userId,
-		proId,
-		status,
-		req.AmountInCents,
-		req.Currency,
-		req.IdempotencyKey,
-		now,
-		now,
-	)
-	var bookingId int64
-	err = row.Scan(&bookingId)
-	if err != nil {
-		return -1, err
-	}
-
-	rows := make([][]any, len(req.Slots))
-	for i, slot := range req.Slots {
-		rows[i] = []any{
-			bookingId,
-			slot.Id,
-			now,
-			now,
-		}
-	}
-
-	columns := []string{
-		"booking_id",
-		"availability_id",
-		"created_at",
-		"updated_at",
-	}
-	_, err = tx.CopyFrom(
-		ctx,
-		pgx.Identifier{"booking_slots"},
-		columns,
-		pgx.CopyFromRows(rows),
-	)
-	if err != nil {
-		return -1, err
-	}
-
-	txDone = true
-	return bookingId, nil
+	return 0, nil
 }
