@@ -1,4 +1,4 @@
-package bookingholdsttl
+package main
 
 import (
 	"context"

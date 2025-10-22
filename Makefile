@@ -19,6 +19,11 @@ build: deps
 	@cd professional-service && \
 	go build -o ../build/app cmd/api/main.go
 
+.PHONY: build-ttl
+build-ttl: deps
+	@cd professional-service && \
+	go build -o ../build/app cmd/booking-holds-ttl/main.go
+
 .PHONY: test
 test: test-deps
 	@cd professional-service && \
