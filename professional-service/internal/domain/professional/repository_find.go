@@ -33,6 +33,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 		AVG(r.rate)::numeric(10,2) AS rating,
 		COUNT(r),
 		jsonb_agg(json_build_object(
+			'id', a.id,
 			'from', LOWER(a.availability),
 			'to', UPPER(a.availability),
 			'createdAt', a.created_at,
