@@ -3,7 +3,6 @@ package integration_test
 import (
 	"testing"
 
-	"cloud.google.com/go/civil"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
