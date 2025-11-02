@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/bookingrepo"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/professionalrepo"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	_ "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
@@ -27,14 +28,14 @@ func NewHandler(database *pgxpool.Pool) http.Handler {
 	bookingController := booking.NewController(
 		userService,
 		booking.NewService(
-			booking.NewRepository(database, timeProvider),
+			bookingrepo.NewRepository(database, timeProvider),
 			payment.NewService(),
 		),
 	)
 	return Handler(proController, bookingController)
 }
 
-func Handler(proController *professional.Controller, bookingController *booking.BookingController) http.Handler {
+func Handler(proController *professional.Controller, bookingController *booking.Controller) http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(ContentTypeJsonMiddleware)
@@ -64,7 +65,7 @@ func proUser(router *chi.Mux, controller *professional.Controller) {
 	router.Post("/professional/availability", controller.UpdateAvailability)
 }
 
-func normalUserBooking(router *chi.Mux, controller *booking.BookingController) {
+func normalUserBooking(router *chi.Mux, controller *booking.Controller) {
 	//
 	// Create a booking for a professional using stripe payment intent
 	// ---
