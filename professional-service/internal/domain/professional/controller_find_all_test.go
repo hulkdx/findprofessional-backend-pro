@@ -87,7 +87,7 @@ func TestFindAllProfessional(t *testing.T) {
 }
 
 func findAllController(findAllSuccess []Professional) *Controller {
-	repository := &FakeRepository{findAllSuccess: findAllSuccess}
+	repository := &FakeRepository{FindAllSuccess: findAllSuccess}
 	return &Controller{
 		service:     NewService(repository),
 		userService: &MockUserServiceAlwaysAuthenticated{},
