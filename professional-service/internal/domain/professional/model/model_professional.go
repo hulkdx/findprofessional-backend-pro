@@ -1,4 +1,4 @@
-package professional
+package model_professional
 
 import (
 	"time"

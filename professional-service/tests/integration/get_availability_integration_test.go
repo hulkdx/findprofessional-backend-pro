@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -25,7 +25,7 @@ func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
 
-		response_model := []professional.Availability{}
+		response_model := []model_professional.Availability{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 0)
 	})
@@ -34,7 +34,7 @@ func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		timeProvider.NowTime = time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 
-		expected := []professional.Availability{
+		expected := []model_professional.Availability{
 			{
 				ID:   0,
 				From: time.Date(2023, 11, 4, 5, 30, 0, 0, time.UTC),
@@ -59,7 +59,7 @@ func GetAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
 
-		response_model := []professional.Availability{}
+		response_model := []model_professional.Availability{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 2)
 		assert.Equal(t, response_model[0].From, expected[0].From)

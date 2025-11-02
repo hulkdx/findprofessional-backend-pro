@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
@@ -12,12 +13,12 @@ import (
 var pgErrUniqueViolation = "23505"
 
 type Service interface {
-	FindAll(context.Context) ([]Professional, error)
-	FindById(ctx context.Context, id string) (Professional, error)
+	FindAll(context.Context) ([]model_professional.Professional, error)
+	FindById(ctx context.Context, id string) (model_professional.Professional, error)
 	Create(context.Context, CreateRequest) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
-	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
-	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
+	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (model_professional.Reviews, error)
+	GetAvailability(ctx context.Context, professionalId int64) (model_professional.Availabilities, error)
 	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
 }
 
@@ -29,11 +30,11 @@ func NewService(repository Repository) Service {
 	return &serviceImpl{repository}
 }
 
-func (s *serviceImpl) FindAll(ctx context.Context) ([]Professional, error) {
+func (s *serviceImpl) FindAll(ctx context.Context) ([]model_professional.Professional, error) {
 	return s.repository.FindAll(ctx)
 }
 
-func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, error) {
+func (s *serviceImpl) FindById(ctx context.Context, id string) (model_professional.Professional, error) {
 	return s.repository.FindById(ctx, id)
 }
 
@@ -60,11 +61,11 @@ func (s *serviceImpl) Update(ctx context.Context, id string, p UpdateRequest) er
 	return s.repository.Update(ctx, id, p)
 }
 
-func (s *serviceImpl) FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error) {
+func (s *serviceImpl) FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (model_professional.Reviews, error) {
 	return s.repository.FindAllReview(ctx, professionalId, page, pageSize)
 }
 
-func (s *serviceImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+func (s *serviceImpl) GetAvailability(ctx context.Context, professionalId int64) (model_professional.Availabilities, error) {
 	return s.repository.GetAvailability(ctx, professionalId)
 }
 

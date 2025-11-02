@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -44,7 +45,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		handler.ServeHTTP(response, NewJsonRequest("GET", "/professional/availability", nil))
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
-		response_model := []professional.Availability{}
+		response_model := []model_professional.Availability{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, response_model[0].From, requestBody.Items[0].From)
@@ -54,7 +55,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 	t.Run("duplicate availability, update them", func(t *testing.T) {
 		// Arrange
 		d1 := insertEmptyPro(t, db)
-		databaseAvailability := []professional.Availability{
+		databaseAvailability := []model_professional.Availability{
 			{
 				ID:   0,
 				From: time.Date(2023, 1, 1, 5, 30, 0, 0, time.UTC),
@@ -88,7 +89,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		handler.ServeHTTP(response, NewJsonRequest("GET", "/professional/availability", nil))
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
-		response_model := []professional.Availability{}
+		response_model := []model_professional.Availability{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, response_model[0].From, newAvailability.Items[0].From)
@@ -98,7 +99,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 	t.Run("non-duplicate availability, should be returned", func(t *testing.T) {
 		// Arrange
 		d1 := insertEmptyPro(t, db)
-		databaseAvailability := []professional.Availability{
+		databaseAvailability := []model_professional.Availability{
 			{
 				ID:   0,
 				From: time.Date(2023, 1, 2, 5, 30, 0, 0, time.UTC),
@@ -132,7 +133,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 		handler.ServeHTTP(response, NewJsonRequest("GET", "/professional/availability", nil))
 		// Asserts
 		assert.Equal(t, response.Code, http.StatusOK)
-		response_model := []professional.Availability{}
+		response_model := []model_professional.Availability{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 2)
 	})

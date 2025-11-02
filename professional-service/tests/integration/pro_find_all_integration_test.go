@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,7 +28,7 @@ func FindAllProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("some professional, only show valid data", func(t *testing.T) {
 		// Arrange
-		records := []professional.Professional{
+		records := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",
@@ -48,7 +48,7 @@ func FindAllProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		}
 		d1 := insertPro(t, db, records...)
 		defer d1()
-		expected := []professional.Professional{
+		expected := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",
@@ -73,7 +73,7 @@ func FindAllProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("hide professional with null PriceNumber or PriceCurrency", func(t *testing.T) {
 		// Arrange
-		records := []professional.Professional{
+		records := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",
@@ -100,7 +100,7 @@ func FindAllProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		}
 		d1 := insertPro(t, db, records...)
 		defer d1()
-		expected := []professional.Professional{
+		expected := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",

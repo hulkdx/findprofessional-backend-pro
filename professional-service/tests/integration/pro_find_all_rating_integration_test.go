@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,7 +19,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	t.Run("proffesional got give 5 star ratings from all users", func(t *testing.T) {
 		// Arrange
 		expected_rating := "5.00"
-		professional_records := []professional.Professional{
+		professional_records := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",
@@ -42,7 +42,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		d2 := insertUserWithId(t, db, userId...)
 		defer d2()
 
-		rating_records := []professional.Review{
+		rating_records := []model_professional.Review{
 			{
 				ID:             1,
 				UserID:         2,
@@ -88,7 +88,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		var expected_rating string
 
-		professional_records := []professional.Professional{
+		professional_records := []model_professional.Professional{
 			{
 				ID:            1,
 				Email:         "test1@gmail.com",

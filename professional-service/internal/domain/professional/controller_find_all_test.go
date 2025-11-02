@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 )
 
@@ -23,7 +24,7 @@ func TestFindAllProfessional(t *testing.T) {
 	})
 	t.Run("empty repository", func(t *testing.T) {
 		// Arrange
-		data := []Professional{}
+		data := []model_professional.Professional{}
 		response := httptest.NewRecorder()
 		controller := findAllController(data)
 		// Act
@@ -34,7 +35,7 @@ func TestFindAllProfessional(t *testing.T) {
 	})
 	t.Run("some professional", func(t *testing.T) {
 		// Arrange
-		data := []Professional{
+		data := []model_professional.Professional{
 			{
 				ID:    1,
 				Email: "test1@gmail.com",
@@ -54,7 +55,7 @@ func TestFindAllProfessional(t *testing.T) {
 	})
 	t.Run("some professional with all optional fields", func(t *testing.T) {
 		// Arrange
-		data := []Professional{
+		data := []model_professional.Professional{
 			{
 				ID:              1,
 				Email:           "test1@gmail.com",
@@ -86,7 +87,7 @@ func TestFindAllProfessional(t *testing.T) {
 	})
 }
 
-func findAllController(findAllSuccess []Professional) *Controller {
+func findAllController(findAllSuccess []model_professional.Professional) *Controller {
 	repository := &FakeRepository{findAllSuccess: findAllSuccess}
 	return &Controller{
 		service:     NewService(repository),

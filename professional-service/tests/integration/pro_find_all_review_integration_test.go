@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
@@ -29,7 +29,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 
-		response_model := []professional.Professional{}
+		response_model := []model_professional.Professional{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, len(response_model[0].Review), 0)
@@ -45,7 +45,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 			ProfileImage: String("image.someurl.com"),
 		}
 		proId := int64(2)
-		pro := professional.Professional{
+		pro := model_professional.Professional{
 			ID:            proId,
 			PriceNumber:   Int(0),
 			PriceCurrency: String(""),
@@ -55,7 +55,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		defer d0()
 		d1 := insertPro(t, db, pro)
 		defer d1()
-		reviews := []professional.Review{
+		reviews := []model_professional.Review{
 			{
 				ID:             67,
 				UserID:         int64(user.ID),
@@ -77,7 +77,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 
-		response_model := []professional.Professional{}
+		response_model := []model_professional.Professional{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, response_model[0].ID, proId)
@@ -135,7 +135,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 				// Act
 				handler.ServeHTTP(response, request)
 				// Assert
-				response_model := []professional.Professional{}
+				response_model := []model_professional.Professional{}
 				Unmarshal(response, &response_model)
 				assert.Equal(t, len(response_model[0].Review), tc.expectedReviews)
 				assert.Equal(t, response_model[0].ReviewSize, tc.expectedReviewSize)
@@ -147,7 +147,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {
 	proId := int64(2)
-	pro := professional.Professional{
+	pro := model_professional.Professional{
 		ID:            proId,
 		PriceNumber:   Int(0),
 		PriceCurrency: String(""),
@@ -160,9 +160,9 @@ func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {
 	}
 	d2 := insertUserWithId(t, db, userIds...)
 
-	var reviews []professional.Review
+	var reviews []model_professional.Review
 	for i := 0; i < count; i++ {
-		review := professional.Review{
+		review := model_professional.Review{
 			ID:             int64(i),
 			UserID:         int64(userIds[i]),
 			ProfessionalID: proId,

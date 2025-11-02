@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,7 +32,7 @@ func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		id := int64(1)
 		userService.UserId = id
-		record := &professional.Professional{
+		record := &model_professional.Professional{
 			ID:    int64(id),
 			Email: "emailofidone@email.com",
 		}

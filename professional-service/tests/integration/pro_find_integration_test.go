@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -29,7 +29,7 @@ func FindProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 	t.Run("found a record", func(t *testing.T) {
 		// Arrange
 		id := int64(1)
-		record := &professional.Professional{
+		record := &model_professional.Professional{
 			ID:            id,
 			Email:         "emailofidone@email.com",
 			PriceNumber:   Int(0),

@@ -4,13 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 )
 
 const REVIEW_LIMIT = 3
 
-type FilterItems func(pro *Professional) []any
+type FilterItems func(pro *model_professional.Professional) []any
 
-func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
+func (r *repositoryImpl) FindAll(ctx context.Context) ([]model_professional.Professional, error) {
 	query := fmt.Sprintf(`
 	WITH professional_review_cte AS
 	(
@@ -75,7 +77,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 		REVIEW_LIMIT,
 		r.timeProvider.Now().Format("2006-01-02 15:04:05"),
 	)
-	filterItems := func(pro *Professional) []any {
+	filterItems := func(pro *model_professional.Professional) []any {
 		return []any{
 			&pro.ID,
 			&pro.Email,
@@ -95,7 +97,7 @@ func (r *repositoryImpl) FindAll(ctx context.Context) ([]Professional, error) {
 	return r.find(ctx, filterItems, query)
 }
 
-func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional, error) {
+func (r *repositoryImpl) FindById(ctx context.Context, id string) (model_professional.Professional, error) {
 	query := fmt.Sprintf(`
 	WITH professional_review_cte AS
 	(
@@ -143,7 +145,7 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional,
 	GROUP BY p.id
 	`, REVIEW_LIMIT)
 
-	filterItems := func(pro *Professional) []any {
+	filterItems := func(pro *model_professional.Professional) []any {
 		return []any{
 			&pro.ID,
 			&pro.Email,
@@ -164,18 +166,18 @@ func (r *repositoryImpl) FindById(ctx context.Context, id string) (Professional,
 	return r.findOne(ctx, filterItems, query, id)
 }
 
-func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, query string, args ...any) ([]Professional, error) {
+func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, query string, args ...any) ([]model_professional.Professional, error) {
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	professionals := []Professional{}
+	professionals := []model_professional.Professional{}
 	for rows.Next() {
-		pro := Professional{
-			Availability: []Availability{},
-			Review:       []Review{},
+		pro := model_professional.Professional{
+			Availability: []model_professional.Availability{},
+			Review:       []model_professional.Review{},
 		}
 		err := rows.Scan(filterItems(&pro)...)
 		if err != nil {
@@ -190,13 +192,13 @@ func (r *repositoryImpl) find(ctx context.Context, filterItems FilterItems, quer
 	return professionals, nil
 }
 
-func (r *repositoryImpl) findOne(ctx context.Context, filterItems FilterItems, query string, queryArgs ...any) (Professional, error) {
+func (r *repositoryImpl) findOne(ctx context.Context, filterItems FilterItems, query string, queryArgs ...any) (model_professional.Professional, error) {
 	professionals, err := r.find(ctx, filterItems, query, queryArgs...)
 	if err != nil {
-		return Professional{}, err
+		return model_professional.Professional{}, err
 	}
 	if len(professionals) == 0 {
-		return Professional{}, sql.ErrNoRows
+		return model_professional.Professional{}, sql.ErrNoRows
 	}
 	return professionals[0], nil
 }

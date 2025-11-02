@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
 )
 
@@ -37,7 +38,7 @@ func TestFindProfessional(t *testing.T) {
 	t.Run("found an id", func(t *testing.T) {
 		// Arrange
 		id := 1
-		record := &Professional{
+		record := &model_professional.Professional{
 			ID:    1,
 			Email: "emailofidone@email.com",
 		}
@@ -51,7 +52,7 @@ func TestFindProfessional(t *testing.T) {
 	})
 }
 
-func findController(findByIdSuccess *Professional, findByIdError error) *Controller {
+func findController(findByIdSuccess *model_professional.Professional, findByIdError error) *Controller {
 	repository := &FakeRepository{}
 	if findByIdSuccess != nil {
 		repository.findByIdSuccess = *findByIdSuccess

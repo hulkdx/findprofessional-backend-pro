@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -70,14 +70,14 @@ func OutputSQL(t *testing.T, db *pgxpool.Pool, query string) {
 }
 
 func insertEmptyPro(t *testing.T, db *pgxpool.Pool) func() {
-	return insertPro(t, db, professional.Professional{
+	return insertPro(t, db, model_professional.Professional{
 		PriceNumber:   Int(0),
 		PriceCurrency: String(""),
 		Pending:       false,
 	})
 }
 
-func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional) func() {
+func insertPro(t *testing.T, db *pgxpool.Pool, pro ...model_professional.Professional) func() {
 	ctx := context.Background()
 
 	query := `INSERT INTO "professionals"
@@ -118,7 +118,7 @@ func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional)
 	}
 }
 
-func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...professional.Availability) ([]int64, func()) {
+func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...model_professional.Availability) ([]int64, func()) {
 	ctx := context.Background()
 
 	query := `
@@ -169,7 +169,7 @@ func insertAvailability(t *testing.T, pool *pgxpool.Pool, availabilities ...prof
 }
 
 // insertReview inserts Reviews in a single transaction.
-func insertReview(t *testing.T, pool *pgxpool.Pool, review ...professional.Review) func() {
+func insertReview(t *testing.T, pool *pgxpool.Pool, review ...model_professional.Review) func() {
 	ctx := context.Background()
 
 	query := `

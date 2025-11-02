@@ -1,24 +1,28 @@
 package professional
 
-import "context"
+import (
+	"context"
+
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
+)
 
 type FakeRepository struct {
-	findAllSuccess       []Professional
+	findAllSuccess       []model_professional.Professional
 	findAllError         error
-	findByIdSuccess      Professional
+	findByIdSuccess      model_professional.Professional
 	findByIdError        error
 	updateError          error
-	findAllReviewSuccess Reviews
+	findAllReviewSuccess model_professional.Reviews
 	findAllReviewError   error
 	createRequestCalled  CreateRequest
 	createError          error
 }
 
-func (r *FakeRepository) FindAll(ctx context.Context) ([]Professional, error) {
+func (r *FakeRepository) FindAll(ctx context.Context) ([]model_professional.Professional, error) {
 	return r.findAllSuccess, r.findAllError
 }
 
-func (r *FakeRepository) FindById(ctx context.Context, id string) (Professional, error) {
+func (r *FakeRepository) FindById(ctx context.Context, id string) (model_professional.Professional, error) {
 	return r.findByIdSuccess, r.findByIdError
 }
 
@@ -26,7 +30,7 @@ func (r *FakeRepository) Update(ctx context.Context, id string, p UpdateRequest)
 	return r.updateError
 }
 
-func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
+func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (model_professional.Reviews, error) {
 	return r.findAllReviewSuccess, r.findAllReviewError
 }
 
@@ -35,7 +39,7 @@ func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pend
 	return r.createError
 }
 
-func (m *FakeRepository) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+func (m *FakeRepository) GetAvailability(ctx context.Context, professionalId int64) (model_professional.Availabilities, error) {
 	return nil, nil
 }
 

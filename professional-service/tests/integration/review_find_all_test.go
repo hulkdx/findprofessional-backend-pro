@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
@@ -21,7 +21,7 @@ func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		professionalId := int64(1)
 
-		d1 := insertPro(t, db, professional.Professional{ID: professionalId})
+		d1 := insertPro(t, db, model_professional.Professional{ID: professionalId})
 		defer d1()
 
 		request := NewJsonRequest("GET", fmt.Sprintf("/professional/%d/review?page=%d&pageSize=%d", professionalId, 1, 1), nil)
@@ -29,7 +29,7 @@ func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 		// Act
 		handler.ServeHTTP(response, request)
 		// Assert
-		response_model := []professional.Review{}
+		response_model := []model_professional.Review{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 0)
 	})
@@ -47,9 +47,9 @@ func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 		date := time.Date(2024, 1, 1, 10, 30, 20, 0, time.UTC)
 		d0 := insertUser(t, db, user)
 		defer d0()
-		d1 := insertPro(t, db, professional.Professional{ID: professionalId})
+		d1 := insertPro(t, db, model_professional.Professional{ID: professionalId})
 		defer d1()
-		reviews := []professional.Review{
+		reviews := []model_professional.Review{
 			{
 				ID:             67,
 				UserID:         int64(user.ID),
@@ -71,7 +71,7 @@ func ReviewFindAllTest(t *testing.T, db *pgxpool.Pool) {
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
 
-		response_model := []professional.Review{}
+		response_model := []model_professional.Review{}
 		Unmarshal(response, &response_model)
 		assert.Equal(t, len(response_model), 1)
 

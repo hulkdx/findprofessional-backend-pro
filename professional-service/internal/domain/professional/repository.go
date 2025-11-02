@@ -5,18 +5,19 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repository interface {
-	FindAll(ctx context.Context) ([]Professional, error)
-	FindById(ctx context.Context, id string) (Professional, error)
+	FindAll(ctx context.Context) ([]model_professional.Professional, error)
+	FindById(ctx context.Context, id string) (model_professional.Professional, error)
 	Create(ctx context.Context, request CreateRequest, pending bool) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
-	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
-	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
+	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (model_professional.Reviews, error)
+	GetAvailability(ctx context.Context, professionalId int64) (model_professional.Availabilities, error)
 	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
 }
 
@@ -66,7 +67,7 @@ func (r *repositoryImpl) Update(ctx context.Context, id string, p UpdateRequest)
 	return performUpdate(r.db, ctx, query, args...)
 }
 
-func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (Reviews, error) {
+func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64, page int, pageSize int) (model_professional.Reviews, error) {
 	offset := (page - 1) * pageSize
 
 	query := `
@@ -94,10 +95,10 @@ func (r *repositoryImpl) FindAllReview(ctx context.Context, professionalID int64
 	}
 	defer rows.Close()
 
-	reviews := make(Reviews, 0)
+	reviews := make(model_professional.Reviews, 0)
 
 	for rows.Next() {
-		var review Review
+		var review model_professional.Review
 
 		err := rows.Scan(
 			&review.ID,
@@ -187,7 +188,7 @@ func (r *repositoryImpl) Create(ctx context.Context, request CreateRequest, pend
 	return tx.Commit(ctx)
 }
 
-func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error) {
+func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int64) (model_professional.Availabilities, error) {
 	query := `
 		SELECT
 			id,
@@ -207,9 +208,9 @@ func (r *repositoryImpl) GetAvailability(ctx context.Context, professionalId int
 		return nil, err
 	}
 	defer rows.Close()
-	availabilities := make(Availabilities, 0)
+	availabilities := make(model_professional.Availabilities, 0)
 	for rows.Next() {
-		var availability Availability
+		var availability model_professional.Availability
 		var from time.Time
 		var to time.Time
 
