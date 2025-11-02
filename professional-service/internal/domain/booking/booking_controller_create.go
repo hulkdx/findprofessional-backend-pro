@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -27,10 +28,10 @@ func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
 
 	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest, auth)
 	if err != nil {
-		switch err {
-		case utils.ErrAmountInCentsMismatch, utils.ErrCurrencyMismatch, utils.ErrValidationDatabase:
+		var safe *utils.SafeHttpError
+		if errors.As(err, &safe) {
 			utils.WriteError(w, http.StatusBadRequest, err.Error())
-		default:
+		} else {
 			utils.WriteGeneralError(w, utils.ErrUnknown)
 		}
 		return

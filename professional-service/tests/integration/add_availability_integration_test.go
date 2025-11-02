@@ -61,7 +61,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 				To:   time.Date(2023, 1, 1, 6, 30, 0, 0, time.UTC),
 			},
 		}
-		d2 := insertAvailability(t, db, databaseAvailability...)
+		_, d2 := insertAvailability(t, db, databaseAvailability...)
 
 		defer d1()
 		defer d2()
@@ -105,7 +105,7 @@ func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
 				To:   time.Date(2023, 1, 2, 6, 30, 0, 0, time.UTC),
 			},
 		}
-		d2 := insertAvailability(t, db, databaseAvailability...)
+		_, d2 := insertAvailability(t, db, databaseAvailability...)
 
 		defer d1()
 		defer d2()
