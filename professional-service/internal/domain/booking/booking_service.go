@@ -19,6 +19,16 @@ func NewService(repository Repository, paymentService payment.PaymentService) *S
 	}
 }
 
-func (s *Service) Create(ctx context.Context, userId int64, proId string, req *booking_model.CreateBookingRequest, auth string) (*booking_model.CreateBookingResponse, error) {
+type CreateParams struct {
+	Availabilities []booking_model.Availability
+	IdempotencyKey string
+	AmountInCents  int64
+	Currency       string
+	UserId         int64
+	ProId          string
+	Auth           string
+}
+
+func (s *Service) Create(ctx context.Context, params *CreateParams) (*booking_model.CreateBookingResponse, error) {
 	return nil, nil
 }

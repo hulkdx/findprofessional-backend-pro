@@ -20,13 +20,22 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proID := chi.URLParam(r, "id")
-	createBookingRequest, err := booking_model.ParseCreateRequest(r)
+	request, err := booking_model.ParseCreateRequest(r)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	booking, err := c.service.Create(ctx, userId, proID, createBookingRequest, auth)
+	params := CreateParams{
+		ProId:          proID,
+		UserId:         userId,
+		AmountInCents:  request.AmountInCents,
+		Currency:       request.Currency,
+		IdempotencyKey: request.IdempotencyKey,
+		Auth:           auth,
+		Availabilities: request.Availabilities,
+	}
+	booking, err := c.service.Create(ctx, &params)
 	if err != nil {
 		var safe *utils.SafeHttpError
 		if errors.As(err, &safe) {
