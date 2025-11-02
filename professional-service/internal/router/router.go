@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/professionalrepo"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	_ "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
@@ -18,7 +19,7 @@ func NewHandler(database *pgxpool.Pool) http.Handler {
 	userService := user.NewService()
 	proController := professional.NewController(
 		professional.NewService(
-			professional.NewRepository(database, timeProvider),
+			professionalrepo.NewRepository(database, timeProvider),
 		),
 		userService,
 		timeProvider,
