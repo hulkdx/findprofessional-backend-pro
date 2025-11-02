@@ -77,7 +77,7 @@ func TestUpdateProfessional(t *testing.T) {
 }
 
 func createUpdateController(updateError error) *Controller {
-	repository := &FakeRepository{updateError: updateError}
+	repository := &FakeRepository{UpdateError: updateError}
 	return &Controller{
 		service:     NewService(repository),
 		userService: &MockUserServiceAlwaysAuthenticated{},

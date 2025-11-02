@@ -54,10 +54,10 @@ func TestFindProfessional(t *testing.T) {
 func findController(findByIdSuccess *Professional, findByIdError error) *Controller {
 	repository := &FakeRepository{}
 	if findByIdSuccess != nil {
-		repository.findByIdSuccess = *findByIdSuccess
+		repository.FindByIdSuccess = *findByIdSuccess
 	}
 	if findByIdError != nil {
-		repository.findByIdError = findByIdError
+		repository.FindByIdError = findByIdError
 	}
 	return &Controller{
 		service:     NewService(repository),

@@ -24,7 +24,7 @@ func TestCreate(t *testing.T) {
 		// Act
 		service.Create(context.Background(), request)
 		// Assert
-		calledPassword := repository.createRequestCalled.Password
+		calledPassword := repository.CreateRequestCalled.Password
 		assert.NotEqual(t, calledPassword, rawPassword)
 	})
 }

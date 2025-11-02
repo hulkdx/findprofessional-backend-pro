@@ -10,7 +10,7 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
 
-func (c *BookingController) Create(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	auth := r.Header.Get("Authorization")
 	userId, err := c.userService.GetAuthenticatedUserId(ctx, auth)

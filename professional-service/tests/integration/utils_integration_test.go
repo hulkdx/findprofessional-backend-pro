@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/professionalrepo"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -34,7 +35,7 @@ func NewTestControllerWithTimeProvider(db *pgxpool.Pool, timeProvider utils.Time
 
 func NewTestControllerWithTimeProviderWithUserService(db *pgxpool.Pool, timeProvider utils.TimeProvider, userService user.Service) *professional.Controller {
 	controller := professional.NewController(
-		professional.NewService(professional.NewRepository(db, timeProvider)),
+		professional.NewService(professionalrepo.NewRepository(db, timeProvider)),
 		userService,
 		timeProvider,
 	)
