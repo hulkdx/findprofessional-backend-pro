@@ -1,4 +1,4 @@
-package professional
+package sqlutils
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func performUpdateTx(tx pgx.Tx, ctx context.Context, query string, args ...any) error {
+func PerformUpdateTx(tx pgx.Tx, ctx context.Context, query string, args ...any) error {
 	return performUpdateCheckErrors(tx.Exec(ctx, query, args...))
 }
 
-func performUpdate(db *pgxpool.Pool, ctx context.Context, query string, args ...any) error {
+func PerformUpdate(db *pgxpool.Pool, ctx context.Context, query string, args ...any) error {
 	return performUpdateCheckErrors(db.Exec(ctx, query, args...))
 }
 
