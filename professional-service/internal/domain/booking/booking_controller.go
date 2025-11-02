@@ -4,10 +4,10 @@ import "github.com/hulkdx/findprofessional-backend-pro/professional-service/inte
 
 type BookingController struct {
 	userService user.Service
-	service     *BookingService
+	service     *Service
 }
 
-func NewController(userService user.Service, service *BookingService) *BookingController {
+func NewController(userService user.Service, service *Service) *BookingController {
 	return &BookingController{
 		userService: userService,
 		service:     service,
