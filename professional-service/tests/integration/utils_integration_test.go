@@ -12,19 +12,20 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func NewTestController(db *pgxpool.Pool) *professional.Controller {
-	fakeTime := &FakeTimeProvider{
-		time.Now(),
+	fakeTime := &mocks.FakeTimeProvider{
+		NowTime: time.Now(),
 	}
 	return NewTestControllerWithTimeProvider(db, fakeTime)
 }
 
 func NewTestControllerWithUserService(db *pgxpool.Pool, userService user.Service) *professional.Controller {
-	fakeTime := &FakeTimeProvider{
-		time.Now(),
+	fakeTime := &mocks.FakeTimeProvider{
+		NowTime: time.Now(),
 	}
 	return NewTestControllerWithTimeProviderWithUserService(db, fakeTime, userService)
 }
@@ -56,14 +57,6 @@ func (m *MockUserService) Login(ctx context.Context, email string, password stri
 
 func (m *MockUserService) GetAuthenticatedUserId(ctx context.Context, auth string) (int64, error) {
 	return m.UserId, nil
-}
-
-type FakeTimeProvider struct {
-	NowTime time.Time
-}
-
-func (p *FakeTimeProvider) Now() time.Time {
-	return p.NowTime
 }
 
 func NewJsonRequest(method, url string, body io.Reader) *http.Request {

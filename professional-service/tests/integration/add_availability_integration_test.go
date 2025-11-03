@@ -10,11 +10,12 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func AddAvailabilityTest(t *testing.T, db *pgxpool.Pool) {
-	timeProvider := &FakeTimeProvider{}
+	timeProvider := &mocks.FakeTimeProvider{}
 	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider), nil)
 
 	t.Run("empty availability", func(t *testing.T) {

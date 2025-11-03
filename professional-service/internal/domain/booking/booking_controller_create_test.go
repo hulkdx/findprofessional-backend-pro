@@ -14,7 +14,7 @@ func TestCreateBooking(t *testing.T) {
 	t.Run("authorize", func(t *testing.T) {
 		// Arrange
 		userService := &MockUserServiceAlwaysAuthenticated{}
-		controller := NewController(userService, NewService(&FakeRepository{}, &mocks.FakePaymentService{}))
+		controller := NewController(userService, NewService(&FakeRepository{}, &mocks.FakePaymentService{}, nil))
 		// Act
 		controller.Create(httptest.NewRecorder(), httptest.NewRequest(http.MethodPost, "/booking", nil))
 		// Assert

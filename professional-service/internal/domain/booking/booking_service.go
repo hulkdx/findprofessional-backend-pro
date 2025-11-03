@@ -5,17 +5,20 @@ import (
 
 	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type Service struct {
 	repository     Repository
 	paymentService payment.PaymentService
+	timeProvider   utils.TimeProvider
 }
 
-func NewService(repository Repository, paymentService payment.PaymentService) *Service {
+func NewService(repository Repository, paymentService payment.PaymentService, timeProvider utils.TimeProvider) *Service {
 	return &Service{
 		repository:     repository,
 		paymentService: paymentService,
+		timeProvider:   timeProvider,
 	}
 }
 

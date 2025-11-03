@@ -30,6 +30,7 @@ func NewHandler(database *pgxpool.Pool) http.Handler {
 		booking.NewService(
 			bookingrepo.NewRepository(database, timeProvider),
 			payment.NewService(),
+			timeProvider,
 		),
 	)
 	return Handler(proController, bookingController)

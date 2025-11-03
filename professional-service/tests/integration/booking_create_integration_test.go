@@ -18,7 +18,7 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 
 func NewTestBookingController(db *pgxpool.Pool, timeProvider utils.TimeProvider, userId int) *booking.Controller {
 	repository := mocks2.NewRepository(db, timeProvider)
-	service := booking.NewService(repository, &mocks.FakePaymentService{})
+	service := booking.NewService(repository, &mocks.FakePaymentService{}, timeProvider)
 	userService := &MockUserService{UserId: int64(userId)}
 	return booking.NewController(userService, service)
 }
