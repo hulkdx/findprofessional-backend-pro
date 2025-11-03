@@ -30,5 +30,11 @@ type CreateParams struct {
 }
 
 func (s *Service) Create(ctx context.Context, params *CreateParams) (*booking_model.CreateBookingResponse, error) {
+	return s.repository.WithTx(ctx, func() (*booking_model.CreateBookingResponse, error) {
+		return s.create(ctx, params)
+	})
+}
+
+func (s *Service) create(ctx context.Context, params *CreateParams) (*booking_model.CreateBookingResponse, error) {
 	return nil, nil
 }

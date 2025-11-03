@@ -15,7 +15,7 @@ func (r *RepositoryImpl) Create(ctx context.Context, request professional.Create
 
 	defer func() {
 		if err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 		}
 	}()
 
