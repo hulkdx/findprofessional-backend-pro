@@ -3,6 +3,7 @@ package booking
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
@@ -19,7 +20,13 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proID := chi.URLParam(r, "id")
+	proIdStr := chi.URLParam(r, "id")
+	proId, err := strconv.ParseInt(proIdStr, 10, 64)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	request, err := booking_model.ParseCreateRequest(r)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
@@ -27,7 +34,7 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := CreateParams{
-		ProId:          proID,
+		ProId:          proId,
 		UserId:         userId,
 		AmountInCents:  request.AmountInCents,
 		Currency:       request.Currency,

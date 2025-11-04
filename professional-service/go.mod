@@ -1,14 +1,15 @@
 module github.com/hulkdx/findprofessional-backend-pro/professional-service
 
 go 1.23.0
+
 toolchain go1.24.1
 
 require (
-	cloud.google.com/go v0.118.0
 	github.com/docker/go-connections v0.5.0
 	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/testcontainers/testcontainers-go v0.36.0
 	golang.org/x/crypto v0.36.0
@@ -73,6 +74,7 @@ require (
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
