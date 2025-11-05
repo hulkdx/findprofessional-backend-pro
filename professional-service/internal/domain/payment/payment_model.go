@@ -1,6 +1,10 @@
 package payment
 
 type PaymentRequest struct {
-	AmountsInCents int64  `json:"amounts_in_cents" validate:"required"`
-	Currency       string `json:"currency" validate:"required,max=50"`
+	AmountsInCents int64  `json:"amounts_in_cents"`
+	Currency       string `json:"currency"`
+	HoldId         int64  `json:"hold_id"`
+}
+
+type PaymentResponse struct {
 }

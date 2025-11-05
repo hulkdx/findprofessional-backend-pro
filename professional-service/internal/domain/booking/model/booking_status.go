@@ -1,4 +1,4 @@
-package booking_model
+package bookingmodel
 
 type BookingStatus string
 

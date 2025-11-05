@@ -8,4 +8,4 @@ var ErrDuplicate = errors.New("duplicate")
 
 var ErrNotFoundUser = errors.New("user not found")
 
-var ErrIdempotencyKeyExpired = errors.New("idempotency key expired")
+var ErrIdempotencyKeyIsUsed = errors.New("idempotency key is used")

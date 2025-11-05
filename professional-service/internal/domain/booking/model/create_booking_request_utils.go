@@ -1,4 +1,4 @@
-package booking_model
+package bookingmodel
 
 import (
 	"net/http"

@@ -1,7 +1,6 @@
-package booking_model
+package bookingmodel
 
 type CreateBookingResponse struct {
-	BookingID             int64                 `json:"booking_id"`
 	PaymentIntentResponse PaymentIntentResponse `json:"payment_intent_response"`
 }
 

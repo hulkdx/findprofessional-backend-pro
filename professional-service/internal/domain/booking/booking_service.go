@@ -2,20 +2,21 @@ package booking
 
 import (
 	"context"
+	"errors"
 	"time"
 
-	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 type Service struct {
 	repository     Repository
-	paymentService payment.PaymentService
+	paymentService payment.Service
 	timeProvider   utils.TimeProvider
 }
 
-func NewService(repository Repository, paymentService payment.PaymentService, timeProvider utils.TimeProvider) *Service {
+func NewService(repository Repository, paymentService payment.Service, timeProvider utils.TimeProvider) *Service {
 	return &Service{
 		repository:     repository,
 		paymentService: paymentService,
@@ -24,7 +25,7 @@ func NewService(repository Repository, paymentService payment.PaymentService, ti
 }
 
 type CreateParams struct {
-	Availabilities []booking_model.Availability
+	Availabilities []bookingmodel.Availability
 	IdempotencyKey string
 	AmountInCents  int64
 	Currency       string
@@ -33,18 +34,46 @@ type CreateParams struct {
 	Auth           string
 }
 
-func (s *Service) Create(ctx context.Context, params *CreateParams) (*booking_model.CreateBookingResponse, error) {
-	return s.repository.WithTx(ctx, func() (*booking_model.CreateBookingResponse, error) {
+func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
+	return s.repository.WithTx(ctx, func() (*bookingmodel.CreateBookingResponse, error) {
 		return s.create(ctx, params)
 	})
 }
 
-func (s *Service) create(ctx context.Context, params *CreateParams) (*booking_model.CreateBookingResponse, error) {
+func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
 	expiry := s.timeProvider.Now().UTC().Add(60 * time.Second)
-
-	_, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
+	holdId, err := s.getBookingHoldId(ctx, params, expiry)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	payResponse, err := s.paymentService.CreatePaymentIntent(
+		ctx,
+		holdId,
+		params.AmountInCents,
+		params.Currency,
+		params.IdempotencyKey,
+		params.Auth,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bookingmodel.CreateBookingResponse{
+		PaymentIntentResponse: *payResponse,
+	}, nil
+}
+
+func (s *Service) getBookingHoldId(ctx context.Context, params *CreateParams, expiry time.Time) (int64, error) {
+	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
+	if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
+		hold, err1 := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
+		if err1 != nil {
+			return -1, errors.Join(err, err1)
+		}
+		return hold.ID, nil
+	}
+	if err != nil {
+		return -1, err
+	}
+	return *holdId, nil
 }

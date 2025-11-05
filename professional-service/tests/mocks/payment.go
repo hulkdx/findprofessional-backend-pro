@@ -3,11 +3,18 @@ package mocks
 import (
 	"context"
 
-	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 )
 
 type FakePaymentService struct{}
 
-func (s *FakePaymentService) CreatePaymentIntent(ctx context.Context, userId int64, req *booking_model.CreateBookingRequest, auth string) (*booking_model.PaymentIntentResponse, error) {
-	return &booking_model.PaymentIntentResponse{}, nil
+func (s *FakePaymentService) CreatePaymentIntent(
+	ctx context.Context,
+	holdId int64,
+	AmountInCents int64,
+	Currency string,
+	IdempotencyKey string,
+	auth string,
+) (*bookingmodel.PaymentIntentResponse, error) {
+	return &bookingmodel.PaymentIntentResponse{}, nil
 }

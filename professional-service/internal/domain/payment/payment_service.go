@@ -5,26 +5,28 @@ import (
 	"fmt"
 	"net/http"
 
-	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 )
 
 const baseUrl = "http://payment-service:8082"
 
-type PaymentService interface {
+type Service interface {
 	CreatePaymentIntent(
 		ctx context.Context,
-		userId int64,
-		req *booking_model.CreateBookingRequest,
+		holdId int64,
+		AmountInCents int64,
+		Currency string,
+		IdempotencyKey string,
 		auth string,
-	) (*booking_model.PaymentIntentResponse, error)
+	) (*bookingmodel.PaymentIntentResponse, error)
 }
 
 type paymentServiceImpl struct {
 	httpClient *http.Client
 }
 
-func NewService() PaymentService {
+func NewService() Service {
 	return &paymentServiceImpl{
 		httpClient: utils.CreateDefaultAppHttpClient(),
 	}
@@ -32,19 +34,22 @@ func NewService() PaymentService {
 
 func (s *paymentServiceImpl) CreatePaymentIntent(
 	ctx context.Context,
-	userId int64,
-	req *booking_model.CreateBookingRequest,
+	holdId int64,
+	AmountInCents int64,
+	Currency string,
+	IdempotencyKey string,
 	auth string,
-) (*booking_model.PaymentIntentResponse, error) {
+) (*bookingmodel.PaymentIntentResponse, error) {
 	url := fmt.Sprintf("%s/payments/create-intent", baseUrl)
 	request := &PaymentRequest{
-		AmountsInCents: req.AmountInCents,
-		Currency:       req.Currency,
+		AmountsInCents: AmountInCents,
+		Currency:       Currency,
+		HoldId:         holdId,
 	}
-	var response booking_model.PaymentIntentResponse
+	var response bookingmodel.PaymentIntentResponse
 	requestHeader := &http.Header{}
 	requestHeader.Set("Authorization", auth)
-	requestHeader.Set("Idempotency-Key", req.IdempotencyKey)
+	requestHeader.Set("Idempotency-Key", IdempotencyKey)
 	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response, requestHeader)
 	return &response, err
 }

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
-	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
@@ -27,7 +27,7 @@ func NewRepository(db *pgxpool.Pool, timeProvider utils.TimeProvider) booking.Re
 	}
 }
 
-func (r *repositoryImpl) WithTx(ctx context.Context, fn booking.WithTxFunc) (*booking_model.CreateBookingResponse, error) {
+func (r *repositoryImpl) WithTx(ctx context.Context, fn booking.WithTxFunc) (*bookingmodel.CreateBookingResponse, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -62,10 +62,21 @@ func (r *repositoryImpl) InsertBookingHolds(ctx context.Context, UserId int64, I
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation && pgErr.ConstraintName == "booking_holds_user_ik_uk" {
-			return nil, utils.ErrIdempotencyKeyExpired
+			return nil, utils.ErrIdempotencyKeyIsUsed
 		}
 		return nil, err
 	}
 
+	return &holdId, nil
+}
+
+func (r *repositoryImpl) GetBookingHold(ctx context.Context, userId int64, idempotencyKey string) (*bookingmodel.BookingHold, error) {
+	query := `SELECT * FROM booking_holds WHERE user_id = $1 AND idempotency_key = $2;`
+	row := r.tx.QueryRow(ctx, query, userId, idempotencyKey)
+
+	var holdId bookingmodel.BookingHold
+	if err := row.Scan(&holdId); err != nil {
+		return nil, err
+	}
 	return &holdId, nil
 }

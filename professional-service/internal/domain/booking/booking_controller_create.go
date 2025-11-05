@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	booking_model "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils/logger"
 )
@@ -27,7 +27,7 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request, err := booking_model.ParseCreateRequest(r)
+	request, err := bookingmodel.ParseCreateRequest(r)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
