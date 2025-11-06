@@ -11,10 +11,10 @@ import (
 
 // TODO: Change timeouts for production
 const (
-	DEFAULT_SERVER_PORT          = "8081"
-	DEFAULT_SERVER_READ_TIMEOUT  = 10 * time.Second
-	DEFAULT_SERVER_WRITE_TIMEOUT = 20 * time.Second
-	DEFAULT_SERVER_IDLE_TIMEOUT  = 30 * time.Second
+	DefaultServerPort         = "8081"
+	DefaultServerReadTimeout  = 10 * time.Second
+	DefaultServerWriteTimeout = 20 * time.Second
+	DefaultServerIdleTimeout  = 30 * time.Second
 )
 
 type Config struct {
@@ -40,10 +40,10 @@ type DatabaseConfig struct {
 func Load() *Config {
 	cfg := &Config{
 		Server: &ServerConfig{
-			Port:         utils.GetEnv("server_port", DEFAULT_SERVER_PORT),
-			ReadTimeout:  utils.GetEnvTime("server_read_timeout", DEFAULT_SERVER_READ_TIMEOUT),
-			WriteTimeout: utils.GetEnvTime("server_write_timeout", DEFAULT_SERVER_WRITE_TIMEOUT),
-			IdleTimeout:  utils.GetEnvTime("server_idle_timeout", DEFAULT_SERVER_IDLE_TIMEOUT),
+			Port:         utils.GetEnv("server_port", DefaultServerPort),
+			ReadTimeout:  utils.GetEnvTime("server_read_timeout", DefaultServerReadTimeout),
+			WriteTimeout: utils.GetEnvTime("server_write_timeout", DefaultServerWriteTimeout),
+			IdleTimeout:  utils.GetEnvTime("server_idle_timeout", DefaultServerIdleTimeout),
 		},
 		Database: LoadDataBaseConfig(),
 	}
