@@ -35,7 +35,6 @@ type CreateParams struct {
 }
 
 func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
-	// TODO: validation
 	return s.repository.WithTx(ctx, func() (*bookingmodel.CreateBookingResponse, error) {
 		return s.create(ctx, params)
 	})
@@ -43,13 +42,23 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 
 func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
 	expiry := s.timeProvider.Now().UTC().Add(60 * time.Second)
-	holdId, err := s.getBookingHoldId(ctx, params, expiry)
-	if err != nil {
+
+	// 1.
+	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
+	if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
+		hold, err1 := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
+		if err1 != nil {
+			return nil, errors.Join(err, err1)
+		}
+		holdId = &hold.ID
+	} else if err != nil {
 		return nil, err
 	}
+
+	// 2.
 	payResponse, err := s.paymentService.CreatePaymentIntent(
 		ctx,
-		holdId,
+		*holdId,
 		params.AmountInCents,
 		params.Currency,
 		params.IdempotencyKey,
@@ -62,19 +71,4 @@ func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmod
 	return &bookingmodel.CreateBookingResponse{
 		PaymentIntentResponse: *payResponse,
 	}, nil
-}
-
-func (s *Service) getBookingHoldId(ctx context.Context, params *CreateParams, expiry time.Time) (int64, error) {
-	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
-	if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
-		hold, err1 := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
-		if err1 != nil {
-			return -1, errors.Join(err, err1)
-		}
-		return hold.ID, nil
-	}
-	if err != nil {
-		return -1, err
-	}
-	return *holdId, nil
 }
