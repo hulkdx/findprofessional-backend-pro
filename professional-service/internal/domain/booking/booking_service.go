@@ -43,19 +43,26 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
 	expiry := s.timeProvider.Now().UTC().Add(60 * time.Second)
 
-	// 1.
 	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
-	if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
+	if err == nil {
+		err1 := s.repository.InsertBookingHoldItems(ctx, *holdId, params.Availabilities, expiry, params.ProId)
+		if err1 != nil {
+			return nil, errors.Join(err, err1)
+		}
+	} else if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
 		hold, err1 := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
 		if err1 != nil {
 			return nil, errors.Join(err, err1)
 		}
+		err1 = s.repository.EnsureAvailabilitiesBelongToProfessional(ctx, params.Availabilities, params.ProId)
+		if err1 != nil {
+			return nil, errors.Join(err, err1)
+		}
 		holdId = &hold.ID
-	} else if err != nil {
+	} else {
 		return nil, err
 	}
 
-	// 2.
 	payResponse, err := s.paymentService.CreatePaymentIntent(
 		ctx,
 		*holdId,

@@ -32,6 +32,14 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	if len(request.Availabilities) == 0 {
+		utils.WriteError(w, http.StatusBadRequest, "no availabilities")
+		return
+	}
+	if len(request.Availabilities) > 48 {
+		utils.WriteError(w, http.StatusBadRequest, "invalid availability size > 48")
+		return
+	}
 
 	params := CreateParams{
 		ProId:          proId,
@@ -42,7 +50,7 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		Auth:           auth,
 		Availabilities: request.Availabilities,
 	}
-	booking, err := c.service.Create(ctx, &params)
+	response, err := c.service.Create(ctx, &params)
 	if err != nil {
 		var safe *utils.SafeHttpError
 		if errors.As(err, &safe) {
@@ -52,6 +60,6 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	logger.Debug("booking created:", booking)
-	utils.WriteJSON(w, http.StatusOK, booking)
+	logger.Debug("response created:", response)
+	utils.WriteJSON(w, http.StatusOK, response)
 }

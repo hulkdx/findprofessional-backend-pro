@@ -2,6 +2,7 @@ package bookingrepo
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
@@ -79,4 +80,75 @@ func (r *repositoryImpl) GetBookingHold(ctx context.Context, userId int64, idemp
 		return nil, err
 	}
 	return &holdId, nil
+}
+
+func (r *repositoryImpl) InsertBookingHoldItems(
+	ctx context.Context,
+	holdId int64,
+	availabilities []bookingmodel.Availability,
+	expiry time.Time,
+	professionalId int64,
+) error {
+	now := r.timeProvider.Now()
+	rows := make([][]any, len(availabilities))
+	ids := make([]int64, len(availabilities))
+	for i, a := range availabilities {
+		rows[i] = []any{
+			holdId,
+			a.Id,
+			now,
+			expiry,
+		}
+		ids[i] = a.Id
+	}
+
+	err := r.ensureAvailabilitiesBelongToProfessional(ctx, ids, professionalId)
+	if err != nil {
+		return err
+	}
+
+	count, err := r.tx.CopyFrom(
+		ctx,
+		pgx.Identifier{"booking_hold_items"},
+		[]string{"hold_id", "availability_id", "created_at", "expires_at"},
+		pgx.CopyFromRows(rows),
+	)
+	if err != nil {
+		return err
+	}
+	if count != int64(len(availabilities)) {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (r *repositoryImpl) EnsureAvailabilitiesBelongToProfessional(
+	ctx context.Context,
+	availabilities []bookingmodel.Availability,
+	professionalId int64,
+) error {
+	ids := make([]int64, len(availabilities))
+	for i, a := range availabilities {
+		ids[i] = a.Id
+	}
+	return r.ensureAvailabilitiesBelongToProfessional(ctx, ids, professionalId)
+}
+
+func (r *repositoryImpl) ensureAvailabilitiesBelongToProfessional(
+	ctx context.Context,
+	ids []int64,
+	professionalId int64,
+) error {
+	query := `SELECT EXISTS (
+		SELECT id FROM professional_availability WHERE id = ANY($1::bigint[]) AND professional_id <> $2)`
+	var hasMismatch bool
+	err := r.tx.QueryRow(ctx, query, ids, professionalId).Scan(&hasMismatch)
+	if err != nil {
+		return err
+	}
+	if hasMismatch {
+		return utils.ErrAvailabilityOwnershipMismatch
+	}
+	return nil
 }
