@@ -17,8 +17,9 @@ type Service interface {
 		holdId int64,
 		AmountInCents int64,
 		Currency string,
-		IdempotencyKey string,
+		idempotencyKey string,
 		auth string,
+		professionalId int64,
 	) (*bookingmodel.PaymentIntentResponse, error)
 }
 
@@ -37,19 +38,21 @@ func (s *paymentServiceImpl) CreatePaymentIntent(
 	holdId int64,
 	AmountInCents int64,
 	Currency string,
-	IdempotencyKey string,
+	idempotencyKey string,
 	auth string,
+	professionalId int64,
 ) (*bookingmodel.PaymentIntentResponse, error) {
 	url := fmt.Sprintf("%s/payments/create-intent", baseUrl)
 	request := &PaymentRequest{
 		AmountsInCents: AmountInCents,
 		Currency:       Currency,
 		HoldId:         holdId,
+		ProfessionalId: professionalId,
 	}
 	var response bookingmodel.PaymentIntentResponse
 	requestHeader := &http.Header{}
 	requestHeader.Set("Authorization", auth)
-	requestHeader.Set("Idempotency-Key", IdempotencyKey)
+	requestHeader.Set("Idempotency-Key", idempotencyKey)
 	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response, requestHeader)
 	return &response, err
 }

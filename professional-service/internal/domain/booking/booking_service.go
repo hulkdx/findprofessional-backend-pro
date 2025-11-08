@@ -70,6 +70,7 @@ func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmod
 		params.Currency,
 		params.IdempotencyKey,
 		params.Auth,
+		params.ProId,
 	)
 	if err != nil {
 		return nil, err
