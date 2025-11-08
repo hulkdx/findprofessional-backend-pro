@@ -49,7 +49,7 @@ type FakeRepository struct {
 	InsertBookingHoldsErrResponse error
 }
 
-func (r *FakeRepository) WithTx(ctx context.Context, fn WithTxFunc) (*bookingmodel.CreateBookingResponse, error) {
+func (r *FakeRepository) WithTx(ctx context.Context, fn WithTxFunc) (*int64, error) {
 	return nil, nil
 }
 
@@ -60,4 +60,12 @@ func (r *FakeRepository) InsertBookingHolds(ctx context.Context, UserId int64, I
 
 func (r *FakeRepository) GetBookingHold(ctx context.Context, userId int64, idempotencyKey string) (*bookingmodel.BookingHold, error) {
 	return nil, nil
+}
+
+func (r *FakeRepository) InsertBookingHoldItems(ctx context.Context, holdId int64, availabilities []bookingmodel.Availability, expiry time.Time, professionalId int64) error {
+	return nil
+}
+
+func (r *FakeRepository) EnsureAvailabilitiesBelongToProfessional(ctx context.Context, availabilities []bookingmodel.Availability, professionalId int64) error {
+	return nil
 }
