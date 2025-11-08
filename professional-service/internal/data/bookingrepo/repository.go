@@ -9,9 +9,7 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
-	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -58,13 +56,14 @@ func (r *repositoryImpl) InsertBookingHolds(ctx context.Context, UserId int64, I
 	createdAt := r.timeProvider.Now()
 	var holdId int64
 
-	query := `INSERT INTO booking_holds (user_id, idempotency_key, created_at, expires_at) VALUES ($1, $2, $3, $4) RETURNING id;`
+	query := `INSERT INTO booking_holds (user_id, idempotency_key, created_at, expires_at) VALUES ($1, $2, $3, $4) 
+       ON CONFLICT (user_id, idempotency_key) DO NOTHING
+       RETURNING id;`
 	err := r.tx.QueryRow(ctx, query, UserId, IdempotencyKey, createdAt, expiry).Scan(&holdId)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, utils.ErrIdempotencyKeyIsUsed
+	}
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation && pgErr.ConstraintName == "booking_holds_user_ik_uk" {
-			return nil, utils.ErrIdempotencyKeyIsUsed
-		}
 		return nil, err
 	}
 
