@@ -35,12 +35,32 @@ type CreateParams struct {
 }
 
 func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
-	return s.repository.WithTx(ctx, func() (*bookingmodel.CreateBookingResponse, error) {
-		return s.create(ctx, params)
+	holdId, err := s.repository.WithTx(ctx, func() (*int64, error) {
+		return s.createTx(ctx, params)
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	payResponse, err := s.paymentService.CreatePaymentIntent(
+		ctx,
+		*holdId,
+		params.AmountInCents,
+		params.Currency,
+		params.IdempotencyKey,
+		params.Auth,
+		params.ProId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bookingmodel.CreateBookingResponse{
+		PaymentIntentResponse: *payResponse,
+	}, nil
 }
 
-func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
+func (s *Service) createTx(ctx context.Context, params *CreateParams) (*int64, error) {
 	expiry := s.timeProvider.Now().UTC().Add(60 * time.Second)
 
 	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
@@ -63,20 +83,5 @@ func (s *Service) create(ctx context.Context, params *CreateParams) (*bookingmod
 		return nil, err
 	}
 
-	payResponse, err := s.paymentService.CreatePaymentIntent(
-		ctx,
-		*holdId,
-		params.AmountInCents,
-		params.Currency,
-		params.IdempotencyKey,
-		params.Auth,
-		params.ProId,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &bookingmodel.CreateBookingResponse{
-		PaymentIntentResponse: *payResponse,
-	}, nil
+	return holdId, nil
 }

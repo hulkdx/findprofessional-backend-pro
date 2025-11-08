@@ -7,10 +7,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 )
 
-type WithTxFunc = func() (*bookingmodel.CreateBookingResponse, error)
+type WithTxFunc = func() (*int64, error)
 
 type Repository interface {
-	WithTx(ctx context.Context, fn WithTxFunc) (*bookingmodel.CreateBookingResponse, error)
+	WithTx(ctx context.Context, fn WithTxFunc) (*int64, error)
 	InsertBookingHolds(ctx context.Context, UserId int64, IdempotencyKey string, expiry time.Time) (*int64, error)
 	GetBookingHold(ctx context.Context, userId int64, idempotencyKey string) (*bookingmodel.BookingHold, error)
 	InsertBookingHoldItems(

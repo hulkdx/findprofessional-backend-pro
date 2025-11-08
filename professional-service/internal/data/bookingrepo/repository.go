@@ -28,7 +28,7 @@ func NewRepository(db *pgxpool.Pool, timeProvider utils.TimeProvider) booking.Re
 	}
 }
 
-func (r *repositoryImpl) WithTx(ctx context.Context, fn booking.WithTxFunc) (*bookingmodel.CreateBookingResponse, error) {
+func (r *repositoryImpl) WithTx(ctx context.Context, fn booking.WithTxFunc) (*int64, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
