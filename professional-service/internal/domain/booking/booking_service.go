@@ -26,13 +26,14 @@ func NewService(repository Repository, paymentService payment.Service, timeProvi
 }
 
 type CreateParams struct {
-	Availabilities []bookingmodel.Availability
-	IdempotencyKey string
-	AmountInCents  int64
-	Currency       string
-	UserId         int64
-	ProId          int64
-	Auth           string
+	Availabilities   []bookingmodel.Availability
+	IdempotencyKey   string
+	AmountInCents    int64
+	Currency         string
+	UserId           int64
+	ProId            int64
+	Auth             string
+	StripeApiVersion string
 }
 
 func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {

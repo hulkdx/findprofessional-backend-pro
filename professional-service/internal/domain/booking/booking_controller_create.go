@@ -42,13 +42,14 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := CreateParams{
-		ProId:          proId,
-		UserId:         userId,
-		AmountInCents:  request.AmountInCents,
-		Currency:       request.Currency,
-		IdempotencyKey: request.IdempotencyKey,
-		Auth:           auth,
-		Availabilities: request.Availabilities,
+		ProId:            proId,
+		UserId:           userId,
+		AmountInCents:    request.AmountInCents,
+		Currency:         request.Currency,
+		IdempotencyKey:   request.IdempotencyKey,
+		Auth:             auth,
+		Availabilities:   request.Availabilities,
+		StripeApiVersion: request.StripeApiVersion,
 	}
 	response, err := c.service.Create(ctx, &params)
 	if err != nil {
