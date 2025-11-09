@@ -36,7 +36,7 @@ type CreateParams struct {
 	StripeApiVersion string
 }
 
-func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.CreateBookingResponse, error) {
+func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmodel.PaymentResponse, error) {
 	holdId, err := s.repository.WithTx(ctx, func() (*int64, error) {
 		return s.createTx(ctx, params)
 	})
@@ -56,13 +56,8 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 	)
 	if err != nil {
 		logger.Error("Failed to create payment intent", err)
-		return nil, err
 	}
-
-	logger.Debug("Booking creation completed successfully for user", params.UserId)
-	return &bookingmodel.CreateBookingResponse{
-		PaymentIntentResponse: *payResponse,
-	}, nil
+	return payResponse, err
 }
 
 func (s *Service) createTx(ctx context.Context, params *CreateParams) (*int64, error) {

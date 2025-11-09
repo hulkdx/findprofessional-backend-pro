@@ -16,6 +16,6 @@ func (s *FakePaymentService) CreatePaymentIntent(
 	idempotencyKey string,
 	auth string,
 	professionalId int64,
-) (*bookingmodel.PaymentIntentResponse, error) {
-	return &bookingmodel.PaymentIntentResponse{}, nil
+) (*bookingmodel.PaymentResponse, error) {
+	return &bookingmodel.PaymentResponse{}, nil
 }
