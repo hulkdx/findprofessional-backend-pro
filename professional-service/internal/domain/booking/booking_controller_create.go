@@ -52,9 +52,9 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	response, err := c.service.Create(ctx, &params)
 	if err != nil {
-		var safe *utils.SafeHttpError
-		if errors.As(err, &safe) {
-			utils.WriteError(w, http.StatusBadRequest, err.Error())
+		var httpError *utils.HttpError
+		if errors.As(err, &httpError) {
+			utils.WriteError(w, httpError.Status, err.Error())
 		} else {
 			utils.WriteGeneralError(w, utils.ErrUnknown)
 		}

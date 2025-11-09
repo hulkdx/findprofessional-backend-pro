@@ -139,15 +139,51 @@ func (r *repositoryImpl) ensureAvailabilitiesBelongToProfessional(
 	ids []int64,
 	professionalId int64,
 ) error {
-	query := `SELECT EXISTS (
-		SELECT id FROM professional_availability WHERE id = ANY($1::bigint[]) AND professional_id <> $2)`
-	var hasMismatch bool
-	err := r.tx.QueryRow(ctx, query, ids, professionalId).Scan(&hasMismatch)
+	uniqueIds := uniqueInt64(ids)
+	query := `SELECT id, professional_id FROM professional_availability WHERE id = ANY($1::bigint[])`
+
+	rows, err := r.tx.Query(ctx, query, uniqueIds)
 	if err != nil {
 		return err
 	}
-	if hasMismatch {
-		return utils.ErrAvailabilityOwnershipMismatch
+	defer rows.Close()
+
+	found := make(map[int64]int64, len(uniqueIds))
+	for rows.Next() {
+		var availabilityId int64
+		var proId int64
+		if err := rows.Scan(&availabilityId, &proId); err != nil {
+			return err
+		}
+		found[availabilityId] = proId
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	if len(found) != len(uniqueIds) {
+		return utils.ErrAvailabilityDoesNotExist
+	}
+	for _, proId := range found {
+		if proId != professionalId {
+			return utils.ErrAvailabilityOwnershipMismatch
+		}
 	}
 	return nil
+}
+
+func uniqueInt64(ids []int64) []int64 {
+	if len(ids) == 0 {
+		return nil
+	}
+	seen := make(map[int64]struct{}, len(ids))
+	result := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		result = append(result, id)
+	}
+	return result
 }
