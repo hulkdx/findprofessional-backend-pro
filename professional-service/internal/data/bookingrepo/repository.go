@@ -74,11 +74,11 @@ func (r *repositoryImpl) GetBookingHold(ctx context.Context, userId int64, idemp
 	query := `SELECT (id, user_id, idempotency_key, created_at, expires_at) FROM booking_holds WHERE user_id = $1 AND idempotency_key = $2;`
 	row := r.tx.QueryRow(ctx, query, userId, idempotencyKey)
 
-	var holdId bookingmodel.BookingHold
-	if err := row.Scan(&holdId); err != nil {
+	var bookingHold bookingmodel.BookingHold
+	if err := row.Scan(&bookingHold); err != nil {
 		return nil, err
 	}
-	return &holdId, nil
+	return &bookingHold, nil
 }
 
 func (r *repositoryImpl) InsertBookingHoldItems(
