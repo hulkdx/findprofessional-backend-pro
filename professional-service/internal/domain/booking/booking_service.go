@@ -63,35 +63,28 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 func (s *Service) createTx(ctx context.Context, params *CreateParams) (*int64, error) {
 	expiry := s.timeProvider.Now().UTC().Add(60 * time.Second)
 
-	logger.Debug("Starting booking creation for user", params.UserId, "with idempotency key", params.IdempotencyKey)
 	holdId, err := s.repository.InsertBookingHolds(ctx, params.UserId, params.IdempotencyKey, expiry)
-	if err == nil {
-		logger.Debug("Created new booking hold with ID", *holdId)
-		err1 := s.repository.InsertBookingHoldItems(ctx, *holdId, params.Availabilities, expiry, params.ProId)
-		if err1 != nil {
-			logger.Error("Failed to insert booking hold items", err1)
-			return nil, errors.Join(err, err1)
+	if err != nil {
+		if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
+			return s.getBookingHold(ctx, params)
 		}
-		logger.Debug("Successfully inserted booking hold items for hold ID", *holdId)
-	} else if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
-		logger.Debug("Idempotency key already used, retrieving existing hold")
-		hold, err1 := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
-		if err1 != nil {
-			logger.Error("Failed to get existing booking hold", err1)
-			return nil, errors.Join(err, err1)
-		}
-		logger.Debug("Retrieved existing booking hold with ID", hold.ID)
-		err1 = s.repository.EnsureAvailabilitiesBelongToProfessional(ctx, params.Availabilities, params.ProId)
-		if err1 != nil {
-			logger.Error("Availabilities validation failed", err1)
-			return nil, errors.Join(err, err1)
-		}
-		logger.Debug("Validated availabilities belong to professional", params.ProId)
-		holdId = &hold.ID
-	} else {
-		logger.Error("Failed to insert booking hold", err)
 		return nil, err
 	}
-
+	err = s.repository.InsertBookingHoldItems(ctx, *holdId, params.Availabilities, expiry, params.ProId)
+	if err != nil {
+		return nil, err
+	}
 	return holdId, nil
+}
+
+func (s *Service) getBookingHold(ctx context.Context, params *CreateParams) (*int64, error) {
+	hold, err := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
+	if err != nil {
+		return nil, err
+	}
+	err = s.repository.EnsureAvailabilitiesBelongToProfessional(ctx, params.Availabilities, params.ProId)
+	if err != nil {
+		return nil, err
+	}
+	return &hold.ID, nil
 }
