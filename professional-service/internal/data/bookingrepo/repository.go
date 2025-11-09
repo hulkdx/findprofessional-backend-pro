@@ -9,7 +9,9 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -113,6 +115,10 @@ func (r *repositoryImpl) InsertBookingHoldItems(
 		pgx.CopyFromRows(rows),
 	)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.ForeignKeyViolation {
+			return utils.ErrAvailabilityDoesNotExist
+		}
 		return err
 	}
 	if count != int64(len(availabilities)) {
@@ -140,7 +146,7 @@ func (r *repositoryImpl) ensureAvailabilitiesBelongToProfessional(
 	professionalId int64,
 ) error {
 	query := `SELECT EXISTS (
-		SELECT id FROM professional_availability WHERE id = ANY($1::bigint[]) AND professional_id <> $2)`
+		SELECT id FROM professional_availability WHERE id = ANY($1) AND professional_id <> $2)`
 	var hasMismatch bool
 	err := r.tx.QueryRow(ctx, query, ids, professionalId).Scan(&hasMismatch)
 	if err != nil {
