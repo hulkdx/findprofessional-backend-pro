@@ -68,10 +68,12 @@ func (s *Service) createTx(ctx context.Context, params *CreateParams) (*int64, e
 		if errors.Is(err, utils.ErrIdempotencyKeyIsUsed) {
 			return s.getBookingHold(ctx, params)
 		}
+		logger.Error("Failed to insert booking hold", err)
 		return nil, err
 	}
 	err = s.repository.InsertBookingHoldItems(ctx, *holdId, params.Availabilities, expiry, params.ProId)
 	if err != nil {
+		logger.Error("Failed to insert booking hold items", err)
 		return nil, err
 	}
 	return holdId, nil
@@ -80,10 +82,12 @@ func (s *Service) createTx(ctx context.Context, params *CreateParams) (*int64, e
 func (s *Service) getBookingHold(ctx context.Context, params *CreateParams) (*int64, error) {
 	hold, err := s.repository.GetBookingHold(ctx, params.UserId, params.IdempotencyKey)
 	if err != nil {
+		logger.Error("Failed to get booking hold", err)
 		return nil, err
 	}
 	err = s.repository.EnsureAvailabilitiesBelongToProfessional(ctx, params.Availabilities, params.ProId)
 	if err != nil {
+		logger.Error("availabilities is not belonging to the professional id: ", err)
 		return nil, err
 	}
 	return &hold.ID, nil
