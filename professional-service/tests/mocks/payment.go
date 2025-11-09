@@ -6,7 +6,10 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
 )
 
-type FakePaymentService struct{}
+type FakePaymentService struct {
+	CreatePaymentIntentSuccess *bookingmodel.PaymentResponse
+	CreatePaymentIntentError   error
+}
 
 func (s *FakePaymentService) CreatePaymentIntent(
 	ctx context.Context,
@@ -17,5 +20,5 @@ func (s *FakePaymentService) CreatePaymentIntent(
 	auth string,
 	professionalId int64,
 ) (*bookingmodel.PaymentResponse, error) {
-	return &bookingmodel.PaymentResponse{}, nil
+	return s.CreatePaymentIntentSuccess, s.CreatePaymentIntentError
 }

@@ -19,7 +19,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// noinspection GoUnhandledErrorResult
 func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 	timeProvider := &mocks.FakeTimeProvider{}
 	userId := 1
@@ -28,6 +27,14 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
+		expectedResponse := &bookingmodel.PaymentResponse{
+			PaymentIntent:               "payment_intent",
+			Customer:                    "customer",
+			PublishableKey:              "publishable_key",
+			CustomerSessionClientSecret: "session_client_secret",
+		}
+		paymentService.CreatePaymentIntentSuccess = expectedResponse
+
 		proId := 1
 		idempotencyKey := "019a4eb2-edb4-7068-b1cb-89bbaee6581f"
 
@@ -58,7 +65,7 @@ func BookingCreateTest(t *testing.T, db *pgxpool.Pool) {
 		handler.ServeHTTP(response, request)
 		// Assert
 		assert.Equal(t, response.Code, http.StatusOK)
-		assert.Equal(t, response.Body.String(), http.StatusOK)
+		assert.EqualJSON(t, response.Body.String(), expectedResponse)
 	})
 
 	t.Run("when availability_id doesn't exists return error 404", func(t *testing.T) {
