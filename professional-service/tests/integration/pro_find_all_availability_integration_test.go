@@ -57,7 +57,10 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		}
 
 		d1 := insertEmptyPro(t, db)
-		_, d2 := insertAvailability(t, db, expected...)
+		ids, d2 := insertAvailability(t, db, expected...)
+		expected[0].ID = ids[0]
+		expected[1].ID = ids[1]
+
 		defer d2()
 		defer d1()
 
