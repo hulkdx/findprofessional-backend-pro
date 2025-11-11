@@ -16,7 +16,7 @@ import (
 )
 
 func NewHandler(database *pgxpool.Pool) http.Handler {
-	timeProvider := &utils.RealTimerProvider{}
+	timeProvider := &utils.RealTimeProvider{}
 	userService := user.NewService()
 	proController := professional.NewController(
 		professional.NewService(
