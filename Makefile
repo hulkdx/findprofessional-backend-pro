@@ -37,8 +37,9 @@ dev:
 
 .PHONY: clear-minikube-psql-cache
 clear-minikube-psql-cache:
-	@eval $$(minikube docker-env); \
-	docker volume rm --force psql_cache
+	PV=$$(kubectl get pvc data-postgresdb-0 -o jsonpath='{.spec.volumeName}'); \
+	HOST=$$(kubectl get pv $$PV -o jsonpath='{.spec.hostPath.path}'); \
+	minikube ssh -- "sudo rm -rf $$HOST"
 
 .PHONY: docker-build
 docker-build:
