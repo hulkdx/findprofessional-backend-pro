@@ -14,7 +14,7 @@ import (
 )
 
 func FindAllRatingProfessionalTest(t *testing.T, db *pgxpool.Pool) {
-	handler := router.Handler(NewTestController(db), nil)
+	handler := router.Handler(NewTestController(db))
 
 	t.Run("proffesional got give 5 star ratings from all users", func(t *testing.T) {
 		// Arrange

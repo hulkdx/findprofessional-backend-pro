@@ -209,48 +209,6 @@ func insertReview(t *testing.T, pool *pgxpool.Pool, review ...professional.Revie
 	}
 }
 
-func insertBookingHolds(
-	t *testing.T,
-	pool *pgxpool.Pool,
-	userId int,
-	idempotency string,
-	createdAt time.Time,
-	expiresAt time.Time,
-) func() {
-	ctx := context.Background()
-
-	query := `
-        INSERT INTO "booking_holds"
-            ("user_id", "idempotency_key", "created_at", "expires_at")
-        VALUES
-            ($1, $2, $3, $4)
-    `
-
-	tx, err := pool.Begin(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, execErr := tx.Exec(ctx, query,
-		userId,
-		idempotency,
-		createdAt,
-		expiresAt,
-	)
-	if execErr != nil {
-		_ = tx.Rollback(ctx)
-		t.Fatal(execErr)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		t.Fatal(err)
-	}
-
-	return func() {
-		_, _ = pool.Exec(ctx, `DELETE FROM booking_holds;`)
-	}
-}
-
 // insertUserWithId inserts users that have their ID = email, for example.
 func insertUserWithId(t *testing.T, pool *pgxpool.Pool, userIDs ...int) func() {
 	users := []user.User{}

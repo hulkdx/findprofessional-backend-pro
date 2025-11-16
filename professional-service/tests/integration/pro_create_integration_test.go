@@ -17,7 +17,7 @@ import (
 )
 
 func CreateProTest(t *testing.T, db *pgxpool.Pool) {
-	handler := router.Handler(NewTestController(db), nil)
+	handler := router.Handler(NewTestController(db))
 
 	t.Run("not found a record, create a new record", func(t *testing.T) {
 		// Arrange
