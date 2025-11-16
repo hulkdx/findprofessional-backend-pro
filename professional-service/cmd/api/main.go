@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,7 +25,7 @@ func main() {
 	defer db.Close(database)
 
 	handler := router.NewHandler(database)
-	server := newServer(cfg, handler)
+	server := newServer(ctx, cfg, handler)
 	<-listenAndServe(server)
 	err := shutdown(server)
 	if err != nil {
@@ -34,13 +35,14 @@ func main() {
 	}
 }
 
-func newServer(cfg *config.Config, handler http.Handler) *http.Server {
+func newServer(ctx context.Context, cfg *config.Config, handler http.Handler) *http.Server {
 	return &http.Server{
 		Addr:         cfg.Server.Addr(),
 		Handler:      handler,
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
+		BaseContext:  func(net.Listener) context.Context { return ctx },
 	}
 }
 

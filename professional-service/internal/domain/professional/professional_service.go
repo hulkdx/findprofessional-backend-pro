@@ -3,13 +3,13 @@ package professional
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
-
-var pgErrUniqueViolation = "23505"
 
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
@@ -47,10 +47,11 @@ func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
 
 	err = s.repository.Create(ctx, r, pending)
 
-	if pqErr, ok := err.(*pgconn.PgError); ok && pqErr.Code == pgErrUniqueViolation {
+	var pqErr *pgconn.PgError
+	if errors.As(err, &pqErr) && pqErr.Code == pgerrcode.UniqueViolation {
 		return utils.ErrDuplicate
 	}
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return utils.ErrNotFoundUser
 	}
 	return err

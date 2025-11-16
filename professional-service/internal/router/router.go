@@ -4,11 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/bookingrepo"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/data/professionalrepo"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking"
-	_ "github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/booking/model"
-	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/payment"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/user"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/utils"
@@ -25,25 +21,16 @@ func NewHandler(database *pgxpool.Pool) http.Handler {
 		userService,
 		timeProvider,
 	)
-	bookingController := booking.NewController(
-		userService,
-		booking.NewService(
-			bookingrepo.NewRepository(database, timeProvider),
-			payment.NewService(),
-		),
-	)
-	return Handler(proController, bookingController)
+	return Handler(proController)
 }
 
-func Handler(proController *professional.Controller, bookingController *booking.Controller) http.Handler {
+func Handler(proController *professional.Controller) http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(ContentTypeJsonMiddleware)
 
 	normalUser(router, proController)
 	proUser(router, proController)
-
-	normalUserBooking(router, bookingController)
 
 	return router
 }
@@ -63,14 +50,4 @@ func proUser(router *chi.Mux, controller *professional.Controller) {
 	router.Get("/professional/availability", controller.GetAvailability)
 	// update availability of current pro user
 	router.Post("/professional/availability", controller.UpdateAvailability)
-}
-
-func normalUserBooking(router *chi.Mux, controller *booking.Controller) {
-	//
-	// Create a booking for a professional using stripe payment intent
-	// ---
-	// Request: booking_model.CreateBookingRequest
-	// Response: booking_model.CreateBookingResponse
-	//
-	router.Post("/professional/{id}/booking", controller.Create)
 }

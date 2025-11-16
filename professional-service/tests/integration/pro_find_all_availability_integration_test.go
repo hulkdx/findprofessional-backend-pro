@@ -9,12 +9,13 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/router"
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/assert"
+	"github.com/hulkdx/findprofessional-backend-pro/professional-service/tests/mocks"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
-	timeProvider := &FakeTimeProvider{}
-	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider), nil)
+	timeProvider := &mocks.FakeTimeProvider{}
+	handler := router.Handler(NewTestControllerWithTimeProvider(db, timeProvider))
 
 	t.Run("empty availability", func(t *testing.T) {
 		// Arrange
@@ -56,7 +57,10 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		}
 
 		d1 := insertEmptyPro(t, db)
-		_, d2 := insertAvailability(t, db, expected...)
+		ids, d2 := insertAvailability(t, db, expected...)
+		expected[0].ID = ids[0]
+		expected[1].ID = ids[1]
+
 		defer d2()
 		defer d1()
 

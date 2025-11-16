@@ -28,15 +28,15 @@ func (r *RepositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 	now := r.timeProvider.Now()
 	rows := make([][]any, len(availability.Items))
 
-	var min *time.Time
-	var max *time.Time
+	var minTime *time.Time
+	var maxTime *time.Time
 	for i, e := range availability.Items {
 		if i == 0 {
-			min = &e.From
-			max = &e.To
+			minTime = &e.From
+			maxTime = &e.To
 		} else {
-			min = utils.MinTime(min, &e.From)
-			max = utils.MaxTime(max, &e.To)
+			minTime = utils.MinTime(minTime, &e.From)
+			maxTime = utils.MaxTime(maxTime, &e.To)
 		}
 
 		rows[i] = []any{
@@ -54,7 +54,7 @@ func (r *RepositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 				professional_id = $1 AND
 				availability && tstzrange($2, $3);
 		`
-		_, err = tx.Exec(ctx, query, professionalId, min, max)
+		_, err = tx.Exec(ctx, query, professionalId, minTime, maxTime)
 		if err != nil {
 			return err
 		}

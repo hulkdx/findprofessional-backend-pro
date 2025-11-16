@@ -33,10 +33,12 @@ func NewService() Service {
 	publicKeyFile, err := os.ReadFile(publicKeyPath)
 	if err != nil {
 		logger.Error("Failed to open public key file: ", err)
+		panic(err)
 	}
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyFile)
 	if err != nil {
 		logger.Error("Failed to parse public key file: ", err)
+		panic(err)
 	}
 	return &serviceImpl{
 		publicKey:  publicKey,
