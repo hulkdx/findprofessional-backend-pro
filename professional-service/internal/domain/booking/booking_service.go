@@ -46,12 +46,14 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 	logger.Debug("Creating payment intent for hold ID", *holdId, "amount", params.AmountInCents)
 	payResponse, err := s.paymentService.CreatePaymentIntent(
 		ctx,
-		*holdId,
-		params.AmountInCents,
-		params.Currency,
+		payment.PaymentRequest{
+			AmountsInCents: params.AmountInCents,
+			Currency:       params.Currency,
+			HoldId:         *holdId,
+			ProfessionalId: params.ProId,
+		},
 		params.IdempotencyKey,
 		params.Auth,
-		params.ProId,
 	)
 	if err != nil {
 		logger.Error("Failed to create payment intent", err)

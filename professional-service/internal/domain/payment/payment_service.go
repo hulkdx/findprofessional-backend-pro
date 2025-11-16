@@ -14,12 +14,9 @@ const baseUrl = "http://payment-service:8082"
 type Service interface {
 	CreatePaymentIntent(
 		ctx context.Context,
-		holdId int64,
-		AmountInCents int64,
-		Currency string,
+		request PaymentRequest,
 		idempotencyKey string,
 		auth string,
-		professionalId int64,
 	) (*bookingmodel.PaymentResponse, error)
 }
 
@@ -35,24 +32,15 @@ func NewService() Service {
 
 func (s *paymentServiceImpl) CreatePaymentIntent(
 	ctx context.Context,
-	holdId int64,
-	AmountInCents int64,
-	Currency string,
+	request PaymentRequest,
 	idempotencyKey string,
 	auth string,
-	professionalId int64,
 ) (*bookingmodel.PaymentResponse, error) {
 	url := fmt.Sprintf("%s/payments/create-intent", baseUrl)
-	request := &PaymentRequest{
-		AmountsInCents: AmountInCents,
-		Currency:       Currency,
-		HoldId:         holdId,
-		ProfessionalId: professionalId,
-	}
 	var response bookingmodel.PaymentResponse
 	requestHeader := &http.Header{}
 	requestHeader.Set("Authorization", auth)
 	requestHeader.Set("Idempotency-Key", idempotencyKey)
-	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, &request, &response, requestHeader)
+	err := utils.DoHttpRequestAsStruct(ctx, s.httpClient, http.MethodPost, url, request, &response, requestHeader)
 	return &response, err
 }
