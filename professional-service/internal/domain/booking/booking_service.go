@@ -51,6 +51,7 @@ func (s *Service) Create(ctx context.Context, params *CreateParams) (*bookingmod
 			Currency:       params.Currency,
 			HoldId:         *holdId,
 			ProfessionalId: params.ProId,
+			Availabilities: params.Availabilities,
 		},
 		params.IdempotencyKey,
 		params.Auth,
