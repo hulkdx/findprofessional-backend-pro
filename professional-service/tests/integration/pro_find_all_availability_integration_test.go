@@ -122,4 +122,51 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		assert.Equal(t, len(response_model), 1)
 		assert.Equal(t, len(response_model[0].Availability), 0)
 	})
+
+	t.Run("should not show availabilities that are booked", func(t *testing.T) {
+		// Arrange
+		timeProvider.NowTime = time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
+
+		userId := 2
+		proId := 1
+
+		pro := professional.Professional{
+			ID:            int64(proId),
+			PriceNumber:   Int(0),
+			PriceCurrency: String(""),
+			Pending:       false,
+		}
+
+		records := []professional.Availability{
+			{
+				ProfessionalID: int64(proId),
+				From:           time.Date(2023, 11, 4, 5, 30, 0, 0, time.UTC),
+				To:             time.Date(2023, 11, 4, 6, 30, 0, 0, time.UTC),
+			},
+		}
+		d1 := insertPro(t, db, pro)
+		defer d1()
+		avIds, d2 := insertAvailability(t, db, records...)
+		defer d2()
+		d3 := insertUserWithId(t, db, userId)
+		defer d3()
+		bookingId, d4 := insertBooking(t, db, int64(userId), int64(proId), "pending", "", "abc")
+		defer d4()
+		d5 := insertBookingItems(t, db, TestBookingItems{BookingID: bookingId, AvailabilityID: avIds[0]})
+		defer d5()
+
+		request := NewJsonRequest("GET", "/professional", nil)
+		response := httptest.NewRecorder()
+
+		// Act
+		handler.ServeHTTP(response, request)
+		// Assert
+		assert.Equal(t, response.Code, http.StatusOK)
+
+		responseModel := []professional.Professional{}
+		Unmarshal(response, &responseModel)
+
+		assert.Equal(t, len(responseModel), 1)
+		assert.Equal(t, len(responseModel[0].Availability), 0)
+	})
 }

@@ -50,7 +50,7 @@ func (r *RepositoryImpl) buildFindQuery(whereClause string) string {
 			'to', UPPER(a.availability),
 			'createdAt', a.created_at,
 			'updatedAt', a.updated_at
-			)) FILTER (WHERE a.id IS NOT NULL),
+  			)) FILTER (WHERE a.id IS NOT NULL AND bi.id IS NULL),
 		jsonb_agg(json_build_object(
 			'id', r.id,
 			'rate', r.rate,
@@ -77,12 +77,16 @@ func (r *RepositoryImpl) buildFindQuery(whereClause string) string {
 	LEFT JOIN professional_availability a
 		ON p.id=a.professional_id
 		AND LOWER(a.availability) > '%s'
+	
+	-- booked availability
+	LEFT JOIN booking_items bi
+  		ON bi.availability_id = a.id
 
 	WHERE p.price_currency IS NOT NULL AND
-				p.price_number   IS NOT NULL AND
-				p.pending        = false
-				%s
-	
+		  p.price_number   IS NOT NULL AND
+          p.pending        = false
+		  %s
+  
 	GROUP BY p.id
 	`,
 		ReviewLimit,
