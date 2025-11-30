@@ -53,7 +53,8 @@ func cleanup(
 			DELETE FROM bookings b
 			USING (
 				SELECT ctid FROM bookings
-				WHERE payment_expires_at < $1
+				WHERE payment_expires_at < $1 AND
+				      status = 'pending'
 				ORDER BY payment_expires_at
 				LIMIT $2
 			) s
