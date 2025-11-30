@@ -50,11 +50,11 @@ func cleanup(
 	cutoff := timeProvider.Now().UTC().Add(-grace)
 	for {
 		query := `
-			DELETE FROM booking_holds b
+			DELETE FROM bookings b
 			USING (
-				SELECT ctid FROM booking_holds
-				WHERE expires_at < $1
-				ORDER BY expires_at
+				SELECT ctid FROM bookings
+				WHERE payment_expires_at < $1
+				ORDER BY payment_expires_at
 				LIMIT $2
 			) s
 			WHERE b.ctid = s.ctid
