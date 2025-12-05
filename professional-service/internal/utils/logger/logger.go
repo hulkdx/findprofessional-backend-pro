@@ -16,6 +16,12 @@ func Debug(v ...any) {
 	}
 }
 
+func DebugF(format string, v ...any) {
+	if config.IsDebug() {
+		logDebug.Printf(format, v...)
+	}
+}
+
 func Error(str string, err error) {
 	logError.Printf("%s\t%s\n", str, err)
 }

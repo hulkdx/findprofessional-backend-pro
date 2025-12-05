@@ -19,6 +19,22 @@ build:
         paths:
           - "**/professional-service/**"
 
+  - image: hulkdx/ff-pro-ttl
+    context: ../
+    custom:
+      buildCommand: |
+        set -e
+        GOOS=linux make build-ttl
+        cat <<EOF | docker build --tag=$IMAGE -f - "$BUILD_CONTEXT"
+            FROM golang:1.23.0-alpine
+            COPY build/app app
+            ENV DEBUG=true
+            ENTRYPOINT [ "./app" ]
+        EOF
+      dependencies:
+        paths:
+          - "**/professional-service/cmd/booking-holds-ttl/**"
+
 manifests:
   kustomize:
     paths:
