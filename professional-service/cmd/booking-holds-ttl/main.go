@@ -49,7 +49,7 @@ func cleanup(
 ) error {
 	cutoff := timeProvider.Now().UTC().Add(-grace)
 	for {
-		query := `
+		const query = `
 			DELETE FROM bookings b
 			USING (
 				SELECT ctid FROM bookings
