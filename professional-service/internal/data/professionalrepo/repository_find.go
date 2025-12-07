@@ -14,6 +14,7 @@ type FilterItems func(pro *professional.Professional) []any
 
 func (r *RepositoryImpl) FindAll(ctx context.Context) ([]professional.Professional, error) {
 	query := r.buildFindQuery("")
+	// log.Fatal(query)
 	return r.find(ctx, query)
 }
 
@@ -30,6 +31,56 @@ func (r *RepositoryImpl) buildFindQuery(whereClause string) string {
 			*, 
 			ROW_NUMBER() OVER (PARTITION BY professional_id ORDER BY created_at) AS row_num
 		FROM professional_review
+	),
+	review_agg AS (
+		SELECT
+			r.professional_id,
+			AVG(r.rate)::numeric(10,2) AS rating,
+			COUNT(*)                    AS review_count,
+			jsonb_agg(
+				json_build_object(
+					'id', r.id,
+					'rate', r.rate,
+					'contentText', r.content_text,
+					'createdAt', r.created_at,
+					'updatedAt', r.updated_at,
+					'user', json_build_object(
+						'id', u.id,
+						'email', u.email,
+						'firstName', u.first_name,
+						'lastName', u.last_name,
+						'profileImage', u.profile_image
+					)
+				)
+				ORDER BY r.created_at
+			) FILTER (WHERE r.row_num <= %d) AS reviews_json
+		FROM professional_review_cte r
+		
+		LEFT JOIN users u
+			ON u.id = r.user_id
+		
+		GROUP BY r.professional_id
+	),
+	availability_agg AS (
+		SELECT
+			a.professional_id,
+			jsonb_agg(
+				json_build_object(
+					'id', a.id,
+					'from', lower(a.availability),
+					'to', upper(a.availability),
+					'createdAt', a.created_at,
+					'updatedAt', a.updated_at
+				)
+			) FILTER (WHERE a.id IS NOT NULL AND bi.id IS NULL) AS availability_json
+		FROM professional_availability a
+
+		LEFT JOIN booking_items bi
+			ON bi.availability_id = a.id
+		
+		WHERE lower(a.availability) > '%s'
+		
+		GROUP BY a.professional_id
 	)
 
 	SELECT
@@ -42,52 +93,24 @@ func (r *RepositoryImpl) buildFindQuery(whereClause string) string {
 		p.price_currency,
 		p.profile_image_url,
 		p.description,
-		AVG(r.rate)::numeric(10,2) AS rating,
-		COUNT(r),
-		jsonb_agg(json_build_object(
-			'id', a.id,
-			'from', LOWER(a.availability),
-			'to', UPPER(a.availability),
-			'createdAt', a.created_at,
-			'updatedAt', a.updated_at
-  			)) FILTER (WHERE a.id IS NOT NULL AND bi.id IS NULL),
-		jsonb_agg(json_build_object(
-			'id', r.id,
-			'rate', r.rate,
-			'contentText', r.content_text,
-			'createdAt', r.created_at,
-			'updatedAt', r.updated_at,
-			'user', json_build_object(
-				'id', u.id,
-				'email', u.email,
-				'firstName', u.first_name,
-				'lastName', u.last_name,
-				'profileImage', u.profile_image
-			)
-			)) FILTER (WHERE r.id IS NOT NULL AND r.row_num <= %d)
+    	ra.rating AS rating,
+    	COALESCE(ra.review_count, 0),
+		aa.availability_json,
+		ra.reviews_json
 	FROM professionals p
 	
 	-- review
-	LEFT JOIN professional_review_cte r
-		ON p.id=r.professional_id
-	LEFT JOIN users u
-		ON r.user_id=u.id
+	LEFT JOIN review_agg ra
+		ON ra.professional_id = p.id
 	
 	-- availability
-	LEFT JOIN professional_availability a
-		ON p.id=a.professional_id
-		AND LOWER(a.availability) > '%s'
-	
-	-- booked availability
-	LEFT JOIN booking_items bi
-  		ON bi.availability_id = a.id
+	LEFT JOIN availability_agg aa
+		ON p.id=aa.professional_id
 
 	WHERE p.price_currency IS NOT NULL AND
 		  p.price_number   IS NOT NULL AND
           p.pending        = false
 		  %s
-  
-	GROUP BY p.id
 	`,
 		ReviewLimit,
 		r.timeProvider.Now().UTC().Format("2006-01-02 15:04:05"),
