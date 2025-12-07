@@ -14,6 +14,7 @@ func Debug(v ...any) {
 	if config.IsDebug() {
 		logDebug.Println(v...)
 	}
+
 }
 
 func DebugF(format string, v ...any) {
