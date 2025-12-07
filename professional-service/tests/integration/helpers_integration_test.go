@@ -262,3 +262,65 @@ func insertUser(t *testing.T, pool *pgxpool.Pool, users ...user.User) func() {
 		_, _ = pool.Exec(ctx, `DELETE FROM users;`)
 	}
 }
+
+type TestBookingItems struct {
+	BookingID      int64
+	AvailabilityID int64
+}
+
+func insertBooking(t *testing.T, pool *pgxpool.Pool, userId, proId int64, status, currency, paymentIntent string) (int64, func()) {
+	t.Helper()
+	ctx := context.Background()
+
+	query := `INSERT INTO bookings (
+			user_id,
+			professional_id,
+			status,
+			total_amount_cents,
+			currency,
+			stripe_payment_intent_id,
+			created_at,
+			updated_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+		RETURNING id`
+
+	// use some fixed amount for tests, or adjust if you want it parametrized
+	const totalAmountCents int64 = 1000
+
+	var id int64
+	if err := pool.QueryRow(ctx, query,
+		userId,
+		proId,
+		status,
+		totalAmountCents,
+		currency,
+		paymentIntent,
+	).Scan(&id); err != nil {
+		t.Fatalf("failed to insert booking: %v", err)
+	}
+
+	return id, func() {
+		pool.Exec(ctx, `DELETE FROM bookings`)
+	}
+}
+
+func insertBookingItems(t *testing.T, pool *pgxpool.Pool, items ...TestBookingItems) func() {
+	ctx := context.Background()
+
+	query := `INSERT INTO booking_items (booking_id, availability_id, created_at, updated_at) VALUES ($1, $2, now(), now())`
+
+	for _, it := range items {
+		_, err := pool.Exec(ctx, query,
+			it.BookingID,
+			it.AvailabilityID,
+		)
+		if err != nil {
+			t.Fatalf("failed to insert booking_item: %+v, err: %v", it, err)
+		}
+	}
+
+	return func() {
+		_, _ = pool.Exec(ctx, `DELETE FROM booking_items;`)
+	}
+}

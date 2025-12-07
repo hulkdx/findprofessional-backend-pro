@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -18,8 +17,6 @@ func main() {
 	grace := utils.GetEnvTimeOrPanic("TTL_GRACE")
 	limit := utils.GetEnvIntOrPanic("TTL_LIMIT")
 
-	logger.Debug("booking-holds-ttl started")
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -31,8 +28,6 @@ func main() {
 		logger.Error("cleanup failed", err)
 		os.Exit(1)
 	}
-
-	logger.Debug("booking-holds-ttl finished")
 }
 
 func setupDatabase(ctx context.Context) *pgxpool.Pool {
@@ -49,12 +44,13 @@ func cleanup(
 ) error {
 	cutoff := timeProvider.Now().UTC().Add(-grace)
 	for {
-		query := `
-			DELETE FROM booking_holds b
+		const query = `
+			DELETE FROM bookings b
 			USING (
-				SELECT ctid FROM booking_holds
-				WHERE expires_at < $1
-				ORDER BY expires_at
+				SELECT ctid FROM bookings
+				WHERE payment_expires_at < $1 AND
+				      status = 'pending'
+				ORDER BY payment_expires_at
 				LIMIT $2
 			) s
 			WHERE b.ctid = s.ctid
@@ -67,7 +63,7 @@ func cleanup(
 		if rows == 0 {
 			break
 		}
-		logger.Debug(fmt.Sprintf("Rows deleted: %d", rows))
+		logger.DebugF("booking-holds-ttl rows deleted: %d\n", rows)
 	}
 
 	return nil

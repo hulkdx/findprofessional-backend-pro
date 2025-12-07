@@ -3,6 +3,7 @@ kind: CronJob
 metadata:
   name: booking-holds-ttl
 spec:
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:

@@ -143,6 +143,75 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		}
 	})
 
+	t.Run("should not duplicate reviews when booked availabilities exist", func(t *testing.T) {
+		// Arrange
+		proId := int64(10)
+		userId := int64(20)
+
+		pro := professional.Professional{
+			ID:            proId,
+			PriceNumber:   Int(50),
+			PriceCurrency: String("GBP"),
+			Pending:       false,
+		}
+		review := professional.Review{
+			ID:             30,
+			UserID:         userId,
+			ProfessionalID: proId,
+			Rate:           5,
+			ContentText:    String("Great session"),
+			CreatedAt:      time.Date(2024, 2, 1, 10, 0, 0, 0, time.UTC),
+			UpdatedAt:      time.Date(2024, 2, 1, 10, 0, 0, 0, time.UTC),
+		}
+
+		d1 := insertPro(t, db, pro)
+		defer d1()
+		d2 := insertUser(t, db, user.User{ID: int(userId), Email: "reviewer@example.com"})
+		defer d2()
+		d3 := insertReview(t, db, review)
+		defer d3()
+
+		availabilities := []professional.Availability{
+			{
+				ProfessionalID: proId,
+				From:           time.Date(2100, 1, 1, 9, 0, 0, 0, time.UTC),
+				To:             time.Date(2100, 1, 1, 10, 0, 0, 0, time.UTC),
+			},
+			{
+				ProfessionalID: proId,
+				From:           time.Date(2100, 1, 2, 9, 0, 0, 0, time.UTC),
+				To:             time.Date(2100, 1, 2, 10, 0, 0, 0, time.UTC),
+			},
+		}
+		availabilityIds, d4 := insertAvailability(t, db, availabilities...)
+		defer d4()
+
+		bookingId, d5 := insertBooking(t, db, userId, proId, "pending", "GBP", "intent")
+		defer d5()
+		d6 := insertBookingItems(t, db,
+			TestBookingItems{BookingID: bookingId, AvailabilityID: availabilityIds[0]},
+			TestBookingItems{BookingID: bookingId, AvailabilityID: availabilityIds[1]},
+		)
+		defer d6()
+
+		request := NewJsonRequest("GET", "/professional", nil)
+		response := httptest.NewRecorder()
+
+		// Act
+		handler.ServeHTTP(response, request)
+
+		// Assert
+		assert.Equal(t, response.Code, http.StatusOK)
+
+		responseModel := []professional.Professional{}
+		Unmarshal(response, &responseModel)
+
+		assert.Equal(t, len(responseModel), 1)
+		assert.Equal(t, responseModel[0].ID, proId)
+		assert.Equal(t, responseModel[0].ReviewSize, int64(1))
+		assert.Equal(t, len(responseModel[0].Review), 1)
+		assert.Equal(t, responseModel[0].Review[0].ID, review.ID)
+	})
 }
 
 func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {

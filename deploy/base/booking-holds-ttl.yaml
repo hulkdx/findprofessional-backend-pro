@@ -3,7 +3,6 @@ kind: CronJob
 metadata:
   name: booking-holds-ttl
 spec:
-  schedule: "* * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
