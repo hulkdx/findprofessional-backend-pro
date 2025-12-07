@@ -19,6 +19,7 @@ type Service interface {
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
 	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
+	GetBookingStatus(ctx context.Context, bookingId int64) (StatusResponse, error)
 }
 
 type serviceImpl struct {
@@ -71,4 +72,8 @@ func (s *serviceImpl) GetAvailability(ctx context.Context, professionalId int64)
 
 func (s *serviceImpl) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
 	return s.repository.UpdateAvailability(ctx, professionalId, availability)
+}
+
+func (s *serviceImpl) GetBookingStatus(ctx context.Context, bookingId int64) (StatusResponse, error) {
+	return s.repository.GetBookingStatus(ctx, bookingId)
 }

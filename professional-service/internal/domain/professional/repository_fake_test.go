@@ -1,6 +1,8 @@
 package professional
 
-import "context"
+import (
+	"context"
+)
 
 type FakeRepository struct {
 	FindAllSuccess       []Professional
@@ -12,6 +14,8 @@ type FakeRepository struct {
 	FindAllReviewError   error
 	CreateRequestCalled  CreateRequest
 	CreateError          error
+	GetBookingStatusResp StatusResponse
+	GetBookingStatusErr  error
 }
 
 func (r *FakeRepository) FindAll(ctx context.Context) ([]Professional, error) {
@@ -41,6 +45,10 @@ func (m *FakeRepository) GetAvailability(ctx context.Context, professionalId int
 
 func (m *FakeRepository) UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error {
 	return nil
+}
+
+func (r *FakeRepository) GetBookingStatus(ctx context.Context, bookingId int64) (StatusResponse, error) {
+	return r.GetBookingStatusResp, r.GetBookingStatusErr
 }
 
 // --------------------------------
