@@ -39,6 +39,8 @@ func normalUser(router *chi.Mux, controller *professional.Controller) {
 	router.Get("/professional", controller.FindAll)
 	router.Get("/professional/{id}", controller.Find)
 	router.Get("/professional/{id}/review", controller.FindAllReview)
+
+	router.Get("/professional/booking/{id}/status", controller.GetBookingStatus)
 }
 
 func proUser(router *chi.Mux, controller *professional.Controller) {
