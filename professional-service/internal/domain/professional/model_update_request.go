@@ -1,7 +1,7 @@
 package professional
 
 type UpdateRequest struct {
-	Email           *string `json:"email" validate:"email,max=50"`
+	Email           *string `json:"email" validate:"omitempty,email,max=50"`
 	FirstName       string  `json:"firstName" validate:"max=50"`
 	LastName        string  `json:"lastName" validate:"max=50"`
 	CoachType       string  `json:"coachType" validate:"max=50"`
