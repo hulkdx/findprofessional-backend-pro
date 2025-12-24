@@ -30,18 +30,18 @@ func (r *RepositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 
 	var minTime *time.Time
 	var maxTime *time.Time
-	for i, e := range availability.Items {
+	for i := range availability.Items {
 		if i == 0 {
-			minTime = &e.From
-			maxTime = &e.To
+			minTime = &availability.Items[i].From
+			maxTime = &availability.Items[i].To
 		} else {
-			minTime = utils.MinTime(minTime, &e.From)
-			maxTime = utils.MaxTime(maxTime, &e.To)
+			minTime = utils.MinTime(minTime, &availability.Items[i].From)
+			maxTime = utils.MaxTime(maxTime, &availability.Items[i].To)
 		}
 
 		rows[i] = []any{
 			professionalId,
-			utils.ConvertToTstzrange(e.From, e.To),
+			utils.ConvertToTstzrange(availability.Items[i].From, availability.Items[i].To),
 			now,
 			now,
 		}
