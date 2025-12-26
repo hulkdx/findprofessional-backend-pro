@@ -48,8 +48,7 @@ func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 				"priceNumber": 100,
 				"priceCurrency": "USD",
 				"profileImageUrl": "http://example.com/images/john.jpg",
-				"description": "Experienced fitness coach with 10 years of experience.",
-				"skypeId": "bla.skype"
+				"description": "Experienced fitness coach with 10 years of experience."
 			}
 		`
 		request := NewJsonRequest("POST", "/professional", strings.NewReader(requestBody))
@@ -79,8 +78,7 @@ func UpdateProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 				"priceNumber": 100,
 				"priceCurrency": "USD",
 				"profileImageUrl": "http://example.com/images/john.jpg",
-				"description": "Experienced fitness coach with 10 years of experience.",
-				"skypeId": "bla.skype"
+				"description": "Experienced fitness coach with 10 years of experience."
 			}
 		`
 		request := NewJsonRequest("POST", "/professional", strings.NewReader(requestBody))
