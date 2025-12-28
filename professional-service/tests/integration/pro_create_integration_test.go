@@ -21,16 +21,19 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("not found a record, create a new record", func(t *testing.T) {
 		// Arrange
+		platform := "meet"
+		link := "https://meet.google.com/abc-defg-hij"
 		bodyRequest := professional.CreateRequest{
-			Email:         "test@gmail.com",
-			Password:      "P@ssw0rd123",
-			FirstName:     "John",
-			LastName:      "Doe",
-			SkypeId:       "john_doe_skype",
-			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-			Price:         500,
-			PriceCurrency: "USD",
-			CoachType:     "Lifecoach",
+			Email:           "test@gmail.com",
+			Password:        "P@ssw0rd123",
+			FirstName:       "John",
+			LastName:        "Doe",
+			SessionPlatform: &platform,
+			SessionLink:     &link,
+			AboutMe:         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:           500,
+			PriceCurrency:   "USD",
+			CoachType:       "Lifecoach",
 		}
 		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
@@ -53,16 +56,19 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("not found a record, pending is stored as true in the database", func(t *testing.T) {
 		// Arrange
+		platform := "meet"
+		link := "https://meet.google.com/abc-defg-hij"
 		bodyRequest := professional.CreateRequest{
-			Email:         "test@gmail.com",
-			Password:      "P@ssw0rd123",
-			FirstName:     "John",
-			LastName:      "Doe",
-			SkypeId:       "john_doe_skype",
-			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-			Price:         500,
-			PriceCurrency: "USD",
-			CoachType:     "Lifecoach",
+			Email:           "test@gmail.com",
+			Password:        "P@ssw0rd123",
+			FirstName:       "John",
+			LastName:        "Doe",
+			SessionPlatform: &platform,
+			SessionLink:     &link,
+			AboutMe:         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:           500,
+			PriceCurrency:   "USD",
+			CoachType:       "Lifecoach",
 		}
 		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
@@ -87,16 +93,19 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("found a record, then return 409 status", func(t *testing.T) {
 		// Arrange
+		platform := "meet"
+		link := "https://meet.google.com/abc-defg-hij"
 		bodyRequest := professional.CreateRequest{
-			Email:         "test@gmail.com",
-			Password:      "P@ssw0rd123",
-			FirstName:     "John",
-			LastName:      "Doe",
-			SkypeId:       "john_doe_skype",
-			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-			Price:         500,
-			PriceCurrency: "USD",
-			CoachType:     "Lifecoach",
+			Email:           "test@gmail.com",
+			Password:        "P@ssw0rd123",
+			FirstName:       "John",
+			LastName:        "Doe",
+			SessionPlatform: &platform,
+			SessionLink:     &link,
+			AboutMe:         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:           500,
+			PriceCurrency:   "USD",
+			CoachType:       "Lifecoach",
 		}
 		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 
@@ -122,16 +131,19 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 
 	t.Run("Creating should update user.professionalId", func(t *testing.T) {
 		// Arrange
+		platform := "meet"
+		link := "https://meet.google.com/abc-defg-hij"
 		bodyRequest := professional.CreateRequest{
-			Email:         "test@gmail.com",
-			Password:      "P@ssw0rd123",
-			FirstName:     "John",
-			LastName:      "Doe",
-			SkypeId:       "john_doe_skype",
-			AboutMe:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-			Price:         500,
-			PriceCurrency: "USD",
-			CoachType:     "Lifecoach",
+			Email:           "test@gmail.com",
+			Password:        "P@ssw0rd123",
+			FirstName:       "John",
+			LastName:        "Doe",
+			SessionPlatform: &platform,
+			SessionLink:     &link,
+			AboutMe:         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			Price:           500,
+			PriceCurrency:   "USD",
+			CoachType:       "Lifecoach",
 		}
 		defer db.Exec(context.Background(), `DELETE FROM professionals`)
 

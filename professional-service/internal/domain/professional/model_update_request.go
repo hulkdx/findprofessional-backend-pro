@@ -9,4 +9,6 @@ type UpdateRequest struct {
 	PriceCurrency   *string `json:"priceCurrency" validate:"omitempty,max=50"`
 	ProfileImageUrl *string `json:"profileImageUrl" validate:"omitempty,max=50"`
 	Description     *string `json:"description" validate:"omitempty,max=255"`
+	SessionPlatform *string `json:"sessionPlatform" validate:"omitempty,max=50"`
+	SessionLink     *string `json:"sessionLink" validate:"omitempty,max=2048"`
 }

@@ -22,7 +22,6 @@ func TestCreateProfessional(t *testing.T) {
 			Password:  "",
 			FirstName: "",
 			LastName:  "",
-			SkypeId:   "",
 			AboutMe:   "",
 		}
 		response := httptest.NewRecorder()
