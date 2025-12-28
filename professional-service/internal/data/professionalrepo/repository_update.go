@@ -43,6 +43,12 @@ func (r *RepositoryImpl) Update(ctx context.Context, id string, p professional.U
 	if p.Description != nil {
 		add("description", *p.Description)
 	}
+	if p.SessionPlatform != nil {
+		add("session_platform", *p.SessionPlatform)
+	}
+	if p.SessionLink != nil {
+		add("session_link", *p.SessionLink)
+	}
 
 	query := fmt.Sprintf("UPDATE professionals SET %s WHERE id = $1", strings.Join(set, ", "))
 	return sqlutils.PerformUpdate(r.db, ctx, query, args...)

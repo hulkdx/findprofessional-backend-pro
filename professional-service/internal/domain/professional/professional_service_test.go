@@ -16,7 +16,6 @@ func TestCreate(t *testing.T) {
 			Password:  rawPassword,
 			FirstName: "",
 			LastName:  "",
-			SkypeId:   "",
 			AboutMe:   "",
 		}
 		repository := &FakeRepository{}

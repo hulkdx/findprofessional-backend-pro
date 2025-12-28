@@ -30,10 +30,12 @@ func (r *RepositoryImpl) Create(ctx context.Context, request professional.Create
 			price_number,
 			price_currency,
 			pending,
+			session_link,
+			session_platform,
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		RETURNING id;
 	`
 
@@ -48,6 +50,8 @@ func (r *RepositoryImpl) Create(ctx context.Context, request professional.Create
 		request.Price,
 		request.PriceCurrency,
 		pending,
+		request.SessionLink,
+		request.SessionPlatform,
 		r.timeProvider.Now(),
 		r.timeProvider.Now(),
 	)
