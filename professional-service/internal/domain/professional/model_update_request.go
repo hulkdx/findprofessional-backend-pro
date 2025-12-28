@@ -9,5 +9,4 @@ type UpdateRequest struct {
 	PriceCurrency   *string `json:"priceCurrency" validate:"omitempty,max=50"`
 	ProfileImageUrl *string `json:"profileImageUrl" validate:"omitempty,max=50"`
 	Description     *string `json:"description" validate:"omitempty,max=255"`
-	SkypeId         *string `json:"skypeId" validate:"omitempty,max=50"`
 }
