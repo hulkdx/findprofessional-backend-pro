@@ -18,9 +18,7 @@ func (r *RepositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 
 	txDone := false
 	defer func() {
-		if txDone {
-			tx.Commit(ctx)
-		} else {
+		if !txDone {
 			tx.Rollback(ctx)
 		}
 	}()
@@ -77,6 +75,10 @@ func (r *RepositoryImpl) UpdateAvailability(ctx context.Context, professionalId 
 	}
 	if count != int64(len(rows)) {
 		return sql.ErrNoRows
+	}
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
 	}
 
 	txDone = true

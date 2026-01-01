@@ -13,9 +13,10 @@ func (r *RepositoryImpl) Create(ctx context.Context, request professional.Create
 		return err
 	}
 
+	txDone := false
 	defer func() {
-		if err != nil {
-			_ = tx.Rollback(ctx)
+		if !txDone {
+			tx.Rollback(ctx)
 		}
 	}()
 
@@ -74,5 +75,11 @@ func (r *RepositoryImpl) Create(ctx context.Context, request professional.Create
 		return sql.ErrNoRows
 	}
 
-	return tx.Commit(ctx)
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	txDone = true
+	return nil
 }
