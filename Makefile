@@ -1,9 +1,5 @@
 GO_VERSION := $(shell grep '^go ' professional-service/go.mod | awk '{print $$2}')
 
-.PHONY: print-go-version
-print-go-version:
-	@echo "Go version from go.mod: $(GO_VERSION)"
-
 .PHONY: deps
 deps:
 	@cd professional-service && \
