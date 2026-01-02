@@ -12,6 +12,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const query = `
+	DELETE FROM bookings b
+	USING (
+		SELECT ctid FROM bookings
+		WHERE payment_expires_at < $1 AND
+				status = 'pending'
+		ORDER BY payment_expires_at
+		LIMIT $2
+	) s
+	WHERE b.ctid = s.ctid
+`
+
 func main() {
 	timeout := utils.GetEnvTimeOrPanic("TTL_TIMEOUT")
 	grace := utils.GetEnvTimeOrPanic("TTL_GRACE")
@@ -44,17 +56,6 @@ func cleanup(
 ) error {
 	cutoff := timeProvider.Now().UTC().Add(-grace)
 	for {
-		const query = `
-			DELETE FROM bookings b
-			USING (
-				SELECT ctid FROM bookings
-				WHERE payment_expires_at < $1 AND
-				      status = 'pending'
-				ORDER BY payment_expires_at
-				LIMIT $2
-			) s
-			WHERE b.ctid = s.ctid
-		`
 		res, err := db.Exec(ctx, query, cutoff, limit)
 		if err != nil {
 			return err
