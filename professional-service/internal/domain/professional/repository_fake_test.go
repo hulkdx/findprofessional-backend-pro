@@ -47,7 +47,7 @@ func (m *FakeRepository) UpdateAvailability(ctx context.Context, professionalId 
 	return nil
 }
 
-func (r *FakeRepository) GetBookingStatus(ctx context.Context, bookingId int64) (StatusResponse, error) {
+func (r *FakeRepository) GetBookingStatus(ctx context.Context, bookingId int64, userId int64) (StatusResponse, error) {
 	return r.GetBookingStatusResp, r.GetBookingStatusErr
 }
 

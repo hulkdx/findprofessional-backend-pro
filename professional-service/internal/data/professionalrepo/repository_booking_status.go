@@ -6,10 +6,11 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 )
 
-func (r *RepositoryImpl) GetBookingStatus(ctx context.Context, bookingId int64) (professional.StatusResponse, error) {
-	const query = `SELECT status FROM bookings WHERE id = $1`
+func (r *RepositoryImpl) GetBookingStatus(ctx context.Context, bookingId int64, userId int64) (professional.StatusResponse, error) {
+	const query = `SELECT status FROM bookings WHERE id = $1 AND user_id = $2`
+
 	var result professional.StatusResponse
-	err := r.db.QueryRow(ctx, query, bookingId).Scan(&result.Status)
+	err := r.db.QueryRow(ctx, query, bookingId, userId).Scan(&result.Status)
 	if err != nil {
 		return professional.StatusResponse{}, err
 	}

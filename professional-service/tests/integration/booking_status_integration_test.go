@@ -14,43 +14,92 @@ import (
 )
 
 func BookingStatusTest(t *testing.T, db *pgxpool.Pool) {
-	handler := router.Handler(NewTestController(db))
+	userId := int64(10)
+	userService := &MockUserService{UserId: userId}
+	handler := router.Handler(NewTestControllerWithUserService(db, userService))
 
 	t.Run("booking not found", func(t *testing.T) {
+		// Arrange
 		request := NewJsonRequest("GET", "/professional/booking/999/status", nil)
 		response := httptest.NewRecorder()
-
+		// Act
 		handler.ServeHTTP(response, request)
-
+		// Assert
 		assert.Equal(t, http.StatusNotFound, response.Code)
 	})
 
 	t.Run("booking found", func(t *testing.T) {
-		handler := router.Handler(NewTestController(db))
-		userCleanup := insertUser(t, db, user.User{
-			ID:    10,
+		// Arrange
+		proId := int64(20)
+
+		d1 := insertUser(t, db, user.User{
+			ID:    int(userId),
 			Email: "user@email.com",
 		})
-		proCleanup := insertPro(t, db, professional.Professional{
-			ID:            20,
+		defer d1()
+		d2 := insertPro(t, db, professional.Professional{
+			ID:            proId,
 			Email:         "pro@email.com",
-			PriceNumber:   Int(0),
-			PriceCurrency: String("GBP"),
+			PriceNumber:   Int(30),
+			PriceCurrency: String("EUR"),
 			Pending:       false,
 		})
-		bookingID, bookingCleanup := insertBooking(t, db, 10, 20, "confirmed", "GBP", "intent-1")
-		defer bookingCleanup()
-		defer proCleanup()
-		defer userCleanup()
-
-		request := NewJsonRequest("GET", fmt.Sprintf("/professional/booking/%d/status", bookingID), nil)
+		defer d2()
+		bookingID, d3 := insertBooking(
+			t,
+			db,
+			userId,
+			proId,
+			"confirmed",
+			"EUR",
+			"intent-1",
+		)
+		defer d3()
 		response := httptest.NewRecorder()
-
-		handler.ServeHTTP(response, request)
-
+		// Act
+		handler.ServeHTTP(response, NewBookingStatusRequest(bookingID))
+		// Assert
 		assert.Equal(t, http.StatusOK, response.Code)
 		var result professional.StatusResponse
 		Unmarshal(response, &result)
 		assert.Equal(t, "confirmed", result.Status)
 	})
+	t.Run("user should only see their own bookings", func(t *testing.T) {
+		// Arrange
+		otherUserId := int64(11)
+		proId := int64(20)
+		d1 := insertUser(t, db,
+			user.User{
+				ID:    int(userId),
+				Email: "user@email.com",
+			},
+			user.User{
+				ID:    int(otherUserId),
+				Email: "other-user@email.com",
+			},
+		)
+		defer d1()
+		d2 := insertPro(t, db,
+			professional.Professional{
+				ID:            proId,
+				Email:         "pro@email.com",
+				PriceNumber:   Int(0),
+				PriceCurrency: String("GBP"),
+				Pending:       false,
+			},
+		)
+		defer d2()
+		bookingID, d3 := insertBooking(t, db, otherUserId, proId, "confirmed", "EUR", "intent-1")
+		defer d3()
+		response := httptest.NewRecorder()
+		OutputSQL(t, db, "SELECT id FROM users")
+		// Act
+		handler.ServeHTTP(response, NewBookingStatusRequest(bookingID))
+		// Assert
+		assert.Equal(t, http.StatusNotFound, response.Code)
+	})
+}
+
+func NewBookingStatusRequest(bookingID int64) *http.Request {
+	return NewJsonRequest("GET", fmt.Sprintf("/professional/booking/%d/status", bookingID), nil)
 }
