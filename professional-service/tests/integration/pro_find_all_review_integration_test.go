@@ -166,7 +166,7 @@ func FindAllReviewProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 		d1 := insertPro(t, db, pro)
 		defer d1()
-		d2 := insertUser(t, db, user.User{ID: int(userId), Email: "reviewer@example.com"})
+		d2 := insertUser(t, db, user.User{ID: int64(userId), Email: "reviewer@example.com"})
 		defer d2()
 		d3 := insertReview(t, db, review)
 		defer d3()
@@ -223,8 +223,8 @@ func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {
 	}
 	d1 := insertPro(t, db, pro)
 
-	userIds := []int{}
-	for i := 1; i <= count; i++ {
+	userIds := []int64{}
+	for i := int64(1); i <= int64(count); i++ {
 		userIds = append(userIds, i)
 	}
 	d2 := insertUserWithId(t, db, userIds...)
@@ -233,7 +233,7 @@ func createReviews(t *testing.T, db *pgxpool.Pool, count int) func() {
 	for i := 0; i < count; i++ {
 		review := professional.Review{
 			ID:             int64(i),
-			UserID:         int64(userIds[i]),
+			UserID:         userIds[i],
 			ProfessionalID: proId,
 			Rate:           4,
 			ContentText:    String("It was a good review!"),

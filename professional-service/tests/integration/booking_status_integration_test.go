@@ -33,7 +33,7 @@ func BookingStatusTest(t *testing.T, db *pgxpool.Pool) {
 		proId := int64(20)
 
 		d1 := insertUser(t, db, user.User{
-			ID:    int(userId),
+			ID:    userId,
 			Email: "user@email.com",
 		})
 		defer d1()
@@ -70,11 +70,11 @@ func BookingStatusTest(t *testing.T, db *pgxpool.Pool) {
 		proId := int64(20)
 		d1 := insertUser(t, db,
 			user.User{
-				ID:    int(userId),
+				ID:    userId,
 				Email: "user@email.com",
 			},
 			user.User{
-				ID:    int(otherUserId),
+				ID:    otherUserId,
 				Email: "other-user@email.com",
 			},
 		)

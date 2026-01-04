@@ -33,7 +33,7 @@ func FindAllRatingProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		d1 := insertPro(t, db, professional_records...)
 		defer d1()
 
-		userId := []int{
+		userId := []int64{
 			2,
 			3,
 			4,

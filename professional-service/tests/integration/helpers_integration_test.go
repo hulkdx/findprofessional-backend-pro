@@ -210,7 +210,7 @@ func insertReview(t *testing.T, pool *pgxpool.Pool, review ...professional.Revie
 }
 
 // insertUserWithId inserts users that have their ID = email, for example.
-func insertUserWithId(t *testing.T, pool *pgxpool.Pool, userIDs ...int) func() {
+func insertUserWithId(t *testing.T, pool *pgxpool.Pool, userIDs ...int64) func() {
 	users := []user.User{}
 	for _, id := range userIDs {
 		// example: Email set to string of the ID
