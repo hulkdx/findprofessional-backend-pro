@@ -51,6 +51,10 @@ func (r *FakeRepository) GetBookingStatus(ctx context.Context, bookingId int64, 
 	return r.GetBookingStatusResp, r.GetBookingStatusErr
 }
 
+func (r *FakeRepository) GetBookings(ctx context.Context, id int64, idType UserType) (*Bookings, error) {
+	return nil, nil
+}
+
 // --------------------------------
 
 type MockUserServiceAlwaysAuthenticated struct {
