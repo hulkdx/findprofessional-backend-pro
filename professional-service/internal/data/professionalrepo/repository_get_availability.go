@@ -2,7 +2,6 @@ package professionalrepo
 
 import (
 	"context"
-	"time"
 
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 )
@@ -30,21 +29,17 @@ func (r *RepositoryImpl) GetAvailability(ctx context.Context, professionalId int
 	availabilities := make(professional.Availabilities, 0)
 	for rows.Next() {
 		var availability professional.Availability
-		var from time.Time
-		var to time.Time
 
 		err := rows.Scan(
 			&availability.ID,
-			&from,
-			&to,
+			&availability.From,
+			&availability.To,
 			&availability.CreatedAt,
 			&availability.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
 		}
-		availability.From = from
-		availability.To = to
 
 		availabilities = append(availabilities, availability)
 	}

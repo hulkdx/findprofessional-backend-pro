@@ -13,4 +13,5 @@ type Repository interface {
 	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
 	UpdateAvailability(ctx context.Context, professionalId int64, availability UpdateAvailabilityRequest) error
 	GetBookingStatus(ctx context.Context, bookingId int64, userId int64) (StatusResponse, error)
+	GetBookings(ctx context.Context, id int64, idType UserType) (*Bookings, error)
 }

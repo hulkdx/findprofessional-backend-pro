@@ -40,8 +40,9 @@ func normalUser(router *chi.Mux, controller *professional.Controller) {
 	router.Get("/professional/{id}", controller.Find)
 	router.Get("/professional/{id}/review", controller.FindAllReview)
 
-	// Note: maybe create bookings microservice
 	router.Get("/professional/booking/{id}/status", controller.GetBookingStatus)
+	router.Get("/professional/bookings/user", controller.GetBookingUser)
+	router.Get("/professional/bookings/pro", controller.GetBookingPro)
 }
 
 func proUser(router *chi.Mux, controller *professional.Controller) {
