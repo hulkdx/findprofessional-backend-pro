@@ -127,11 +127,11 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		timeProvider.NowTime = time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 
-		userId := 2
-		proId := 1
+		userId := int64(2)
+		proId := int64(1)
 
 		pro := professional.Professional{
-			ID:            int64(proId),
+			ID:            proId,
 			PriceNumber:   Int(0),
 			PriceCurrency: String(""),
 			Pending:       false,
@@ -139,7 +139,7 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 
 		records := []professional.Availability{
 			{
-				ProfessionalID: int64(proId),
+				ProfessionalID: proId,
 				From:           time.Date(2023, 11, 4, 5, 30, 0, 0, time.UTC),
 				To:             time.Date(2023, 11, 4, 6, 30, 0, 0, time.UTC),
 			},
@@ -150,7 +150,7 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		defer d2()
 		d3 := insertUserWithId(t, db, userId)
 		defer d3()
-		bookingId, d4 := insertBooking(t, db, int64(userId), int64(proId), "pending", "", "abc")
+		bookingId, d4 := insertBooking(t, db, userId, proId, "pending", "", "abc")
 		defer d4()
 		d5 := insertBookingItems(t, db, TestBookingItems{BookingID: bookingId, AvailabilityID: avIds[0]})
 		defer d5()
