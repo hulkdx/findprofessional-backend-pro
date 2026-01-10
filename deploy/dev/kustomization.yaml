@@ -5,9 +5,6 @@ resources:
   - ../base
   - https://raw.githubusercontent.com/hulkdx/findprofessional-backend-user/main/deploy/dev/db.yaml
 
-patchesStrategicMerge:
-  - booking-holds-ttl-env.yaml
-
 secretGenerator:
 - name: secrets-env
   envs:
