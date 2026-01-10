@@ -6,9 +6,6 @@ namePrefix: prod-
 resources:
   - ../base
 
-patchesStrategicMerge:
-  - booking-holds-ttl-env.yaml
-
 secretGenerator:
 - name: secrets-env
   envs:
