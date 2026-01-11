@@ -12,7 +12,7 @@ type FakeRepository struct {
 	UpdateError          error
 	FindAllReviewSuccess Reviews
 	FindAllReviewError   error
-	CreateRequestCalled  CreateRequest
+	CreateRequestCalled  ProCreateRequest
 	CreateError          error
 	GetBookingStatusResp StatusResponse
 	GetBookingStatusErr  error
@@ -34,7 +34,7 @@ func (r *FakeRepository) FindAllReview(ctx context.Context, professionalID int64
 	return r.FindAllReviewSuccess, r.FindAllReviewError
 }
 
-func (r *FakeRepository) Create(ctx context.Context, request CreateRequest, pending bool) error {
+func (r *FakeRepository) Create(ctx context.Context, request ProCreateRequest, pending bool) error {
 	r.CreateRequestCalled = request
 	return r.CreateError
 }

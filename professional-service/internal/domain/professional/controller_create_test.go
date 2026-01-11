@@ -17,7 +17,7 @@ func TestCreateProfessional(t *testing.T) {
 			service:     NewService(&FakeRepository{}),
 			userService: &MockUserServiceAlwaysAuthenticated{},
 		}
-		request := CreateRequest{
+		request := ProCreateRequest{
 			Email:     "test@gmail.com",
 			Password:  "",
 			FirstName: "",
@@ -32,7 +32,7 @@ func TestCreateProfessional(t *testing.T) {
 	})
 }
 
-func createRequest(body *CreateRequest) *http.Request {
+func createRequest(body *ProCreateRequest) *http.Request {
 	jsonData, _ := json.Marshal(body)
 	request, _ := http.NewRequest("PUT", "/professional", strings.NewReader(string(jsonData)))
 	return request

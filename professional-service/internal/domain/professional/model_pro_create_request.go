@@ -1,6 +1,6 @@
 package professional
 
-type CreateRequest struct {
+type ProCreateRequest struct {
 	Email           string  `json:"email" validate:"email,required,max=50"`
 	Password        string  `json:"password" validate:"max=50"`
 	FirstName       string  `json:"firstName" validate:"max=50"`

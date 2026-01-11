@@ -38,13 +38,13 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(response))
 }
 
-func parseCreateRequest(r *http.Request) (CreateRequest, error) {
-	request := CreateRequest{}
+func parseCreateRequest(r *http.Request) (ProCreateRequest, error) {
+	request := ProCreateRequest{}
 	if err := utils.ReadJSON(r, &request); err != nil {
-		return CreateRequest{}, err
+		return ProCreateRequest{}, err
 	}
 	if err := utils.Validate(&request); err != nil {
-		return CreateRequest{}, err
+		return ProCreateRequest{}, err
 	}
 	return request, nil
 }
