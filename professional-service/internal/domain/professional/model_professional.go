@@ -20,6 +20,8 @@ type Professional struct {
 	Description     *string        `json:"description,omitempty"`
 	ReviewSize      int64          `json:"reviewSize"`
 	Rating          *string        `json:"rating,omitempty"`
+	SessionLink     *string        `json:"sessionLink,omitempty"`
+	SessionPlatform *string        `json:"sessionPlatform,omitempty"`
 	Availability    Availabilities `json:"availability,omitempty"`
 	Review          Reviews        `json:"reviews,omitempty"`
 	Pending         bool           `json:"-"`

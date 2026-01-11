@@ -22,8 +22,8 @@ func (r *RepositoryImpl) GetBookings(ctx context.Context, id int64, idType profe
 		p.id,
 		p.first_name,
 		p.last_name,
-		p.session_platform,
-		p.session_link,
+		COALESCE(NULLIF(b.session_platform, ''), NULLIF(p.session_platform, '')),
+		COALESCE(NULLIF(b.session_link, ''),     NULLIF(p.session_link, '')),
 
 		u.id,
 		u.first_name,
