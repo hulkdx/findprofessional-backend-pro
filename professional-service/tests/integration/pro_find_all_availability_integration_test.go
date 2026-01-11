@@ -150,7 +150,7 @@ func FindAllAvailabilityProfessionalTest(t *testing.T, db *pgxpool.Pool) {
 		defer d2()
 		d3 := insertUserWithId(t, db, userId)
 		defer d3()
-		bookingId, d4 := insertBooking(t, db, userId, proId, "pending", "", "abc")
+		bookingId, d4 := insertBooking(t, db, userId, proId, "pending", "", "abc", nil, nil)
 		defer d4()
 		d5 := insertBookingItems(t, db, TestBookingItems{BookingID: bookingId, AvailabilityID: avIds[0]})
 		defer d5()
