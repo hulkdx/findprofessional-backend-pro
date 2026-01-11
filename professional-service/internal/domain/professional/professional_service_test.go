@@ -11,7 +11,7 @@ func TestCreate(t *testing.T) {
 	t.Run("should bcrypt password", func(t *testing.T) {
 		// Arrange
 		rawPassword := "password"
-		request := CreateRequest{
+		request := ProCreateRequest{
 			Email:     "test@gmail.com",
 			Password:  rawPassword,
 			FirstName: "",

@@ -23,7 +23,7 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		platform := "meet"
 		link := "https://meet.google.com/abc-defg-hij"
-		bodyRequest := professional.CreateRequest{
+		bodyRequest := professional.ProCreateRequest{
 			Email:           "test@gmail.com",
 			Password:        "P@ssw0rd123",
 			FirstName:       "John",
@@ -58,7 +58,7 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		platform := "meet"
 		link := "https://meet.google.com/abc-defg-hij"
-		bodyRequest := professional.CreateRequest{
+		bodyRequest := professional.ProCreateRequest{
 			Email:           "test@gmail.com",
 			Password:        "P@ssw0rd123",
 			FirstName:       "John",
@@ -95,7 +95,7 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		platform := "meet"
 		link := "https://meet.google.com/abc-defg-hij"
-		bodyRequest := professional.CreateRequest{
+		bodyRequest := professional.ProCreateRequest{
 			Email:           "test@gmail.com",
 			Password:        "P@ssw0rd123",
 			FirstName:       "John",
@@ -133,7 +133,7 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 		// Arrange
 		platform := "meet"
 		link := "https://meet.google.com/abc-defg-hij"
-		bodyRequest := professional.CreateRequest{
+		bodyRequest := professional.ProCreateRequest{
 			Email:           "test@gmail.com",
 			Password:        "P@ssw0rd123",
 			FirstName:       "John",
@@ -168,7 +168,7 @@ func CreateProTest(t *testing.T, db *pgxpool.Pool) {
 	})
 }
 
-func createProRequest(body professional.CreateRequest) *http.Request {
+func createProRequest(body professional.ProCreateRequest) *http.Request {
 	var buf bytes.Buffer
 	json.NewEncoder(&buf).Encode(body)
 	return NewJsonRequest("PUT", "/professional", &buf)

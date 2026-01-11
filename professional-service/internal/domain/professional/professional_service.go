@@ -14,7 +14,7 @@ import (
 type Service interface {
 	FindAll(context.Context) ([]Professional, error)
 	FindById(ctx context.Context, id string) (Professional, error)
-	Create(context.Context, CreateRequest) error
+	Create(context.Context, ProCreateRequest) error
 	Update(ctx context.Context, id string, p UpdateRequest) error
 	FindAllReview(ctx context.Context, professionalId int64, page int, pageSize int) (Reviews, error)
 	GetAvailability(ctx context.Context, professionalId int64) (Availabilities, error)
@@ -39,7 +39,7 @@ func (s *serviceImpl) FindById(ctx context.Context, id string) (Professional, er
 	return s.repository.FindById(ctx, id)
 }
 
-func (s *serviceImpl) Create(ctx context.Context, r CreateRequest) error {
+func (s *serviceImpl) Create(ctx context.Context, r ProCreateRequest) error {
 	pending := true
 	hash, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)
 	if err != nil {

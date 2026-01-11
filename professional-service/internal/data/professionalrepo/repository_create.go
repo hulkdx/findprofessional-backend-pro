@@ -7,7 +7,7 @@ import (
 	"github.com/hulkdx/findprofessional-backend-pro/professional-service/internal/domain/professional"
 )
 
-func (r *RepositoryImpl) Create(ctx context.Context, request professional.CreateRequest, pending bool) error {
+func (r *RepositoryImpl) Create(ctx context.Context, request professional.ProCreateRequest, pending bool) error {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
