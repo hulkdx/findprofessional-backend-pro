@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -48,23 +47,12 @@ func BookingUserTest(t *testing.T, db *pgxpool.Pool) {
 			Pending:       false,
 		})
 		defer d2()
-		bookingID, d3 := insertBooking(t, db, userId, proId, "confirmed", "EUR", "intent-1")
-		defer d3()
-		otherBookingID, d4 := insertBooking(t, db, otherUserId, proId, "pending", "GBP", "intent-2")
-		defer d4()
 		scheduledStart := time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC)
 		scheduledEnd := time.Date(2024, 1, 1, 11, 0, 0, 0, time.UTC)
-		_, err := db.Exec(
-			context.Background(),
-			"UPDATE bookings SET scheduled_start_at=$1, scheduled_end_at=$2 WHERE id IN ($3, $4)",
-			scheduledStart,
-			scheduledEnd,
-			bookingID,
-			otherBookingID,
-		)
-		if err != nil {
-			t.Fatal(err)
-		}
+		bookingID, d3 := insertBooking(t, db, userId, proId, "confirmed", "EUR", "intent-1", &scheduledStart, &scheduledEnd)
+		defer d3()
+		_, d4 := insertBooking(t, db, otherUserId, proId, "pending", "GBP", "intent-2", &scheduledStart, &scheduledEnd)
+		defer d4()
 		request := NewJsonRequest("GET", "/professional/bookings/user", nil)
 		response := httptest.NewRecorder()
 		// Act

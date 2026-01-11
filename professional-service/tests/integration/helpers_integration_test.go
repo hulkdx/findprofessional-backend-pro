@@ -268,7 +268,17 @@ type TestBookingItems struct {
 	AvailabilityID int64
 }
 
-func insertBooking(t *testing.T, pool *pgxpool.Pool, userId, proId int64, status, currency, paymentIntent string) (int64, func()) {
+func insertBooking(
+	t *testing.T,
+	pool *pgxpool.Pool,
+	userId,
+	proId int64,
+	status,
+	currency,
+	paymentIntent string,
+	scheduledStartAt *time.Time,
+	scheduledEndAt *time.Time,
+) (int64, func()) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -279,10 +289,12 @@ func insertBooking(t *testing.T, pool *pgxpool.Pool, userId, proId int64, status
 			total_amount_cents,
 			currency,
 			stripe_payment_intent_id,
+			scheduled_start_at,
+			scheduled_end_at,
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
 		RETURNING id`
 
 	// use some fixed amount for tests, or adjust if you want it parametrized
@@ -296,6 +308,8 @@ func insertBooking(t *testing.T, pool *pgxpool.Pool, userId, proId int64, status
 		totalAmountCents,
 		currency,
 		paymentIntent,
+		scheduledStartAt,
+		scheduledEndAt,
 	).Scan(&id); err != nil {
 		t.Fatalf("failed to insert booking: %v", err)
 	}

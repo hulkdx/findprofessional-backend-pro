@@ -53,6 +53,8 @@ func BookingStatusTest(t *testing.T, db *pgxpool.Pool) {
 			"confirmed",
 			"EUR",
 			"intent-1",
+			nil,
+			nil,
 		)
 		defer d3()
 		response := httptest.NewRecorder()
@@ -89,10 +91,9 @@ func BookingStatusTest(t *testing.T, db *pgxpool.Pool) {
 			},
 		)
 		defer d2()
-		bookingID, d3 := insertBooking(t, db, otherUserId, proId, "confirmed", "EUR", "intent-1")
+		bookingID, d3 := insertBooking(t, db, otherUserId, proId, "confirmed", "EUR", "intent-1", nil, nil)
 		defer d3()
 		response := httptest.NewRecorder()
-		OutputSQL(t, db, "SELECT id FROM users")
 		// Act
 		handler.ServeHTTP(response, NewBookingStatusRequest(bookingID))
 		// Assert
