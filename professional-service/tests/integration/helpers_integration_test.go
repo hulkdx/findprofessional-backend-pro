@@ -81,8 +81,22 @@ func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional)
 	ctx := context.Background()
 
 	query := `INSERT INTO "professionals"
-	(id,"email","password","first_name","last_name","coach_type","price_number","price_currency", "pending", "created_at", "updated_at") VALUES
-	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+	(
+		"id",
+		"email",
+		"password",
+		"first_name",
+		"last_name",
+		"coach_type",
+		"price_number",
+		"price_currency",
+		"pending",
+		"session_platform",
+		"session_link",
+		"created_at",
+		"updated_at"
+	) VALUES
+	($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -100,6 +114,8 @@ func insertPro(t *testing.T, db *pgxpool.Pool, pro ...professional.Professional)
 			p.PriceNumber,
 			p.PriceCurrency,
 			p.Pending,
+			p.SessionPlatform,
+			p.SessionLink,
 			p.CreatedAt,
 			p.UpdatedAt,
 		)
@@ -279,6 +295,34 @@ func insertBooking(
 	scheduledStartAt *time.Time,
 	scheduledEndAt *time.Time,
 ) (int64, func()) {
+	return insertBookingWithSessions(
+		t,
+		pool,
+		userId,
+		proId,
+		status,
+		currency,
+		paymentIntent,
+		scheduledStartAt,
+		scheduledEndAt,
+		nil,
+		nil,
+	)
+}
+
+func insertBookingWithSessions(
+	t *testing.T,
+	pool *pgxpool.Pool,
+	userId,
+	proId int64,
+	status,
+	currency,
+	paymentIntent string,
+	scheduledStartAt *time.Time,
+	scheduledEndAt *time.Time,
+	sessionLink *string,
+	sessionPlatform *string,
+) (int64, func()) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -291,10 +335,12 @@ func insertBooking(
 			stripe_payment_intent_id,
 			scheduled_start_at,
 			scheduled_end_at,
+			session_platform,
+			session_link,
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
 		RETURNING id`
 
 	// use some fixed amount for tests, or adjust if you want it parametrized
@@ -310,6 +356,8 @@ func insertBooking(
 		paymentIntent,
 		scheduledStartAt,
 		scheduledEndAt,
+		sessionPlatform,
+		sessionLink,
 	).Scan(&id); err != nil {
 		t.Fatalf("failed to insert booking: %v", err)
 	}
