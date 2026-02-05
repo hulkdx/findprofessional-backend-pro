@@ -51,3 +51,31 @@ jobs:
         docker push ${API_DOCKER_IMAGE_NAME} &> /dev/null
         docker push ${TTL_DOCKER_IMAGE_NAME} &> /dev/null
 
+    - name: install digital ocean cli
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DO_TOKEN }}
+
+    - name: kubeconfig (DOKS)
+      run: |
+        doctl kubernetes cluster kubeconfig save ${{ secrets.DO_CLUSTER_NAME }} --expiry-seconds 600
+
+    - name: prod deploy
+      run: |
+        base64 --decode <<< ${{ secrets.RSA_PUBLIC_KEY }} > deploy/prod/rsa.public.key
+
+        echo postgres_username=${{ secrets.postgres_username }} >> ./deploy/prod/.env
+        echo postgres_password=${{ secrets.postgres_password }} >> ./deploy/prod/.env
+        echo postgres_url=${{ secrets.postgres_url }} >> ./deploy/prod/.env
+        
+        kubectl apply -k deploy/prod
+
+    - name: cleanup
+      if: always()
+      run: |
+        rm -rf ~/.docker \
+               ~/.kube   \
+               ~/.aws    \
+               ./deploy/prod/rsa.private.key \
+               ./deploy/prod/rsa.public.key \
+               ./deploy/prod/.env
