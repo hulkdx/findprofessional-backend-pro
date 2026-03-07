@@ -4,6 +4,7 @@ name: deploy-to-kubernetes
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   API_DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/ff-pro:v1
