@@ -14,6 +14,7 @@ spec:
       containers:
         - name: professional-service
           image: hulkdx/ff-pro:v1
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           envFrom:
